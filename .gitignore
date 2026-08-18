@@ -26,6 +26,16 @@ dist/
 *.p12
 *.pfx
 
+# ── Database ─────────────────────────────────────────────────────────────
+# Kept out of the repository. Note this means a fresh clone cannot run the
+# README's setup step — schema.sql has to be supplied out of band.
+db/
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+
 # ── Logs ─────────────────────────────────────────────────────────────────
 *.log
 npm-debug.log*
