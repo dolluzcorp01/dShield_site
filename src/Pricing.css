@@ -1,0 +1,119 @@
+.pricing__note { margin: 22px 0 34px; max-width: 720px; }
+
+/* ── the free band ──────────────────────────────────────────────────────
+   Horizontal, above the paid row. Deliberately a different shape from the
+   plan cards so it reads as the starting point rather than a fifth option. */
+.freeband {
+    display: grid;
+    grid-template-columns: minmax(190px, 0.9fr) minmax(0, 1.5fr) auto;
+    gap: 30px;
+    align-items: center;
+    border-color: var(--line-2);
+    margin-bottom: 34px;
+}
+
+.freeband__head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.freeband__name { margin: 0; font-size: 1.1rem; }
+.freeband__price { font-size: 1.9rem; font-weight: 700; letter-spacing: -.03em; color: var(--gold); line-height: 1; }
+.freeband__billing { margin: 6px 0 0; }
+.freeband__tagline { margin: 10px 0 0; font-style: italic; color: var(--gold); font-size: .92rem; }
+
+.freeband__features {
+    list-style: none; padding: 0; margin: 0;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 18px;
+}
+.freeband__features li {
+    display: flex; gap: 9px; align-items: flex-start;
+    font-size: .89rem; color: var(--bone-dim); line-height: 1.45;
+}
+
+.freeband__action { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+.freeband__not { margin: 0; display: flex; gap: 7px; align-items: flex-start; }
+
+.plans__label { margin: 0 0 16px; }
+
+/* ── the paid row ───────────────────────────────────────────────────────
+   Four fixed columns, not auto-fit. With five cards auto-fit wrapped the
+   last one onto its own line; with four it would still wrap the moment a
+   name ran long. minmax(0, 1fr) lets the columns shrink below their content
+   instead of overflowing the wrap. */
+.plans {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    align-items: stretch;
+}
+
+.plan { position: relative; display: flex; flex-direction: column; }
+.plan.is-highlight { border-color: var(--gold); }
+
+.plan__flag {
+    position: absolute; top: -11px; left: 22px;
+    background: var(--gold); color: #14100A;
+    font-family: var(--mono); font-size: .62rem;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 4px; font-weight: 600;
+}
+
+/* Two lines' worth of room, always. "Full Protection + Extended Support"
+   wraps where the other three names do not, and without this its card's
+   price sits a line lower than the rest of the row. */
+.plan__name { margin-bottom: 10px; font-size: 1.1rem; min-height: 2.4em; }
+.plan__price { font-size: 2.1rem; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+.plan.is-highlight .plan__price { color: var(--gold); }
+.plan__billing { margin-top: 4px; }
+
+.plan__tagline {
+    margin: 16px 0; padding: 12px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    font-style: italic; color: var(--gold);
+    font-size: .92rem;
+}
+
+.plan__features { list-style: none; padding: 0; margin: 0 0 20px; flex: 1; }
+.plan__features li {
+    display: flex; gap: 9px; align-items: flex-start;
+    font-size: .89rem; color: var(--bone-dim);
+    margin-bottom: 9px; line-height: 1.45;
+}
+.plan__tick { color: var(--gold); flex-shrink: 0; }
+.plan__cross { color: var(--bone-faint); flex-shrink: 0; }
+.plan__features--not { margin-top: -8px; }
+.plan__features--not li { color: var(--bone-faint); }
+
+.plan__cta { margin-top: auto; }
+
+.notify { margin: 44px 0; }
+.notify__form { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.notify__form .ds-input { flex: 1; min-width: 200px; }
+.notify__tier { max-width: 260px; }
+
+.faq { margin-top: 20px; max-width: 760px; }
+.faq__item { padding: 20px 0; border-bottom: 1px solid var(--line); }
+.faq__item h3 { margin-bottom: 8px; font-size: 1.02rem; }
+.faq__item p { margin: 0; }
+
+/* Four across holds to about 1020px, then folds to two — never three, which
+   leaves an orphan card sitting alone on the second line. */
+@media (max-width: 1020px) {
+    .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .plan__name { min-height: 0; }
+}
+
+@media (max-width: 900px) {
+    .freeband { grid-template-columns: 1fr; gap: 20px; }
+    .freeband__action { align-items: flex-start; }
+    .freeband__action .ds-btn { width: 100%; text-align: center; }
+}
+
+@media (max-width: 640px) {
+    .notify__form { flex-direction: column; }
+    .notify__tier { max-width: none; }
+}
+
+@media (max-width: 560px) {
+    .plans { grid-template-columns: 1fr; }
+    .freeband__features { grid-template-columns: 1fr; }
+}

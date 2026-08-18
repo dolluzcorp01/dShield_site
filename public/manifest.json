@@ -1,10 +1,14 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "dShield",
+  "name": "dShield by Dolluz Corp",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#08090C",
+  "background_color": "#08090C",
   "icons": [
     {
       "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "sizes": "16x16 32x32 48x48",
       "type": "image/x-icon"
     },
     {
@@ -17,9 +21,5 @@
       "type": "image/png",
       "sizes": "512x512"
     }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  ]
 }

@@ -1,25 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
+
+import Navbar from "./Navbar";
+import Home from "./Home";
+import Result from "./Result";
+import Pricing from "./Pricing";
+import { ToolsIndex, ToolPage } from "./Tools";
+import { Contact, HowItWorks, Trust, Footer, NotFound } from "./Pages";
+import "./App.css";
+
+/* Router keeps scroll position between pages, which on a marketing site means
+   arriving halfway down the page you just navigated to. */
+function ScrollToTop() {
+    const { pathname } = useLocation();
+    useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+    return null;
+}
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <div className="app">
+            <ScrollToTop />
+            <Navbar />
+            <main className="app__main">
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/result/:id" element={<Result />} />
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/tools" element={<ToolsIndex />} />
+                    <Route path="/tools/:slug" element={<ToolPage />} />
+                    <Route path="/how-it-works" element={<HowItWorks />} />
+                    <Route path="/trust" element={<Trust />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+            </main>
+            <Footer />
+        </div>
+    );
 }
 
 export default App;

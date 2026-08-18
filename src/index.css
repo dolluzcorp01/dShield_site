@@ -1,13 +1,225 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ─────────────────────────────────────────────────────────────────────────
+   dShield global site — design tokens and base styles.
+
+   Near-black and gold. This is dShield's own identity rather than Dolluz
+   Corp navy and orange: a security product is bought on the feeling that
+   the people behind it are serious, and the palette carries that. The
+   "BY DOLLUZ CORP" lockup in the header is what ties it back to the parent.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+    --ink:        #08090C;   /* page background */
+    --ink-2:      #0D1015;   /* raised surface */
+    --ink-3:      #14181F;   /* card */
+    --line:       #1F252F;   /* hairline border */
+    --line-2:     #2A323E;
+
+    --bone:       #EFEBE2;   /* primary text */
+    --bone-dim:   #A8A79F;   /* secondary text */
+    --bone-faint: #6E7079;   /* tertiary / metadata */
+
+    --gold:       #F5A524;
+    --gold-dim:   #C98416;
+    --gold-glow:  rgba(245, 165, 36, 0.14);
+
+    --critical:   #F0544F;
+    --high:       #F5A524;
+    --medium:     #E5C55B;
+    --low:        #7FA8C9;
+    --pass:       #4FB286;
+
+    --radius:     10px;
+    --radius-lg:  16px;
+
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--bone);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: inherit; text-decoration: none; }
+
+h1, h2, h3, h4 {
+    margin: 0 0 12px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+}
+
+h1 { font-size: clamp(2rem, 5vw, 3.4rem); }
+h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); }
+h3 { font-size: 1.2rem; }
+
+p { margin: 0 0 14px; }
+
+button, input, select, textarea { font-family: inherit; font-size: inherit; }
+
+/* ── layout ─────────────────────────────────────────────────────────── */
+
+.ds-wrap {
+    width: 100%;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.ds-section { padding: 72px 0; }
+.ds-section--tight { padding: 44px 0; }
+
+.ds-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+}
+
+.ds-lead {
+    font-size: 1.12rem;
+    color: var(--bone-dim);
+    max-width: 62ch;
+}
+
+.ds-muted { color: var(--bone-dim); }
+.ds-faint { color: var(--bone-faint); font-size: 0.88rem; }
+
+/* ── buttons ────────────────────────────────────────────────────────── */
+
+.ds-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 24px;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    background: var(--gold);
+    color: #14100A;
+    font-weight: 650;
+    cursor: pointer;
+    transition: transform .12s ease, background .16s ease, opacity .16s ease;
+    white-space: nowrap;
+}
+.ds-btn:hover:not(:disabled) { background: #FFB93C; transform: translateY(-1px); }
+.ds-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.ds-btn--ghost {
+    background: transparent;
+    border-color: var(--line-2);
+    color: var(--bone);
+}
+.ds-btn--ghost:hover:not(:disabled) { background: var(--ink-3); border-color: var(--gold-dim); transform: none; }
+
+.ds-btn--sm { padding: 9px 16px; font-size: 0.9rem; }
+.ds-btn--block { width: 100%; }
+
+/* ── cards ──────────────────────────────────────────────────────────── */
+
+.ds-card {
+    background: var(--ink-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 26px;
+}
+
+.ds-card--flat { background: var(--ink-2); }
+
+/* ── forms ──────────────────────────────────────────────────────────── */
+
+.ds-field { margin-bottom: 16px; }
+
+.ds-label {
+    display: block;
+    font-size: 0.86rem;
+    color: var(--bone-dim);
+    margin-bottom: 6px;
+}
+
+.ds-input {
+    width: 100%;
+    padding: 13px 15px;
+    background: var(--ink-2);
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius);
+    color: var(--bone);
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.ds-input::placeholder { color: var(--bone-faint); }
+.ds-input:focus { border-color: var(--gold-dim); box-shadow: 0 0 0 3px var(--gold-glow); }
+
+textarea.ds-input { resize: vertical; min-height: 110px; }
+
+.ds-error {
+    color: var(--critical);
+    font-size: 0.9rem;
+    margin-top: 8px;
+}
+
+.ds-note {
+    background: var(--gold-glow);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 14px 18px;
+    color: var(--bone);
+    font-size: 0.94rem;
+}
+
+/* ── severity pills ─────────────────────────────────────────────────── */
+
+.ds-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid currentColor;
+}
+.ds-pill--critical { color: var(--critical); }
+.ds-pill--high     { color: var(--high); }
+.ds-pill--medium   { color: var(--medium); }
+.ds-pill--low      { color: var(--low); }
+.ds-pill--pass     { color: var(--pass); }
+
+/* ── utility ────────────────────────────────────────────────────────── */
+
+.ds-grid { display: grid; gap: 20px; }
+.ds-grid--2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.ds-grid--3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.ds-grid--4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+.ds-mono { font-family: var(--mono); }
+.ds-center { text-align: center; }
+
+.ds-spin {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,.2);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: ds-rotate .7s linear infinite;
+}
+@keyframes ds-rotate { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+    .ds-section { padding: 48px 0; }
+    .ds-wrap { padding: 0 18px; }
+    .ds-card { padding: 20px; }
 }

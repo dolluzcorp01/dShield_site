@@ -1,0 +1,80 @@
+require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const path = require("path");
+
+const app = express();
+
+// Hardcoded, and deliberately NOT read from process.env.PORT.
+//
+// react-scripts loads .env into process.env before it starts, and its dev
+// server port is `parseInt(process.env.PORT) || 3000`. A PORT line in .env
+// meant for Express is therefore taken by the React dev server first, which
+// then binds the FRONTEND to the API's port and leaves nothing for the API.
+// Same convention as the sibling dApps: dAdmin 4002, dShield 4008.
+const port = 4008;
+
+// ✅ CORS — explicit allowlist in production; in development also allow any
+// localhost / 127.0.0.1 port so the React dev server on 3000 isn't blocked.
+const isProd = process.env.NODE_ENV === "production";
+
+const allowedOrigins = [
+    'https://dshield.dolluzcorp.com',   // Production URL (this app)
+    'https://dolluzcorp.com',
+];
+
+// A browser cannot forge a localhost Origin from a real site, and this is
+// gated on !isProd, so production stays locked to the allowlist above.
+const isLocalhostOrigin = (origin) =>
+    /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);   // same-origin / server-to-server / health checks
+        const clean = origin.replace(/\/$/, '');
+        if (allowedOrigins.includes(clean)) return callback(null, true);
+        if (!isProd && isLocalhostOrigin(clean)) return callback(null, true);
+        console.error("❌ Blocked by CORS:", origin);
+        return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    exposedHeaders: ["Content-Disposition"],
+}));
+
+// ✅ Middleware for parsing JSON and reading HTTP-only cookies
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.use(cookieParser());
+
+// Behind nginx in production, req.ip is the proxy unless we trust it. The
+// scan limiter is per IP, so without this every visitor shares one bucket
+// and the first dozen scans of the hour lock out everybody else.
+if (isProd) app.set("trust proxy", 1);
+
+// Routes
+const ScanRoutes = require('./src/backend_routes/Scan_server');
+const ToolsRoutes = require('./src/backend_routes/Tools_server');
+const LeadRoutes = require('./src/backend_routes/Lead_server');
+
+app.use("/api/scan", ScanRoutes);
+app.use("/api/tools", ToolsRoutes);
+app.use("/api/leads", LeadRoutes);
+
+// Health check — used by the deploy script and by uptime monitoring.
+app.get("/api/health", (req, res) => {
+    res.json({ ok: true, app: "dshield-global", time: new Date().toISOString() });
+});
+
+// Serve the built React app in production. In development the React dev
+// server runs separately on 3000 and proxies here.
+if (isProd) {
+    const build = path.join(__dirname, "build");
+    app.use(express.static(build));
+    app.get(/^\/(?!api\/).*/, (req, res) => res.sendFile(path.join(build, "index.html")));
+}
+
+app.listen(port, () => {
+    console.log(`🚀 Server running at http://localhost:${port}`);
+});

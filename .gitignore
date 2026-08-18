@@ -1,23 +1,55 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
+# ── Dependencies ─────────────────────────────────────────────────────────
+node_modules/
 /.pnp
 .pnp.js
 
-# testing
-/coverage
+# ── Build output ─────────────────────────────────────────────────────────
+build/
+dist/
+.cache/
+.eslintcache
 
-# production
-/build
-
-# misc
-.DS_Store
+# ── Environment & secrets ────────────────────────────────────────────────
+# .env holds DB credentials. .env.example is committed as the template and
+# must never contain a real password.
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*.local
 
+# Keys and certificates. This project reads TLS certs from remote hosts and
+# should never carry one of its own into the repository.
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ── Logs ─────────────────────────────────────────────────────────────────
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
+logs/
+
+# ── Testing ──────────────────────────────────────────────────────────────
+coverage/
+
+# ── Editors ──────────────────────────────────────────────────────────────
+# .vscode is shared on purpose: launch.json makes F5 start the API rather
+# than whatever file happens to be open, and settings.json pins tab width
+# and EOL so the team's diffs stay clean.
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS ───────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
