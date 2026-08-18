@@ -27,14 +27,14 @@ dist/
 *.pfx
 
 # ── Database ─────────────────────────────────────────────────────────────
-# Kept out of the repository. Note this means a fresh clone cannot run the
-# README's setup step — schema.sql has to be supplied out of band.
-db/
-*.sql
+# Schema IS committed. It carries no credentials, and schema changes are
+# exactly the kind that benefit from review and history.
+# Dumps and local database files are not.
 *.sqlite
 *.sqlite3
 *.db
 *.dump
+*.backup
 
 # ── Logs ─────────────────────────────────────────────────────────────────
 *.log
