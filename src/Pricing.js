@@ -150,8 +150,9 @@ function Pricing() {
                     <>
                         <h2>You are on the list</h2>
                         <p className="ds-muted" style={{ marginBottom: 0 }}>
-                            We will write the moment reports open. In the meantime the free scan and
-                            all five tools are yours to use as often as you like.
+                            A confirmation email is on its way. We will write again the moment
+                            reports open. In the meantime the free scan and all five tools are
+                            yours to use as often as you like.
                         </p>
                     </>
                 ) : (

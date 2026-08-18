@@ -36,6 +36,7 @@ accounts. The free scan and all five tools use only DNS, TLS and HTTP.
 # 1 — database
 mysql -u root -p < db/schema.sql
 mysql -u root -p < db/schema-legal.sql   # must run after schema.sql
+mysql -u root -p < db/schema-mail.sql    # must run after schema-legal.sql
 
 # 2 — configure
 #     open .env and set DB_PASSWORD

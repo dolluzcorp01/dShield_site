@@ -16,6 +16,22 @@ const express = require("express");
 const crypto = require("crypto");
 const getDBConnection = require("../../config/db");
 const { isSuppressed } = require("../utils/suppression");
+const { queueMail } = require("../utils/mail");
+
+/* Service slugs, mirrored from SERVICE_LABELS in src/Pages.js. Kept here so
+   an enquiry alert reads "Penetration Testing" rather than
+   "penetration-testing" — whoever picks it up should not have to decode a
+   URL slug. */
+const TOPIC_LABELS = {
+    "technical-assurance": "Technical Assurance",
+    "third-party-risk-management": "Third-Party Risk Management",
+    "soc-setup-monitoring": "SOC Setup & Monitoring",
+    "incident-response-forensics": "Incident Response & Forensics",
+    "penetration-testing": "Penetration Testing",
+    "continuous-grc": "Continuous GRC",
+    "standards-compliance-audits": "Standards & Compliance Audits",
+};
+const labelForTopic = (slug) => (slug ? (TOPIC_LABELS[slug] || slug) : null);
 
 const router = express.Router();
 const db = getDBConnection(process.env.DB_NAME || "dshield");
@@ -60,10 +76,41 @@ router.post("/enquiry", (req, res) => {
             console.error("❌ Enquiry could not be stored:", err.sqlMessage || err.message);
             return res.status(500).json({ success: false, message: "We could not record that. Please try again." });
         }
-        /* No email is sent yet — SendGrid is not wired on this app. The row is
-           the record, and it must be visible in the console. An enquiry that
-           reaches nobody is worse than one that was never made, because the
-           person is waiting. */
+
+        /* Two messages: an acknowledgement to them, and an alert to us.
+           Both go through the outbox rather than to SendGrid directly, so a
+           provider outage cannot lose them.
+
+           Neither is allowed to affect the response. The enquiry is stored,
+           which is the part that matters to the visitor — if queueing fails
+           we log it and still say thank you. */
+        const payload = {
+            name: row.name, email: row.email, company: row.company, phone: row.phone,
+            domain: row.domain, tier: clean(req.body?.tier, 40),
+            topicLabel: labelForTopic(clean(req.body?.topic, 40)),
+            message: row.message,
+            receivedAt: new Date().toISOString().replace("T", " ").slice(0, 19) + " UTC",
+        };
+
+        queueMail(db, {
+            to: row.email, template: "enquiry_ack", category: "transactional",
+            subject: "We have your message — Dolluz Corp", payload,
+        }, (qErr) => { if (qErr) console.error("⚠️  Could not queue enquiry acknowledgement:", qErr.message); });
+
+        const alertTo = String(process.env.ENQUIRY_ALERT_TO || "").trim();
+        if (alertTo) {
+            queueMail(db, {
+                to: alertTo, template: "enquiry_alert", category: "internal",
+                subject: `Enquiry from ${payload.name || payload.email} — ${payload.topicLabel || payload.tier || "general"}`,
+                payload,
+            }, (qErr) => { if (qErr) console.error("⚠️  Could not queue enquiry alert:", qErr.message); });
+        } else {
+            // Louder than a shrug: with no address set, nobody is told an
+            // enquiry arrived, which is the exact failure this task exists
+            // to fix.
+            console.error("⚠️  ENQUIRY_ALERT_TO is not set — nobody will be notified of this enquiry.");
+        }
+
         res.json({
             success: true,
             message: "Thank you. We have your enquiry and someone will be in touch.",
@@ -111,7 +158,34 @@ router.post("/notify", (req, res) => {
                     console.error("❌ Notify signup failed:", err.sqlMessage || err.message);
                     return res.status(500).json({ success: false, message: "We could not record that. Please try again." });
                 }
+
+                /* Answer the visitor first. Everything below is bookkeeping
+                   and must not delay or endanger the response. */
                 res.json({ success: true, message: "You are on the list. We will write when reports open." });
+
+                /* Read the token BACK rather than using the one generated
+                   above. On the duplicate-key path COALESCE keeps whatever
+                   token the row already had, so the value we just generated
+                   may not be the one stored — and an unsubscribe link built
+                   from a token that is not in the database is a link that
+                   cannot work. */
+                db.query(
+                    "SELECT unsubscribe_token FROM leads WHERE email = ? LIMIT 1",
+                    [address],
+                    (tErr, rows) => {
+                        if (tErr || !rows || !rows.length) {
+                            return console.error("⚠️  Could not read unsubscribe token, confirmation not queued:",
+                                tErr ? (tErr.sqlMessage || tErr.message) : "no row");
+                        }
+                        queueMail(db, {
+                            to: address,
+                            template: "notify_confirm",
+                            category: "marketing",
+                            subject: "You are on the list — dShield",
+                            payload: { unsubscribeToken: rows[0].unsubscribe_token },
+                        }, (qErr) => { if (qErr) console.error("⚠️  Could not queue notify confirmation:", qErr.message); });
+                    }
+                );
             }
         );
     });

@@ -4,6 +4,7 @@
   "private": true,
   "description": "dShield global site — free scan, free tools, pricing. Dolluz Corp.",
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

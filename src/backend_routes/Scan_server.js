@@ -18,6 +18,7 @@ const crypto = require("crypto");
 const getDBConnection = require("../../config/db");
 const { runScan } = require("../utils/scan_engine");
 const { isSuppressed } = require("../utils/suppression");
+const { queueMail } = require("../utils/mail");
 
 const router = express.Router();
 const db = getDBConnection(process.env.DB_NAME || "dshield");
@@ -183,6 +184,34 @@ router.post("/", async (req, res) => {
     }
 
     res.json({ success: true, scanId, result });
+
+    /* Queue the result email AFTER responding. The scan is what they came
+       for and must never wait on the mail table.
+
+       TRANSACTIONAL, deliberately: they typed their address into a box that
+       offered to send them this result, in this moment. Suppression governs
+       the mailing list, not a receipt somebody asked for — see the category
+       note in db/schema-mail.sql.
+
+       The payload carries the grade, score and counts only. No finding
+       titles and no evidence: the same paywall applies in email as on the
+       page, and an email is rather more likely to be forwarded. */
+    if (row.visitor_email) {
+        queueMail(db, {
+            to: row.visitor_email,
+            template: "scan_result",
+            category: "transactional",
+            subject: `Your dShield scan of ${result.domain}`,
+            payload: {
+                domain: result.domain,
+                grade: result.grade,
+                score: result.score,
+                counts: result.counts,
+                passedCount: result.passedCount,
+                scanId,
+            },
+        }, (qErr) => { if (qErr) console.error("⚠️  Could not queue scan result email:", qErr.message); });
+    }
 });
 
 // ── GET /api/scan/:id ────────────────────────────────────────────────────

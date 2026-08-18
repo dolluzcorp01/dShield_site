@@ -110,6 +110,22 @@ if (isProd) {
     });
 }
 
+/* Mail worker.
+ *
+ * Runs IN-PROCESS, which is only correct because this site is a single
+ * instance. Under PM2 cluster mode four processes would each poll
+ * mail_outbox on the same schedule and every message would go out four
+ * times. If that day comes the fix is a lock or one dedicated worker
+ * process — not a shorter interval. See the header of
+ * src/workers/mail-worker.js. */
+if (String(process.env.MAIL_WORKER_ENABLED || "").toLowerCase() === "true") {
+    const { startMailWorker } = require("./src/workers/mail-worker");
+    const getDBConnection = require("./config/db");
+    startMailWorker(getDBConnection(process.env.DB_NAME || "dshield"));
+} else {
+    console.log("✉️  Mail worker disabled (MAIL_WORKER_ENABLED is not 'true'). Messages will queue.");
+}
+
 app.listen(port, () => {
     console.log(`🚀 Server running at http://localhost:${port}`);
 });
