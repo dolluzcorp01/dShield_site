@@ -17,6 +17,7 @@ const express = require("express");
 const crypto = require("crypto");
 const getDBConnection = require("../../config/db");
 const { runScan } = require("../utils/scan_engine");
+const { isSuppressed } = require("../utils/suppression");
 
 const router = express.Router();
 const db = getDBConnection(process.env.DB_NAME || "dshield");
@@ -141,21 +142,44 @@ router.post("/", async (req, res) => {
         if (err) console.error("⚠️  Scan ran but could not be stored:", err.sqlMessage || err.message);
     });
 
-    // Lead capture, if they offered an address. Same rule: a failure here
-    // must never cost them the check they came for.
+    /* Lead capture, if they offered an address. Same rule: a failure here
+       must never cost them the check they came for.
+
+       Note what is NOT gated on suppression: `scans.visitor_email` above.
+       They typed that address into a box offering to send them this result.
+       It is the record of what happened and a transactional address, not a
+       marketing subscription, and erasing it would leave a scan nobody can
+       be told about. Suppression governs the mailing list, not the receipt.
+
+       The `leads` row is a different thing, and it is gated. Someone who has
+       unsubscribed and later runs a scan must not be quietly re-subscribed
+       by it — an unsubscribe that only holds until the next form is not an
+       unsubscribe. */
     if (row.visitor_email) {
-        db.query(
-            `INSERT INTO leads (email, name, company, domain, source, scan_id)
-             VALUES (?, ?, ?, ?, 'free_scan', ?)
-             ON DUPLICATE KEY UPDATE
-               name = COALESCE(VALUES(name), name),
-               company = COALESCE(VALUES(company), company),
-               domain = VALUES(domain),
-               scan_id = VALUES(scan_id),
-               updated_at = CURRENT_TIMESTAMP`,
-            [row.visitor_email, name || null, company || null, result.domain, scanId],
-            (err) => { if (err) console.error("⚠️  Lead capture failed:", err.sqlMessage || err.message); }
-        );
+        isSuppressed(db, row.visitor_email, (supErr, suppressed) => {
+            /* Fail closed. If we could not confirm they are NOT suppressed,
+               do not write the lead. A lead we failed to capture is
+               recoverable — they are in `scans` either way. Email sent to
+               someone who asked us to stop is not. */
+            if (supErr) {
+                console.error("⚠️  Suppression check failed, lead not captured:", supErr.sqlMessage || supErr.message);
+                return;
+            }
+            if (suppressed) return;
+
+            db.query(
+                `INSERT INTO leads (email, name, company, domain, source, scan_id)
+                 VALUES (?, ?, ?, ?, 'free_scan', ?)
+                 ON DUPLICATE KEY UPDATE
+                   name = COALESCE(VALUES(name), name),
+                   company = COALESCE(VALUES(company), company),
+                   domain = VALUES(domain),
+                   scan_id = VALUES(scan_id),
+                   updated_at = CURRENT_TIMESTAMP`,
+                [row.visitor_email, name || null, company || null, result.domain, scanId],
+                (err) => { if (err) console.error("⚠️  Lead capture failed:", err.sqlMessage || err.message); }
+            );
+        });
     }
 
     res.json({ success: true, scanId, result });

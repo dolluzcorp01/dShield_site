@@ -17,8 +17,8 @@
 // ─────────────────────────────────────────────────────────────────────────
 
 const express = require("express");
-const crypto = require("crypto");
 const getDBConnection = require("../../config/db");
+const { emailHash } = require("../utils/suppression");
 
 const db = getDBConnection(process.env.DB_NAME || "dshield");
 
@@ -29,11 +29,6 @@ const clean = (v, max) => (v === undefined || v === null) ? null : String(v).tri
 // matched constant is what reaches SQL — the value from the URL is passed as
 // a bound parameter and never interpolated.
 const DOC_KEYS = ["terms", "privacy", "refunds", "cookies"];
-
-/** SHA-256 of the lowercased, trimmed address. The only form we ever store. */
-function emailHash(email) {
-    return crypto.createHash("sha256").update(String(email).trim().toLowerCase()).digest("hex");
-}
 
 /**
  * Mask an address for display: sh•••@dolluzcorp.com

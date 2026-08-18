@@ -15,16 +15,13 @@
 const express = require("express");
 const crypto = require("crypto");
 const getDBConnection = require("../../config/db");
+const { isSuppressed } = require("../utils/suppression");
 
 const router = express.Router();
 const db = getDBConnection(process.env.DB_NAME || "dshield");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const clean = (v, max) => (v === undefined || v === null) ? null : String(v).trim().slice(0, max) || null;
-
-/** SHA-256 of the lowercased address — the only form the suppression list holds. */
-const emailHash = (email) =>
-    crypto.createHash("sha256").update(String(email).trim().toLowerCase()).digest("hex");
 
 // ── POST /api/leads/enquiry ──────────────────────────────────────────────
 router.post("/enquiry", (req, res) => {
@@ -74,40 +71,36 @@ router.post("/notify", (req, res) => {
        suppression list — that would let anyone test whether a given address
        had ever unsubscribed, which is nobody's business but theirs. The
        response is the ordinary one, and no row is written. */
-    db.query(
-        "SELECT 1 FROM email_suppression WHERE email_hash = ? LIMIT 1",
-        [emailHash(address)],
-        (supErr, supRows) => {
-            if (supErr) {
-                console.error("❌ Suppression check failed:", supErr.sqlMessage || supErr.message);
-                return res.status(500).json({ success: false, message: "We could not record that. Please try again." });
-            }
-            if (supRows && supRows.length) {
-                return res.json({ success: true, message: "You are on the list. We will write when reports open." });
-            }
-
-            db.query(
-                `INSERT INTO leads (email, name, company, domain, source, tier_interest, unsubscribe_token)
-                 VALUES (?, ?, ?, ?, 'notify_me', ?, ?)
-                 ON DUPLICATE KEY UPDATE
-                   tier_interest = VALUES(tier_interest),
-                   -- Keep the token already printed in an email they may still
-                   -- have. Reissuing it would break every unsubscribe link we
-                   -- have ever sent this person.
-                   unsubscribe_token = COALESCE(unsubscribe_token, VALUES(unsubscribe_token)),
-                   updated_at = CURRENT_TIMESTAMP`,
-                [address, clean(req.body?.name, 120), clean(req.body?.company, 160),
-                 clean(req.body?.domain, 253), clean(req.body?.tier, 40), crypto.randomUUID()],
-                (err) => {
-                    if (err) {
-                        console.error("❌ Notify signup failed:", err.sqlMessage || err.message);
-                        return res.status(500).json({ success: false, message: "We could not record that. Please try again." });
-                    }
-                    res.json({ success: true, message: "You are on the list. We will write when reports open." });
-                }
-            );
+    isSuppressed(db, address, (supErr, suppressed) => {
+        if (supErr) {
+            console.error("❌ Suppression check failed:", supErr.sqlMessage || supErr.message);
+            return res.status(500).json({ success: false, message: "We could not record that. Please try again." });
         }
-    );
+        if (suppressed) {
+            return res.json({ success: true, message: "You are on the list. We will write when reports open." });
+        }
+
+        db.query(
+            `INSERT INTO leads (email, name, company, domain, source, tier_interest, unsubscribe_token)
+             VALUES (?, ?, ?, ?, 'notify_me', ?, ?)
+             ON DUPLICATE KEY UPDATE
+               tier_interest = VALUES(tier_interest),
+               -- Keep the token already printed in an email they may still
+               -- have. Reissuing it would break every unsubscribe link we
+               -- have ever sent this person.
+               unsubscribe_token = COALESCE(unsubscribe_token, VALUES(unsubscribe_token)),
+               updated_at = CURRENT_TIMESTAMP`,
+            [address, clean(req.body?.name, 120), clean(req.body?.company, 160),
+             clean(req.body?.domain, 253), clean(req.body?.tier, 40), crypto.randomUUID()],
+            (err) => {
+                if (err) {
+                    console.error("❌ Notify signup failed:", err.sqlMessage || err.message);
+                    return res.status(500).json({ success: false, message: "We could not record that. Please try again." });
+                }
+                res.json({ success: true, message: "You are on the list. We will write when reports open." });
+            }
+        );
+    });
 });
 
 // ── GET /api/leads/pricing ───────────────────────────────────────────────
