@@ -149,10 +149,9 @@ Do not add these. Their absence is the plan, not an oversight.
 - **Two checks need outbound access** some networks block: `crt.sh` and
   `api.pwnedpasswords.com`. Both degrade to inconclusive, never to a false
   pass.
-- **`db/` is currently gitignored**, which means a fresh clone cannot run the
-  README setup. If that is not intentional, un-ignore `db/*.sql` — a schema
-  carries no credentials and schema changes are exactly the kind that benefit
-  from review.
+- **`db/*.sql` is committed.** The schema carries no credentials, and schema
+  changes are exactly the kind that benefit from review and history. Dumps
+  and local database files stay ignored.
 
 ---
 
