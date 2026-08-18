@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import { apiGet } from "./utils/api";
 import "./Result.css";
+import { useDocumentMeta } from "./utils/meta";
 
 const GRADE_WORD = {
     A: "Strong", B: "Good", C: "Mixed", D: "Weak", E: "Poor",
@@ -17,6 +18,16 @@ function Result() {
     const [result, setResult] = useState(location.state?.result || null);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(!location.state?.result);
+
+    /* noindex, and a GENERIC title with no domain in it.
+       A result is an assessment of somebody else's company and often carries
+       a poor grade. Letting Google index "acme.com — Grade D" would publish a
+       security assessment of a third party under our name. */
+    useDocumentMeta({
+        title: "Scan Result | dShield",
+        description: "A dShield free security scan result.",
+        noindex: true,
+    });
 
     useEffect(() => {
         if (result) return;

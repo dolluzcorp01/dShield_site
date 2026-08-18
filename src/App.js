@@ -27,6 +27,11 @@ function App() {
             <ScrollToTop />
             <Navbar />
             <main className="app__main">
+                {/* ⚠️  A NEW ROUTE MUST ALSO BE ADDED TO src/utils/routes.js.
+                    That list is what server.js uses to decide 200 vs 404 in
+                    production. A route added here and forgotten there still
+                    renders perfectly for a person — it just carries a 404
+                    status, so crawlers drop it and nobody notices. */}
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/result/:id" element={<Result />} />

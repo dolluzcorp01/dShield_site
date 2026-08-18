@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./Services.css";
+import { useDocumentMeta } from "./utils/meta";
 
 /* ─────────────────────────────────────────────────────────────────────────
    The gap argument, as a standalone page.
@@ -28,6 +29,12 @@ const CONNECT = [
 ];
 
 function Coverage() {
+    useDocumentMeta({
+        title: "What a Security Scan Cannot See | dShield",
+        description: "A scan reaches five of twenty-three risk domains. See what the other eighteen cover, and which six open when you connect a system.",
+        canonical: "/coverage",
+    });
+
     return (
         <div className="coverage">
             <section className="ds-wrap ds-section">

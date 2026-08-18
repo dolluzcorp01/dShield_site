@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { apiGet, apiPost } from "./utils/api";
 import "./Legal.css";
+import { useDocumentMeta } from "./utils/meta";
 
 /* ─────────────────────────────────────────────────────────────────────────
    Legal documents.
@@ -32,6 +33,12 @@ const formatDate = (v) => {
 /* ── The index ───────────────────────────────────────────────────────── */
 
 export function LegalIndex() {
+    useDocumentMeta({
+        title: "Legal Documents | dShield",
+        description: "Terms of Service, Privacy Notice, Refund Policy and Cookie Notice.",
+        canonical: "/legal",
+    });
+
     const [docs, setDocs] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
@@ -90,6 +97,14 @@ export function Legal() {
     const [doc, setDoc] = useState(null);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
+
+    useDocumentMeta({
+        title: doc ? `${doc.title} | dShield` : "Legal Documents | dShield",
+        description: doc
+            ? `${doc.title} for dShield, by Dolluz Corp.`
+            : "Terms of Service, Privacy Notice, Refund Policy and Cookie Notice.",
+        canonical: `/legal/${key}`,
+    });
 
     useEffect(() => {
         setLoading(true); setError(""); setDoc(null);
@@ -161,6 +176,12 @@ const REQUEST_TYPES = [
 ];
 
 export function DataRequest() {
+    useDocumentMeta({
+        title: "Ask About Your Data | dShield",
+        description: "Ask what we hold about you, ask for it to be corrected, or ask for it to be erased.",
+        noindex: true,
+    });
+
     const [form, setForm] = useState({ email: "", request_type: "access", details: "" });
     const [busy, setBusy] = useState(false);
     const [sent, setSent] = useState(false);

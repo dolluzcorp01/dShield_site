@@ -2,37 +2,48 @@ import React, { useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { apiPost, apiFetch } from "./utils/api";
 import "./Tools.css";
+import { useDocumentMeta, SITE_URL } from "./utils/meta";
 
 /* Each tool is its own page and its own front door. Not a dropdown:
    somebody searching "can people fake email from my domain" should land on a
    page that answers exactly that, and leave knowing our name. */
 const TOOLS = [
     {
-        slug: "email-spoofing", name: "Email Spoofing Test", endpoint: "/api/tools/email-spoofing",
+        slug: "email-spoofing",
+        seoTitle: "Email Spoofing Test \u2014 Can Anyone Fake Your Email? | dShield",
+        seoDescription: "Free SPF, DKIM, DMARC and MTA-STS check. Find out in seconds whether someone can send email that appears to come from your domain.", name: "Email Spoofing Test", endpoint: "/api/tools/email-spoofing",
         blurb: "Can anyone send email that looks like it came from you?",
         detail: "Checks SPF, DKIM, DMARC and MTA-STS — the records that tell the rest of the world which servers may send mail using your name.",
         input: "domain",
     },
     {
-        slug: "ssl", name: "SSL / TLS Test", endpoint: "/api/tools/ssl",
+        slug: "ssl",
+        seoTitle: "Free SSL / TLS Certificate Test | dShield",
+        seoDescription: "Check your certificate's expiry, issuer, chain and protocol the way a browser does. Free, instant, no sign-up.", name: "SSL / TLS Test", endpoint: "/api/tools/ssl",
         blurb: "Is your encryption valid, current, and trusted?",
         detail: "Reads your certificate the way a browser does: who issued it, what it covers, when it expires, and which protocol you negotiate.",
         input: "domain",
     },
     {
-        slug: "headers", name: "Security Headers Test", endpoint: "/api/tools/headers",
+        slug: "headers",
+        seoTitle: "Free Security Headers Test | dShield",
+        seoDescription: "Check HSTS, Content Security Policy, frame protection and cookie flags on your website. See what your pages tell browsers about protecting visitors.", name: "Security Headers Test", endpoint: "/api/tools/headers",
         blurb: "Are your pages telling browsers how to protect your visitors?",
         detail: "Six headers and your cookie flags. Missing ones are the difference between an injected script being blocked and being executed.",
         input: "domain",
     },
     {
-        slug: "lookalike", name: "Lookalike Domain Check", endpoint: "/api/tools/lookalike",
+        slug: "lookalike",
+        seoTitle: "Lookalike Domain Check \u2014 Find Fake Versions of Your Domain | dShield",
+        seoDescription: "Find misspellings of your domain that are registered, and which of them have mail servers configured and can send invoices today.", name: "Lookalike Domain Check", endpoint: "/api/tools/lookalike",
         blurb: "Which misspellings of your domain can send invoices today?",
         detail: "A registered typo is a nuisance. One with mail servers configured is an invoice-fraud campaign waiting to be sent.",
         input: "domain",
     },
     {
-        slug: "password", name: "Password Exposure Check", endpoint: null,
+        slug: "password",
+        seoTitle: "Free Password Exposure Check \u2014 Has Yours Been Breached? | dShield",
+        seoDescription: "Check whether a password appears in known data breaches. Your password never leaves your browser \u2014 only five characters of its hash are sent.", name: "Password Exposure Check", endpoint: null,
         blurb: "Has this password appeared in a known breach?",
         detail: "Your password never leaves your browser. It is hashed here, and only the first five characters of that hash are ever sent.",
         input: "password",
@@ -308,6 +319,12 @@ function DomainTool({ tool }) {
 /* ── Pages ────────────────────────────────────────────────────────────── */
 
 export function ToolsIndex() {
+    useDocumentMeta({
+        title: "Five Free Security Tools | dShield",
+        description: "Check email spoofing, SSL certificates, security headers, lookalike domains and password exposure. Free, unlimited, no login.",
+        canonical: "/tools",
+    });
+
     return (
         <div className="ds-wrap ds-section">
             <p className="ds-eyebrow">Free forever · No login · No card</p>
@@ -336,6 +353,15 @@ export function ToolPage() {
     const navigate = useNavigate();
     const tool = TOOLS.find((t) => t.slug === slug);
 
+    // An unknown slug renders the not-found card. noindex so a mistyped tool
+    // URL cannot be indexed as if it were a real page.
+    useDocumentMeta({
+        title: tool ? tool.seoTitle : "Free Security Tools | dShield",
+        description: tool ? tool.seoDescription : "Five free security tools from dShield.",
+        canonical: tool ? `/tools/${tool.slug}` : "/tools",
+        noindex: !tool,
+    });
+
     if (!tool) {
         return (
             <div className="ds-wrap ds-section ds-center">
@@ -350,6 +376,22 @@ export function ToolPage() {
             <Link to="/tools" className="ds-faint">← All tools</Link>
             <h1 style={{ marginTop: 14 }}>{tool.name}</h1>
             <p className="ds-lead">{tool.detail}</p>
+
+            {/* Factual only. No aggregateRating and no review count —
+                inventing ratings is dishonest and a manual-action risk. */}
+            <script type="application/ld+json">
+                {JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "WebApplication",
+                    name: tool.name,
+                    description: tool.seoDescription,
+                    applicationCategory: "SecurityApplication",
+                    operatingSystem: "Any",
+                    url: `${SITE_URL}/tools/${tool.slug}`,
+                    offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+                    provider: { "@type": "Organization", name: "Dolluz Corp" },
+                })}
+            </script>
 
             <div style={{ marginTop: 30 }}>
                 {tool.input === "password" ? <PasswordTool /> : <DomainTool tool={tool} />}

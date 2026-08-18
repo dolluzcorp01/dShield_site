@@ -2,8 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiGet, apiPost } from "./utils/api";
 import "./Pricing.css";
+import { useDocumentMeta } from "./utils/meta";
 
 function Pricing() {
+    useDocumentMeta({
+        title: "Pricing — Security Assessment Reports | dShield",
+        description: "From a free grade to full remediation. See what each level covers, what a report contains, and where the free scan stops.",
+        canonical: "/pricing",
+    });
+
     const [plans, setPlans] = useState([]);
     const [note, setNote] = useState("");
     const [loading, setLoading] = useState(true);

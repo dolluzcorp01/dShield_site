@@ -1,2 +1,14 @@
+# Scan results are about somebody else's company and often carry a poor
+# grade. Indexing "acme.com — Grade D" would publish a security assessment of
+# a third party under our name. Preferences and data requests are personal.
+#
+# These mirror the noindex tags set in the app. Both are needed: robots.txt
+# stops the crawl, noindex stops indexing if the page is reached another way.
+
 User-agent: *
 Allow: /
+Disallow: /result/
+Disallow: /preferences/
+Disallow: /data-request
+
+Sitemap: https://dshield.dolluzcorp.com/sitemap.xml

@@ -71,6 +71,11 @@ app.use("/api/legal", legalRouter);
 app.use("/api/preferences", preferencesRouter);
 app.use("/api/data-request", dataRequestRouter);
 
+// Mounted here, before the static and SPA-fallback block below. After them,
+// express.static would miss it and the fallback would answer with index.html.
+const SitemapRoutes = require('./src/backend_routes/Sitemap_server');
+app.use("/sitemap.xml", SitemapRoutes);
+
 // Health check — used by the deploy script and by uptime monitoring.
 app.get("/api/health", (req, res) => {
     res.json({ ok: true, app: "dshield-global", time: new Date().toISOString() });
@@ -80,8 +85,29 @@ app.get("/api/health", (req, res) => {
 // server runs separately on 3000 and proxies here.
 if (isProd) {
     const build = path.join(__dirname, "build");
+    const { isKnownRoute } = require("./src/utils/routes");
+
     app.use(express.static(build));
-    app.get(/^\/(?!api\/).*/, (req, res) => res.sendFile(path.join(build, "index.html")));
+
+    /* SPA fallback, with an honest status code.
+     *
+     * Previously every path returned 200 and let React render NotFound. To a
+     * person that looks right; to a crawler it is a "soft 404" — the server
+     * said the page exists and is healthy, so every typo and every stale link
+     * anyone ever posts becomes an indexed page, diluting the ranking of the
+     * pages that matter.
+     *
+     * The fix is the status, not the body. index.html is still served either
+     * way, so React still renders a proper NotFound page rather than a bare
+     * error. The difference is invisible to a person and decisive for a
+     * crawler.
+     *
+     * Known paths live in src/utils/routes.js — add new routes there as well
+     * as in src/App.js. */
+    app.get(/^\/(?!api\/).*/, (req, res) => {
+        const status = isKnownRoute(req.path) ? 200 : 404;
+        res.status(status).sendFile(path.join(build, "index.html"));
+    });
 }
 
 app.listen(port, () => {

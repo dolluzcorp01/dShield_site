@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { apiPost } from "./utils/api";
 import "./Home.css";
+import { useDocumentMeta } from "./utils/meta";
 
 /* The five things a free scan actually looks at.
    These must stay in step with the eight checks in scan_engine.js. A site
@@ -17,6 +18,12 @@ const PROMISED = [
 ];
 
 function Home() {
+    useDocumentMeta({
+        title: "Free Security Scan — See What an Attacker Sees | dShield",
+        description: "Check your company's security from the outside in under a minute. Email spoofing, certificates, exposed files and lookalike domains. No sign-up, no card.",
+        canonical: "/",
+    });
+
     const [domain, setDomain] = useState("");
     const [email, setEmail] = useState("");
     const [busy, setBusy] = useState(false);

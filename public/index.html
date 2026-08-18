@@ -4,8 +4,39 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#08090C" />
+
+    <!-- ─────────────────────────────────────────────────────────────────
+         STATIC FALLBACK. Deliberately generic, describing the whole site
+         rather than the homepage.
+
+         React sets per-route <title>, description and canonical on mount
+         (src/utils/meta.js), and Google runs JavaScript so it sees those.
+         Most social preview crawlers — WhatsApp, Slack, LinkedIn, Twitter —
+         do NOT: they read this raw HTML and never execute anything. So
+         every link anyone shares, of any page, previews with what is below.
+
+         Genuine per-page previews need server-rendered tags. Until then,
+         these must read sensibly for any page on the site.
+         ───────────────────────────────────────────────────────────────── -->
     <meta name="description"
-          content="dShield checks what an attacker can see of your company from the outside — email security, certificates, exposed files and lookalike domains. Free, no sign-up." />
+          content="Free security tools and an outside-in scan of your company from Dolluz Corp. Check email spoofing, SSL certificates, security headers, lookalike domains and password exposure. No sign-up, no card." />
+
+    <meta property="og:title" content="dShield — Free Security Scan by Dolluz Corp" />
+    <meta property="og:description"
+          content="See what an attacker sees of your company. Free security tools and an outside-in scan — email spoofing, certificates, exposed files and lookalike domains. No sign-up." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dshield.dolluzcorp.com/" />
+    <meta property="og:site_name" content="dShield" />
+    <meta property="og:image" content="%PUBLIC_URL%/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="dShield — See what an attacker sees" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="dShield — Free Security Scan by Dolluz Corp" />
+    <meta name="twitter:description"
+          content="See what an attacker sees of your company. Free security tools and an outside-in scan. No sign-up." />
+    <meta name="twitter:image" content="%PUBLIC_URL%/og-image.png" />
     <!-- Dolluz eagle, generated from src/assets/img/logo_eagle.png. The mark is
          gold on #08090C rather than on transparency: gold on a light tab bar is
          close to invisible, and #08090C is already the theme colour below. -->
@@ -16,7 +47,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    <title>dShield — See what an attacker sees</title>
+    <title>dShield — Free Security Scan by Dolluz Corp</title>
   </head>
   <body>
     <noscript>dShield needs JavaScript to run a scan.</noscript>

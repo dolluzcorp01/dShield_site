@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { apiPost } from "./utils/api";
 import "./Pages.css";
+import { useDocumentMeta } from "./utils/meta";
 
 /* ── Contact ─────────────────────────────────────────────────────────── */
 
@@ -22,6 +23,12 @@ const SERVICE_LABELS = {
 };
 
 export function Contact() {
+    useDocumentMeta({
+        title: "Contact Dolluz Corp — Security Services | dShield",
+        description: "Talk to our engineers about audits, penetration testing, incident response or compliance.",
+        canonical: "/contact",
+    });
+
     const [params] = useSearchParams();
     const topic = (params.get("topic") || "").trim().slice(0, 40);
     const topicIsTier = TIER_VALUES.includes(topic);
@@ -138,6 +145,12 @@ export function Contact() {
 /* ── How it works ────────────────────────────────────────────────────── */
 
 export function HowItWorks() {
+    useDocumentMeta({
+        title: "How the dShield Security Scan Works | dShield",
+        description: "We read only what your servers already publish. No port scanning, no login attempts, no access to your systems. Here is exactly what we check.",
+        canonical: "/how-it-works",
+    });
+
     return (
         <div className="ds-wrap ds-section">
             <p className="ds-eyebrow">How it works</p>
@@ -186,6 +199,12 @@ export function HowItWorks() {
 /* ── Trust ───────────────────────────────────────────────────────────── */
 
 export function Trust() {
+    useDocumentMeta({
+        title: "Our Scoring Formula, Published | dShield",
+        description: "The formula behind every grade, what we store, and why a check that could not run never counts as a pass.",
+        canonical: "/trust",
+    });
+
     return (
         <div className="ds-wrap ds-section">
             <p className="ds-eyebrow">Trust</p>
@@ -290,6 +309,12 @@ export function Footer() {
 /* ── 404 ─────────────────────────────────────────────────────────────── */
 
 export function NotFound() {
+    useDocumentMeta({
+        title: "Page Not Found | dShield",
+        description: "That page does not exist.",
+        noindex: true,
+    });
+
     return (
         <div className="ds-wrap ds-section ds-center">
             <p className="ds-eyebrow">404</p>

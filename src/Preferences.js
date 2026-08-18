@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { apiGet, apiPost } from "./utils/api";
 import "./Pages.css";
+import { useDocumentMeta } from "./utils/meta";
 
 /* ─────────────────────────────────────────────────────────────────────────
    The unsubscribe landing page, reached from a link in an email.
@@ -19,6 +20,13 @@ import "./Pages.css";
 
 function Preferences() {
     const { token } = useParams();
+
+    useDocumentMeta({
+        title: "Email Preferences | dShield",
+        description: "Manage the email you receive from dShield.",
+        noindex: true,
+    });
+
     const [state, setState] = useState({ loading: true, error: "", masked: null, done: false });
     const [busy, setBusy] = useState(false);
 

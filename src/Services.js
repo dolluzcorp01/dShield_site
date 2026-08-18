@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./Services.css";
+import { useDocumentMeta } from "./utils/meta";
 
 /* ─────────────────────────────────────────────────────────────────────────
    What we do · Services · Compliance.
@@ -52,6 +53,12 @@ const PRIVACY = [
 ];
 
 function Services() {
+    useDocumentMeta({
+        title: "Cybersecurity Services — Audits, Testing, Compliance | dShield",
+        description: "Penetration testing, incident response, SOC setup, third-party risk and ISO 27001, SOC 2 and DPDP compliance, delivered by Dolluz Corp engineers.",
+        canonical: "/services",
+    });
+
     return (
         <div className="services">
 
