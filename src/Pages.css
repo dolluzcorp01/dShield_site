@@ -47,3 +47,7 @@
 .prefs h1 { margin-top: 6px; }
 .prefs__email { color: var(--bone); word-break: break-all; }
 .prefs__actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+
+/* A service arrived via ?topic= — shown as a read-only line rather than
+   dropped into the tier dropdown, which lists prices a service does not have. */
+.contact__topic { color: var(--bone); display: flex; align-items: center; cursor: default; }

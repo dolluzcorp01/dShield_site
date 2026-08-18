@@ -69,3 +69,8 @@
     .gap { flex-direction: column; gap: 20px; align-items: flex-start; }
     .gap__figure { border-right: 0; border-bottom: 1px solid var(--line); padding: 0 0 16px; text-align: left; width: 100%; }
 }
+
+/* The gap card previously ended with no action. Someone persuaded by the
+   argument had nowhere to go from it. */
+.gap__more { display: inline-block; margin-top: 16px; color: var(--gold); font-size: .92rem; }
+.gap__more:hover { color: #FFB93C; }

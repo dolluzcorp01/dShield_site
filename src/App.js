@@ -6,6 +6,8 @@ import Home from "./Home";
 import Result from "./Result";
 import Pricing from "./Pricing";
 import { ToolsIndex, ToolPage } from "./Tools";
+import Services from "./Services";
+import Coverage from "./Coverage";
 import { LegalIndex, Legal, DataRequest } from "./Legal";
 import Preferences from "./Preferences";
 import { Contact, HowItWorks, Trust, Footer, NotFound } from "./Pages";
@@ -31,6 +33,8 @@ function App() {
                     <Route path="/pricing" element={<Pricing />} />
                     <Route path="/tools" element={<ToolsIndex />} />
                     <Route path="/tools/:slug" element={<ToolPage />} />
+                    <Route path="/services" element={<Services />} />
+                    <Route path="/coverage" element={<Coverage />} />
                     <Route path="/how-it-works" element={<HowItWorks />} />
                     <Route path="/trust" element={<Trust />} />
                     <Route path="/contact" element={<Contact />} />

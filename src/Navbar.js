@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
+/* Five plus the Free-scan button is the most that fits before the mobile
+   breakpoint. /coverage is deliberately NOT here — it is reached from the
+   scan result and the homepage gap card, which is where somebody is actually
+   thinking about what a scan could not see. */
 const LINKS = [
+    { to: "/services", label: "Services" },
     { to: "/how-it-works", label: "How it works" },
     { to: "/pricing", label: "Pricing" },
     { to: "/tools", label: "Free tools" },

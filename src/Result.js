@@ -224,6 +224,9 @@ function Result() {
                     </p>
                     <div className="nextstep__actions">
                         <Link to="/pricing" className="ds-btn">See what a full report covers</Link>
+                        {/* Somebody who has just been shown 18 dark tiles is the most
+                            likely person on the site to want to know what is in them. */}
+                        <Link to="/coverage" className="ds-btn ds-btn--ghost">What the other 18 cover</Link>
                         <Link to="/contact" className="ds-btn ds-btn--ghost">Talk to us</Link>
                     </div>
                 </div>

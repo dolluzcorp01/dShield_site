@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { apiPost } from "./utils/api";
 import "./Home.css";
 
@@ -149,6 +149,9 @@ function Home() {
                                 which ones we could not measure. Most tools show you the five and let
                                 you assume that is everything.
                             </p>
+                            <Link to="/coverage" className="gap__more">
+                                See what the other eighteen cover →
+                            </Link>
                         </div>
                     </div>
                 </div>

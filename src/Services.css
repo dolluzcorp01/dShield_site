@@ -1,0 +1,143 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Services and Coverage share this stylesheet.
+
+   Tokens only — every colour comes from the variables in index.css. The
+   frozen prototype's cyan/lime/magenta palette does not come across; the
+   live site is near-black and gold and stays that way.
+
+   No animation library. The one entrance effect here is a CSS keyframe that
+   switches itself off under prefers-reduced-motion.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* ── stat cards ──────────────────────────────────────────────────────── */
+
+.stat { text-align: left; }
+
+.stat__figure {
+    font-size: 3rem;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--gold);
+    font-family: var(--mono);
+}
+
+.stat__label {
+    font-size: .82rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+    margin: 10px 0 8px;
+}
+
+/* ── service cards ───────────────────────────────────────────────────── */
+
+.service {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+}
+
+.service__no {
+    font-size: .8rem;
+    color: var(--bone-faint);
+    letter-spacing: .08em;
+}
+
+.service__name {
+    margin: 8px 0 6px;
+    font-size: 1.05rem;
+}
+
+.service__note { margin: 0 0 16px; }
+
+.service__go {
+    margin-top: auto;
+    color: var(--gold);
+    font-size: .9rem;
+}
+
+.service__go:hover { color: #FFB93C; }
+
+/* Card 01 is our own platform, and reads as the first column of the row
+   rather than one more service to enquire about. */
+.service--platform { border-color: var(--gold-dim); }
+
+.services__pentest-note {
+    margin: 26px 0 0;
+    max-width: 680px;
+    line-height: 1.65;
+}
+
+/* ── compliance ──────────────────────────────────────────────────────── */
+
+.framework__list {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.framework__list li { line-height: 1.55; }
+
+.services__cta { max-width: 640px; }
+
+/* ── coverage page ───────────────────────────────────────────────────── */
+
+.coverage__lead { max-width: 720px; }
+
+.connect {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.connect__system {
+    font-size: .78rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+/* "Would tell you …" is conditional on purpose. It is not a claim about
+   anything we have already found on the customer's estate. */
+.connect__would { margin: 0; line-height: 1.6; color: var(--bone-dim); }
+
+.checktwice {
+    border-color: var(--gold-dim);
+    margin-top: 34px;
+}
+
+.checktwice p { margin: 0; line-height: 1.7; }
+
+.checktwice strong { color: var(--bone); }
+
+.coverage__counterweight { max-width: 720px; }
+
+.coverage__actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 26px;
+}
+
+/* ── entrance motion ─────────────────────────────────────────────────── */
+
+@keyframes ds-rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+.services .ds-card,
+.coverage .ds-card {
+    animation: ds-rise .32s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .services .ds-card,
+    .coverage .ds-card {
+        animation: none;
+    }
+}

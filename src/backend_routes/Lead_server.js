@@ -36,7 +36,21 @@ router.post("/enquiry", (req, res) => {
         company: clean(req.body?.company, 160),
         phone: clean(req.body?.phone, 40),
         domain: clean(req.body?.domain, 253),
-        tier_interest: clean(req.body?.tier, 40),
+        /* An enquiry can now arrive from a service card with a slug in
+           `topic`, or from the tier selector with `tier`. Both are the same
+           kind of thing — a free-text marker for what the person is after —
+           so both land in tier_interest rather than earning a column. A
+           migration for one string is not worth the schema drift.
+
+           `topic` wins when both are present: it comes from the card they
+           actually clicked, while `tier` may just be the selector's default.
+
+           Clamped to 40, not 60. enquiries.tier_interest is VARCHAR(40) and
+           this server runs under STRICT_TRANS_TABLES, so a 60-character topic
+           would not truncate — it would raise "Data too long for column" and
+           lose the whole enquiry to a 500. Every slug we emit is well under
+           40; the cap is here for anything hand-crafted in a URL. */
+        tier_interest: clean(req.body?.topic, 40) || clean(req.body?.tier, 40),
         message: clean(req.body?.message, 2000),
         source: "enquiry",
     };

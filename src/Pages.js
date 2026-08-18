@@ -1,12 +1,37 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { apiPost } from "./utils/api";
 import "./Pages.css";
 
 /* ── Contact ─────────────────────────────────────────────────────────── */
 
+/* The tier selector's own values. A ?topic= matching one of these pre-fills
+   the selector; anything else is a service slug from a card on /services and
+   is shown as a read-only line instead — putting a service into a dropdown
+   of prices would misrepresent it as something with a list price. */
+const TIER_VALUES = ["basic", "advanced", "full_protection", "extended_support"];
+
+const SERVICE_LABELS = {
+    "technical-assurance": "Technical Assurance",
+    "third-party-risk-management": "Third-Party Risk Management",
+    "soc-setup-monitoring": "SOC Setup & Monitoring",
+    "incident-response-forensics": "Incident Response & Forensics",
+    "penetration-testing": "Penetration Testing",
+    "continuous-grc": "Continuous GRC",
+    "standards-compliance-audits": "Standards & Compliance Audits",
+};
+
 export function Contact() {
-    const [form, setForm] = useState({ name: "", email: "", company: "", phone: "", domain: "", tier: "", message: "" });
+    const [params] = useSearchParams();
+    const topic = (params.get("topic") || "").trim().slice(0, 40);
+    const topicIsTier = TIER_VALUES.includes(topic);
+    const serviceLabel = topicIsTier ? null : (SERVICE_LABELS[topic] || null);
+
+    const [form, setForm] = useState({
+        name: "", email: "", company: "", phone: "", domain: "",
+        tier: topicIsTier ? topic : "",
+        message: "",
+    });
     const [busy, setBusy] = useState(false);
     const [sent, setSent] = useState(false);
     const [error, setError] = useState("");
@@ -18,7 +43,10 @@ export function Contact() {
         setError("");
         if (!form.email.trim()) return setError("Enter your email address so we can reply.");
         setBusy(true);
-        const res = await apiPost("/api/leads/enquiry", form);
+        // Send the slug only when it names a real service. An unrecognised
+        // ?topic= is somebody editing the URL, and it should not be recorded
+        // as an interest we can act on.
+        const res = await apiPost("/api/leads/enquiry", serviceLabel ? { ...form, topic } : form);
         setBusy(false);
         if (!res.success) return setError(res.message || "That could not be sent.");
         setSent(true);
@@ -72,13 +100,23 @@ export function Contact() {
                     </div>
                     <div className="ds-field">
                         <label className="ds-label">Interested in</label>
-                        <select className="ds-input" value={form.tier} onChange={set("tier")} disabled={busy}>
-                            <option value="">Not sure yet</option>
-                            <option value="basic">Basic — $49</option>
-                            <option value="advanced">Advanced — $199</option>
-                            <option value="full_protection">Full Protection — $499</option>
-                            <option value="extended_support">Full Protection + Extended Support — $999+/month</option>
-                        </select>
+                        {serviceLabel ? (
+                            <>
+                                <div className="ds-input contact__topic" aria-readonly="true">{serviceLabel}</div>
+                                <p className="ds-faint" style={{ margin: "8px 0 0" }}>
+                                    From the service you came in on. Tell us more below, or{" "}
+                                    <Link to="/services">pick a different one</Link>.
+                                </p>
+                            </>
+                        ) : (
+                            <select className="ds-input" value={form.tier} onChange={set("tier")} disabled={busy}>
+                                <option value="">Not sure yet</option>
+                                <option value="basic">Basic — $49</option>
+                                <option value="advanced">Advanced — $199</option>
+                                <option value="full_protection">Full Protection — $499</option>
+                                <option value="extended_support">Full Protection + Extended Support — $999+/month</option>
+                            </select>
+                        )}
                     </div>
                 </div>
 
@@ -220,7 +258,9 @@ export function Footer() {
                     <span className="ds-faint">by Dolluz Corp · Chennai</span>
                 </div>
                 <nav className="footer__links">
+                    <Link to="/services">Services</Link>
                     <Link to="/how-it-works">How it works</Link>
+                    <Link to="/coverage">Coverage</Link>
                     <Link to="/pricing">Pricing</Link>
                     <Link to="/tools">Free tools</Link>
                     <Link to="/trust">Trust</Link>
