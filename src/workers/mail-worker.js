@@ -27,7 +27,7 @@ let running = false;   // guards against a slow tick overlapping the next one
 
 function claim(db, callback) {
     db.query(
-        `SELECT id, to_email, template, category, subject, payload, attempts
+        `SELECT id, to_email, cc, template, category, subject, payload, attempts
            FROM mail_outbox
           WHERE status = 'queued' AND attempts < ?
           ORDER BY queued_at
@@ -64,7 +64,7 @@ function processRow(db, row, done) {
             return done();
         }
 
-        sendNow({ to: row.to_email, subject: row.subject || rendered.subject, html: rendered.html, text: rendered.text })
+        sendNow({ to: row.to_email, cc: row.cc, subject: row.subject || rendered.subject, html: rendered.html, text: rendered.text })
             .then(() => {
                 db.query(
                     "UPDATE mail_outbox SET status = 'sent', sent_at = NOW() WHERE id = ?",

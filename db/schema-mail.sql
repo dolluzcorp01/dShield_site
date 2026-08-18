@@ -62,3 +62,25 @@ CREATE TABLE IF NOT EXISTS mail_outbox (
   INDEX idx_status_queued (status, queued_at),
   INDEX idx_to (to_email)
 ) ENGINE=InnoDB;
+
+
+-- ── mail_outbox.cc ───────────────────────────────────────────────────────
+-- Added after the table shipped, so it goes through information_schema
+-- rather than a plain ALTER: MySQL 8 has no ADD COLUMN IF NOT EXISTS, and
+-- this file has to stay safe to re-run.
+--
+-- Comma-separated list. Used by the enquiry alert so more than one person at
+-- Dolluz sees an enquiry arrive — an alert that reaches one inbox nobody is
+-- watching is the same failure as no alert at all.
+SET @cc_col := (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME   = 'mail_outbox'
+    AND COLUMN_NAME  = 'cc'
+);
+SET @cc_ddl := IF(@cc_col = 0,
+  'ALTER TABLE mail_outbox ADD COLUMN cc VARCHAR(500) NULL AFTER to_email',
+  'DO 0');
+PREPARE cc_stmt FROM @cc_ddl;
+EXECUTE cc_stmt;
+DEALLOCATE PREPARE cc_stmt;

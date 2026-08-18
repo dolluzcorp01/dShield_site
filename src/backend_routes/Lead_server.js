@@ -99,8 +99,14 @@ router.post("/enquiry", (req, res) => {
 
         const alertTo = String(process.env.ENQUIRY_ALERT_TO || "").trim();
         if (alertTo) {
+            /* Copy the rest of the team. An alert that reaches one inbox
+               nobody happens to be watching is the same failure as no alert
+               at all. Addresses live in ENQUIRY_ALERT_CC rather than in this
+               file — who should see an enquiry is configuration, and changing
+               it should not need a deploy. */
             queueMail(db, {
-                to: alertTo, template: "enquiry_alert", category: "internal",
+                to: alertTo, cc: process.env.ENQUIRY_ALERT_CC || "",
+                template: "enquiry_alert", category: "internal",
                 subject: `Enquiry from ${payload.name || payload.email} — ${payload.topicLabel || payload.tier || "general"}`,
                 payload,
             }, (qErr) => { if (qErr) console.error("⚠️  Could not queue enquiry alert:", qErr.message); });
