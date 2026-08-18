@@ -58,9 +58,18 @@ const ScanRoutes = require('./src/backend_routes/Scan_server');
 const ToolsRoutes = require('./src/backend_routes/Tools_server');
 const LeadRoutes = require('./src/backend_routes/Lead_server');
 
+// Legal_server exports three routers rather than one. They share a file
+// because they share the suppression and document helpers, but they mount at
+// three unrelated paths — folding them into one router would mean writing
+// the mount point into each route string.
+const { legalRouter, preferencesRouter, dataRequestRouter } = require('./src/backend_routes/Legal_server');
+
 app.use("/api/scan", ScanRoutes);
 app.use("/api/tools", ToolsRoutes);
 app.use("/api/leads", LeadRoutes);
+app.use("/api/legal", legalRouter);
+app.use("/api/preferences", preferencesRouter);
+app.use("/api/data-request", dataRequestRouter);
 
 // Health check — used by the deploy script and by uptime monitoring.
 app.get("/api/health", (req, res) => {

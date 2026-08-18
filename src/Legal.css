@@ -1,0 +1,83 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Legal documents and the data-request form.
+
+   Tokens only — every colour here comes from the variables in index.css.
+   Long-form prose is the one thing on this site with a narrower measure
+   than the page: a policy read at full width is a policy nobody finishes.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.legal { max-width: 760px; }
+
+.legal__meta { margin: 6px 0 22px; }
+
+.legal__placeholder { margin-bottom: 30px; }
+
+.legal__body { line-height: 1.75; }
+
+.legal__body h2 {
+    font-size: 1.15rem;
+    margin: 34px 0 12px;
+    color: var(--bone);
+}
+
+.legal__body h2:first-child { margin-top: 0; }
+
+.legal__body p {
+    margin: 0 0 16px;
+    color: var(--bone-dim);
+}
+
+.legal__foot { margin-top: 44px; }
+
+/* ── index cards ─────────────────────────────────────────────────────── */
+
+.legalcard {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    text-decoration: none;
+    transition: border-color .15s ease, transform .15s ease;
+}
+
+a.legalcard:hover {
+    border-color: var(--gold-dim);
+    transform: translateY(-2px);
+}
+
+.legalcard h3 { margin: 0; }
+
+.legalcard__flag {
+    font-size: .76rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    border-radius: 999px;
+    padding: 3px 10px;
+}
+
+.legalcard__go {
+    color: var(--gold);
+    font-size: .9rem;
+    margin-top: auto;
+}
+
+.legalcard--data { margin-top: 20px; }
+
+/* ── data request form ───────────────────────────────────────────────── */
+
+.datareq {
+    max-width: 620px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.datareq select.ds-input { cursor: pointer; }
+
+.datareq textarea.ds-input {
+    resize: vertical;
+    min-height: 110px;
+    font-family: inherit;
+}

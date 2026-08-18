@@ -6,6 +6,8 @@ import Home from "./Home";
 import Result from "./Result";
 import Pricing from "./Pricing";
 import { ToolsIndex, ToolPage } from "./Tools";
+import { LegalIndex, Legal, DataRequest } from "./Legal";
+import Preferences from "./Preferences";
 import { Contact, HowItWorks, Trust, Footer, NotFound } from "./Pages";
 import "./App.css";
 
@@ -32,6 +34,10 @@ function App() {
                     <Route path="/how-it-works" element={<HowItWorks />} />
                     <Route path="/trust" element={<Trust />} />
                     <Route path="/contact" element={<Contact />} />
+                    <Route path="/legal" element={<LegalIndex />} />
+                    <Route path="/legal/:key" element={<Legal />} />
+                    <Route path="/preferences/:token" element={<Preferences />} />
+                    <Route path="/data-request" element={<DataRequest />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </main>

@@ -226,6 +226,17 @@ export function Footer() {
                     <Link to="/trust">Trust</Link>
                     <Link to="/contact">Contact</Link>
                 </nav>
+
+                {/* Kept as a separate, lighter row rather than merged into the
+                    nav above. Nine links of equal weight is a list nobody
+                    reads; the legal row needs to be findable, not prominent. */}
+                <nav className="footer__legal">
+                    <Link to="/legal/terms">Terms</Link>
+                    <Link to="/legal/privacy">Privacy</Link>
+                    <Link to="/legal/refunds">Refunds</Link>
+                    <Link to="/legal/cookies">Cookies</Link>
+                    <Link to="/data-request">Your data</Link>
+                </nav>
                 <p className="ds-faint footer__note">
                     dShield assesses security posture from publicly available information. It does
                     not defend, block or remediate, and no assessment can guarantee that a system

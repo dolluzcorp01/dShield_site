@@ -32,3 +32,18 @@
 .footer__links a { color: var(--bone-dim); font-size: .92rem; }
 .footer__links a:hover { color: var(--gold); }
 .footer__note { max-width: 640px; margin: 0; line-height: 1.6; }
+
+/* ── footer · legal row ──────────────────────────────────────────────── */
+/* Deliberately lighter than .footer__links above it. These have to be
+   findable — Razorpay and the DPDP Act both expect them reachable from every
+   page — without competing with the links people actually came to use. */
+.footer__legal { display: flex; gap: 18px; flex-wrap: wrap; }
+.footer__legal a { color: var(--bone-faint); font-size: .84rem; }
+.footer__legal a:hover { color: var(--bone-dim); }
+
+/* ── preferences · unsubscribe landing ───────────────────────────────── */
+/* No stylesheet of its own: one card and a button. */
+.prefs { max-width: 560px; }
+.prefs h1 { margin-top: 6px; }
+.prefs__email { color: var(--bone); word-break: break-all; }
+.prefs__actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
