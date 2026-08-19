@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { apiGet } from "./utils/api";
+import { apiGet, API_BASE } from "./utils/api";
 import { useDocumentMeta } from "./utils/meta";
 import "./Report.css";
 
@@ -31,7 +31,7 @@ function Report() {
             if (!res.success) {
                 return setState({ loading: false, report: null, error: res.message || "That report could not be opened.", expired: !!res.expired });
             }
-            setState({ loading: false, report: res.report, error: "", expired: false, expiresAt: res.expiresAt });
+            setState({ loading: false, report: res.report, error: "", expired: false, expiresAt: res.expiresAt, pdfReady: !!res.pdfReady, pdfStatus: res.pdfStatus });
         })();
     }, [token]);
 
@@ -93,9 +93,20 @@ function Report() {
                     </div>
                 )}
 
-                <button className="ds-btn ds-btn--ghost report__print" onClick={() => window.print()}>
-                    Print or save as PDF
-                </button>
+                <div className="report__downloads">
+                    {/* The PDF button appears only once the file exists. A
+                        button that returns 503 is worse than no button. */}
+                    {state.pdfReady && (
+                        <a className="ds-btn" href={`${API_BASE}/api/reports/${token}.pdf`}>Download PDF</a>
+                    )}
+                    <button className="ds-btn ds-btn--ghost" onClick={() => window.print()}>
+                        Print this page
+                    </button>
+                    <a className="report__json ds-faint" href={`${API_BASE}/api/reports/${token}.json`}>Download JSON</a>
+                    {state.pdfStatus === "pending" && (
+                        <span className="ds-faint">The PDF is still being prepared.</span>
+                    )}
+                </div>
             </header>
 
             {/* ── the roadmap, advanced only ─────────────────────────── */}

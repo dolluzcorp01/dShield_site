@@ -94,3 +94,9 @@
     .covertile { border: 1px solid #ddd !important; }
     a { text-decoration: underline; color: #111 !important; }
 }
+
+/* ── downloads ───────────────────────────────────────────────────────── */
+.report__downloads { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.report__json { text-decoration: underline; font-size: .88rem; }
+.report__json:hover { color: var(--gold); }
+@media print { .report__downloads { display: none !important; } }

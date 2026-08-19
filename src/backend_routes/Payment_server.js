@@ -31,6 +31,7 @@ const { runScan, normaliseDomain } = require("../utils/scan_engine");
 const { buildReport } = require("../utils/report_builder");
 const { getPlan, ASSESSMENT_TIERS, paymentsConfigured } = require("../data/plans");
 const { queueMail } = require("../utils/mail");
+const { renderReportPdf, isPdfAvailable, reportDir } = require("../utils/pdf");
 
 const db = getDBConnection(process.env.DB_NAME || "dshield");
 
@@ -187,13 +188,59 @@ async function fulfilOrder(orderRef) {
             },
         }, (err) => { if (err) console.error("⚠️  Could not queue the report email:", err.message); resolve(); }));
 
-        // 8 · Delivered.
+        // 8 · Delivered. The customer has the page and the email from here on.
         await query("UPDATE orders SET fulfilment_status='delivered', delivered_at=NOW() WHERE order_ref=?", [orderRef]);
         console.log(`✅ Delivered ${order.tier} report for ${order.domain} (${orderRef})`);
+
+        /* 9 · The PDF, LAST and deliberately so.
+           Chrome is the least reliable thing in this chain — it needs memory,
+           a binary on disk and a few seconds. Generating it before the order
+           is marked delivered would let a Chrome problem turn a completed
+           purchase into a failed one. A missing PDF is an inconvenience; a
+           missing report is a chargeback. Failures here are recorded and
+           alerted separately and never touch fulfilment_status. */
+        generatePdfFor(orderRef, report, order).catch((e) =>
+            console.error("⚠️  PDF generation threw outside its own handler:", e.message));
+
         return { claimed: true, ok: true, token };
     } catch (err) {
         // Never leave an order stuck at `running`.
         return await failOrder(err.message);
+    }
+}
+
+/**
+ * Render and record the PDF for an order.
+ *
+ * Never throws to its caller and never changes fulfilment_status. The order
+ * is already delivered by the time this runs.
+ */
+async function generatePdfFor(orderRef, report, order) {
+    const avail = await isPdfAvailable();
+    if (!avail.ok) {
+        // Not an error — PDF_ENABLED=false is a legitimate configuration and
+        // must be silent rather than alarming.
+        console.log(`ℹ️  PDF not generated for ${orderRef}: ${avail.reason}`);
+        return;
+    }
+
+    await query("UPDATE orders SET pdf_status='pending' WHERE order_ref=?", [orderRef]).catch(() => {});
+
+    try {
+        const out = await renderReportPdf(report, orderRef);
+        await query(
+            "UPDATE orders SET pdf_status='ready', pdf_path=?, pdf_sha256=?, pdf_bytes=?, pdf_error=NULL WHERE order_ref=?",
+            [out.relPath, out.sha256, out.bytes, orderRef]);
+        console.log(`📄 PDF ready for ${orderRef} — ${out.bytes} bytes`);
+    } catch (err) {
+        await query("UPDATE orders SET pdf_status='failed', pdf_error=? WHERE order_ref=?",
+            [String(err.message).slice(0, 500), orderRef]).catch(() => {});
+        console.error(`⚠️  PDF failed for ${orderRef}: ${err.message}`);
+        alertInternal(`⚠️ PDF generation failed — ${orderRef}`, {
+            orderRef, tier: order.tier, domain: order.domain, email: order.email,
+            amountInr: order.amount_paise / 100,
+            error: `${err.message} — the customer HAS their report page and email; only the PDF is missing.`,
+        });
     }
 }
 
@@ -398,7 +445,7 @@ router.get("/order/:ref", async (req, res) => {
     }
     try {
         const rows = await query(
-            "SELECT order_ref, tier, domain, status, fulfilment_status, fulfilment_error, report_token, report_expires_at, delivered_at FROM orders WHERE order_ref=? LIMIT 1",
+            "SELECT order_ref, tier, domain, status, fulfilment_status, fulfilment_error, report_token, report_expires_at, delivered_at, pdf_status FROM orders WHERE order_ref=? LIMIT 1",
             [ref]);
         if (!rows.length) return res.status(404).json({ success: false, message: "We could not find that order." });
         const o = rows[0];
@@ -412,6 +459,8 @@ router.get("/order/:ref", async (req, res) => {
             // The customer is told THAT it failed, never the internal detail.
             failed: o.fulfilment_status === "failed",
             reportUrl: o.report_token ? `/report/${o.report_token}` : null,
+            pdfStatus: o.pdf_status,
+            pdfReady: o.pdf_status === "ready",
             expiresAt: o.report_expires_at,
             deliveredAt: o.delivered_at,
         });
@@ -425,6 +474,105 @@ router.get("/order/:ref", async (req, res) => {
    Mounted separately at /api/reports in server.js. */
 const reportsRouter = express.Router();
 
+/* ── downloads ────────────────────────────────────────────────────────────
+   Both formats sit behind the SAME token and the SAME expiry as the page,
+   and both serve what buildReport already filtered. The JSON export is not a
+   side door around the paywall: a basic order's JSON contains exactly what a
+   basic order's page contains. */
+
+const path = require("path");
+const fsp = require("fs").promises;
+
+/** Shared lookup so the three routes cannot drift on token or expiry rules. */
+async function loadReportRow(token) {
+    if (!/^[0-9a-f]{64}$/i.test(String(token || ""))) return { error: "invalid" };
+    const rows = await query(
+        `SELECT order_ref, tier, domain, report_json, report_expires_at, delivered_at,
+                pdf_status, pdf_path, pdf_sha256, pdf_bytes
+           FROM orders WHERE report_token=? LIMIT 1`, [token]);
+    if (!rows.length || !rows[0].report_json) return { error: "invalid" };
+    const o = rows[0];
+    if (o.report_expires_at && new Date(o.report_expires_at) < new Date()) return { error: "expired", order: o };
+    return { order: o };
+}
+
+const fileStamp = (d) => new Date(d || Date.now()).toISOString().slice(0, 10);
+
+// ── GET /api/reports/:token.pdf ──────────────────────────────────────────
+reportsRouter.get("/:token.pdf", async (req, res) => {
+    try {
+        const { order, error } = await loadReportRow(req.params.token);
+        if (error === "invalid") return res.status(404).json({ success: false, message: "That report link is not valid." });
+        if (error === "expired") {
+            return res.status(410).json({
+                success: false, expired: true,
+                message: "This report link has expired. Your report still exists — write to us and we will send you a fresh link.",
+            });
+        }
+
+        /* Not ready is 503, NOT 404. The customer has paid; a file that is
+           still being prepared is our problem to explain, not theirs to
+           interpret, and the page is available meanwhile. */
+        if (order.pdf_status !== "ready" || !order.pdf_path) {
+            return res.status(503).json({
+                success: false,
+                pdfStatus: order.pdf_status,
+                message: order.pdf_status === "failed"
+                    ? "The PDF could not be produced for this report. Your full report is available on the page, and we have been alerted."
+                    : "The PDF is still being prepared. Your full report is available on the page in the meantime.",
+                reportUrl: `/report/${req.params.token}`,
+            });
+        }
+
+        const file = path.join(reportDir(), path.basename(order.pdf_path));
+        let buf;
+        try { buf = await fsp.readFile(file); }
+        catch (e) {
+            console.error("⚠️  PDF recorded as ready but missing on disk:", file);
+            return res.status(503).json({
+                success: false,
+                message: "The PDF could not be read. Your full report is available on the page, and we have been alerted.",
+                reportUrl: `/report/${req.params.token}`,
+            });
+        }
+
+        const name = `dShield-${String(order.domain).replace(/[^a-zA-Z0-9.-]/g, "")}-${fileStamp(order.delivered_at)}.pdf`;
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `attachment; filename="${name}"`);
+        res.setHeader("Content-Length", buf.length);
+        if (order.pdf_sha256) res.setHeader("X-Report-SHA256", order.pdf_sha256);
+        res.send(buf);
+    } catch (err) {
+        console.error("❌ PDF download failed:", err.message);
+        res.status(500).json({ success: false, message: "We could not send that file." });
+    }
+});
+
+// ── GET /api/reports/:token.json ─────────────────────────────────────────
+reportsRouter.get("/:token.json", async (req, res) => {
+    try {
+        const { order, error } = await loadReportRow(req.params.token);
+        if (error === "invalid") return res.status(404).json({ success: false, message: "That report link is not valid." });
+        if (error === "expired") {
+            return res.status(410).json({ success: false, expired: true, message: "This report link has expired. Write to us and we will send you a fresh link." });
+        }
+
+        // The SAME stored object the page renders. Tier gating already
+        // happened in buildReport; this is not a second decision.
+        const name = `dShield-${String(order.domain).replace(/[^a-zA-Z0-9.-]/g, "")}-${fileStamp(order.delivered_at)}.json`;
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        res.setHeader("Content-Disposition", `attachment; filename="${name}"`);
+        res.send(order.report_json);
+    } catch (err) {
+        console.error("❌ JSON download failed:", err.message);
+        res.status(500).json({ success: false, message: "We could not send that file." });
+    }
+});
+
+/* ⚠️  THE PAGE ROUTE IS REGISTERED LAST, AND MUST STAY LAST.
+   Express matches in order and `:token` happily matches "abc.pdf" — so if
+   this came first, every download would be answered by the page route with
+   a token it considered malformed. */
 reportsRouter.get("/:token", async (req, res) => {
     const token = String(req.params.token || "");
     if (!/^[0-9a-f]{64}$/i.test(token)) {
@@ -432,7 +580,7 @@ reportsRouter.get("/:token", async (req, res) => {
     }
     try {
         const rows = await query(
-            "SELECT order_ref, tier, domain, report_json, report_expires_at, delivered_at FROM orders WHERE report_token=? LIMIT 1",
+            "SELECT order_ref, tier, domain, report_json, report_expires_at, delivered_at, pdf_status FROM orders WHERE report_token=? LIMIT 1",
             [token]);
         if (!rows.length || !rows[0].report_json) {
             return res.status(404).json({ success: false, message: "That report link is not valid." });
@@ -453,7 +601,11 @@ reportsRouter.get("/:token", async (req, res) => {
         try { report = JSON.parse(o.report_json); }
         catch (e) { return res.status(500).json({ success: false, message: "That report could not be read." }); }
 
-        res.json({ success: true, report, deliveredAt: o.delivered_at, expiresAt: o.report_expires_at });
+        res.json({
+            success: true, report,
+            deliveredAt: o.delivered_at, expiresAt: o.report_expires_at,
+            pdfStatus: o.pdf_status, pdfReady: o.pdf_status === "ready",
+        });
     } catch (err) {
         console.error("❌ Report lookup failed:", err.message);
         res.status(500).json({ success: false, message: "We could not open that report." });

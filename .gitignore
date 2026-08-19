@@ -26,6 +26,11 @@ dist/
 *.p12
 *.pfx
 
+# ── Generated reports ────────────────────────────────────────────────────
+# Paid PDFs live here. They contain customer findings and evidence and must
+# never reach the repository.
+storage/
+
 # ── Database ─────────────────────────────────────────────────────────────
 # Schema IS committed. It carries no credentials, and schema changes are
 # exactly the kind that benefit from review and history.

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { apiGet } from "./utils/api";
+import { apiGet, API_BASE } from "./utils/api";
 import { useDocumentMeta } from "./utils/meta";
 import "./Checkout.css";
 
@@ -48,8 +48,12 @@ function OrderStatus() {
             }
             setState({ loading: false, order: res, error: "" });
 
-            const done = res.fulfilment === "delivered" || res.fulfilment === "failed";
-            if (done) return;
+            /* Keep polling a little after delivery: the PDF is generated
+               after the order is marked delivered, so stopping the moment
+               fulfilment completes would never show the download button. */
+            const settled = res.fulfilment === "failed"
+                || (res.fulfilment === "delivered" && (res.pdfReady || res.pdfStatus === "failed" || res.pdfStatus === "none"));
+            if (settled) return;
 
             if (Date.now() - started.current > GIVE_UP_MS) { setTimedOut(true); return; }
             timer = setTimeout(poll, POLL_MS);
@@ -89,6 +93,7 @@ function OrderStatus() {
                     </p>
                     <div className="orderdone__actions">
                         <Link to={o.reportUrl} className="ds-btn">Open your report</Link>
+                        {o.pdfReady && <a className="ds-btn ds-btn--ghost" href={`${API_BASE}/api/reports/${o.reportUrl.split("/").pop()}.pdf`}>Download PDF</a>}
                         <Link to="/contact" className="ds-btn ds-btn--ghost">Talk to us</Link>
                     </div>
                     <p className="ds-faint" style={{ marginTop: 18 }}>Order reference {o.orderRef}</p>

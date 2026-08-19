@@ -38,6 +38,7 @@ mysql -u root -p < db/schema.sql
 mysql -u root -p < db/schema-legal.sql   # must run after schema.sql
 mysql -u root -p < db/schema-mail.sql    # must run after schema-legal.sql
 mysql -u root -p < db/schema-orders.sql  # must run after schema-mail.sql
+mysql -u root -p < db/schema-pdf.sql     # must run after schema-orders.sql
 
 # 2 — configure
 #     open .env and set DB_PASSWORD
@@ -155,6 +156,33 @@ the server before launch rather than assuming.
 unless Express is told otherwise, and the scan limiter is per IP. Without it
 every visitor shares one bucket and the first dozen scans of the hour lock out
 everybody else.
+
+### PDF reports — Chrome is a dependency
+
+Paid reports are delivered as a web page **and** a PDF. The page always works;
+the PDF is generated after delivery and is allowed to fail without affecting
+the order.
+
+```bash
+npx puppeteer browsers install chrome
+```
+
+**The server needs 4GB of RAM.** A render peaks around 700MB across Chrome's
+helper processes, and below 4GB the OS kills Chrome mid-render — which shows
+up as intermittent, hard-to-attribute failures rather than a clean error.
+Check the droplet before this ships.
+
+Renders are serialised one at a time for the same reason. Chrome is launched
+with `--no-sandbox`, which is acceptable only because it renders our own
+template: every value interpolated into it is escaped, and no customer-supplied
+HTML is ever passed in.
+
+Generated files live in `REPORT_DIR` (default `./storage/reports`), which is
+gitignored — they contain customer findings.
+
+**If Chrome misbehaves in production, set `PDF_ENABLED=false`.** Everything
+else keeps working: orders complete, reports are delivered, and no PDF button
+is offered.
 
 ### Production
 
