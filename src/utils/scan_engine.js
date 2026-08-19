@@ -308,7 +308,14 @@ async function runScan(domainInput, opts = {}) {
                 onProgress({ index: completed, total: checks.length, checkId: check.id, title: check.title });
             }
             try {
-                const out = await withTimeout(check.run(target), PER_CHECK_TIMEOUT_MS, check.title);
+                /* A SHORT, GENERIC LABEL — not check.title.
+                   withTimeout formats its label as "<label> timed out", and
+                   every place that shows a reason already prints the title
+                   beside it. Passing the title produced "Administrative
+                   interface exposed to the internet — Administrative interface
+                   exposed to the internet timed out", which reads as a bug in
+                   a document a customer files. */
+                const out = await withTimeout(check.run(target), PER_CHECK_TIMEOUT_MS, "The check");
                 findings.push({
                     checkId: check.id, domain: check.domain, severity: check.severity,
                     title: check.title, why: check.why,
