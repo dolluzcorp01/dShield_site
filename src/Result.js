@@ -66,17 +66,42 @@ function Result() {
        told they were secure. Saying "we could not measure this" is the only
        honest output, and it is the product's whole argument. */
     if (result.status === "inconclusive") {
+        /* A blocked scan and a slow one look the same in the numbers and are
+           completely different to the reader. If a firewall identified us and
+           stopped answering, say so — that is their protection working, not a
+           fault on either side, and it has a different remedy. */
+        const wasBlocked = (result.inconclusive || []).some((i) =>
+            /stopped responding|scanning was stopped/i.test(i.reason || ""));
+
         return (
             <div className="ds-wrap ds-section">
                 <div className="ds-card inconclusive">
                     <p className="ds-eyebrow">No grade issued</p>
-                    <h2>We could not see enough of {result.domain} to grade it.</h2>
-                    <p className="ds-muted">
-                        Only {result.checksCompleted} of {result.checksRun} checks completed. We
-                        will not publish a score from a partial scan, because a number built on
-                        checks that never ran would tell you that you are safe when what actually
-                        happened is that we could not look.
-                    </p>
+                    {wasBlocked ? (
+                        <>
+                            <h2>{result.domain} stopped responding to us partway through.</h2>
+                            <p className="ds-muted">
+                                This usually means a firewall or security service identified the scan
+                                and blocked it — which is your protection working. We stopped rather
+                                than pressing on. Trying again in an hour usually succeeds, and if you
+                                own this domain you can allow our scanner instead.
+                            </p>
+                            <p className="ds-muted">
+                                {result.checksCompleted} of {result.checksRun} checks completed before
+                                that happened. We will not publish a score from a partial scan.
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <h2>We could not see enough of {result.domain} to grade it.</h2>
+                            <p className="ds-muted">
+                                Only {result.checksCompleted} of {result.checksRun} checks completed. We
+                                will not publish a score from a partial scan, because a number built on
+                                checks that never ran would tell you that you are safe when what actually
+                                happened is that we could not look.
+                            </p>
+                        </>
+                    )}
                     {result.inconclusive?.length > 0 && (
                         <ul className="inconclusive__list">
                             {result.inconclusive.map((i) => (
@@ -87,11 +112,16 @@ function Result() {
                             ))}
                         </ul>
                     )}
-                    <p className="ds-muted">
-                        This usually means a firewall is blocking us, the domain is behind a
-                        service that refuses unknown clients, or DNS is slow to answer. Trying
-                        again in a few minutes often works.
-                    </p>
+                    {/* Only for the ordinary case — the blocked wording above
+                        already explains itself, and repeating it would read as
+                        though we had not understood our own result. */}
+                    {!wasBlocked && (
+                        <p className="ds-muted">
+                            This usually means a firewall is blocking us, the domain is behind a
+                            service that refuses unknown clients, or DNS is slow to answer. Trying
+                            again in a few minutes often works.
+                        </p>
+                    )}
                     <Link to="/" className="ds-btn">Try again</Link>
                 </div>
             </div>

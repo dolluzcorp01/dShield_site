@@ -47,26 +47,62 @@ const bannerOf = (target) => memo(target, "surface:banner", async () => {
     };
 });
 
-const ADMIN_PATHS = [
+/* ── PROBE LISTS ARE SPLIT BY TIER ON PURPOSE. DO NOT CONSOLIDATE THEM. ──
+   Task 05a requested 31 speculative paths on every scan and got this scanner
+   blocked by an ordinary customer site on shared hosting. To a web
+   application firewall, a burst of requests for /phpmyadmin/, /manager/html
+   and /wp-config.php.bak is not "reading published information" — it is the
+   signature of directory brute-forcing, because it is identical to it.
+
+   So the free tier asks for almost nothing: three paths a well-run site
+   expects to be asked for. Paid tiers probe harder, where the customer has
+   accepted terms and knows what we do.
+
+   That ordering is also commercially correct — the paid scan genuinely
+   looks harder — but the reason it exists is that a free visitor should
+   never get a blocked, ungradeable scan from their first impression of us. */
+
+const ADMIN_PATHS_BASIC = [
     { p: "/admin", name: "Generic admin" },
     { p: "/wp-admin/", name: "WordPress admin" },
+];
+
+/* ADVANCED ONLY. Every one of these is on the first page of every
+   brute-force wordlist, and requesting them is what trips a WAF. */
+const ADMIN_PATHS_ADVANCED = [
     { p: "/administrator/", name: "Joomla admin" },
     { p: "/phpmyadmin/", name: "phpMyAdmin" },
     { p: "/manager/html", name: "Tomcat Manager" },
     { p: "/jenkins/", name: "Jenkins" },
-    { p: "/.well-known/security.txt", name: null },   // control: proves the host answers at all
     { p: "/solr/", name: "Apache Solr" },
     { p: "/grafana/login", name: "Grafana" },
     { p: "/kibana/", name: "Kibana" },
 ];
 
+// A path any site expects to be asked for. Doubles as a control: if this
+// answers and nothing else does, the host is up and simply has no admin panel.
+const CONTROL_PATH = { p: "/.well-known/security.txt", name: null };
+
+const isAdvanced = (target) => target.tier === "advanced" || target.tier === "full_protection";
+const isBasicUp = (target) => isAdvanced(target) || target.tier === "basic";
+
+function adminPathsFor(target) {
+    if (isAdvanced(target)) return [...ADMIN_PATHS_BASIC, ...ADMIN_PATHS_ADVANCED, CONTROL_PATH];
+    if (isBasicUp(target)) return [...ADMIN_PATHS_BASIC, CONTROL_PATH];
+    return [CONTROL_PATH];
+}
+
 const NONPROD = /^(dev|test|staging|stage|uat|qa|sandbox|demo|preprod|beta|alpha)[.-]/i;
 
-const BACKUP_PATHS = [
-    "/backup.zip", "/backup.tar.gz", "/backup.sql", "/db.sql", "/dump.sql",
-    "/database.sql", "/site.zip", "/www.zip", "/backup.bak", "/wp-config.php.bak",
-    "/config.php.bak", "/.env.bak", "/index.php.bak",
+// basic and above. A free scan never asks for these.
+const BACKUP_PATHS_BASIC = ["/backup.zip", "/backup.sql", "/db.sql", "/backup.bak"];
+const BACKUP_PATHS_ADVANCED = [
+    "/backup.tar.gz", "/dump.sql", "/database.sql", "/site.zip", "/www.zip",
+    "/wp-config.php.bak", "/config.php.bak", "/.env.bak", "/index.php.bak",
 ];
+const backupPathsFor = (target) =>
+    isAdvanced(target) ? [...BACKUP_PATHS_BASIC, ...BACKUP_PATHS_ADVANCED]
+        : isBasicUp(target) ? BACKUP_PATHS_BASIC : [];
 
 const ARCHIVE_MAGIC = [/^PK\x03\x04/, /^\x1f\x8b/];
 
@@ -119,7 +155,7 @@ module.exports = [
                an admin path sitting behind authentication. When this was
                critical, google.com, wikipedia.org and stripe.com all scored
                D. If a source says critical, the source is stale. */
-            const results = await mapLimit(ADMIN_PATHS, 4, async (a) => ({ a, r: await probe(target.domain, a.p, { cap: 8192 , timeout: 4500 }) }));
+            const results = await mapLimit(adminPathsFor(target), 2, async (a) => ({ a, r: await probe(target.domain, a.p, { cap: 8192 , timeout: 4500 }) }));
 
             const found = [];
             let answered = 0;
@@ -196,7 +232,9 @@ module.exports = [
         title: "Backup or archive files accessible in the web root",
         why: "A backup left in the web root hands over your database or source code to anyone who guesses the filename, and the filenames are always the same handful.",
         async run(target) {
-            const results = await mapLimit(BACKUP_PATHS, 4, async (p) => ({ p, r: await probe(target.domain, p, { cap: 2048 , timeout: 4500 }) }));
+            const paths = backupPathsFor(target);
+            if (!paths.length) throw new Error("Backup path probing does not run at this tier");
+            const results = await mapLimit(paths, 2, async (p) => ({ p, r: await probe(target.domain, p, { cap: 2048, timeout: 4500 }) }));
 
             const found = [];
             for (const { p, r } of results) {
@@ -224,8 +262,10 @@ module.exports = [
         title: "Directory listing enabled",
         why: "A directory listing shows every file in a folder, including ones never linked from anywhere. It removes the guesswork from finding what you did not mean to publish.",
         async run(target) {
-            const paths = ["/images/", "/uploads/", "/files/", "/assets/", "/static/", "/backup/", "/docs/"];
-            const results = await mapLimit(paths, 4, async (p) => ({ p, r: await probe(target.domain, p, { cap: 8192 , timeout: 4500 }) }));
+            const paths = isAdvanced(target)
+                ? ["/images/", "/uploads/", "/files/", "/assets/", "/static/", "/backup/", "/docs/"]
+                : ["/uploads/", "/files/", "/backup/"];
+            const results = await mapLimit(paths, 2, async (p) => ({ p, r: await probe(target.domain, p, { cap: 8192 , timeout: 4500 }) }));
 
             const found = [];
             for (const { p, r } of results) {
@@ -291,7 +331,7 @@ module.exports = [
             const base = target.domain.replace(/\.[a-z]+$/, "").replace(/\./g, "-");
             const names = [base, `${base}-assets`, `${base}-backup`, `${base}-static`, `${base}-uploads`, `${base}-data`, `${base}-prod`];
 
-            const results = await mapLimit(names, 4, async (n) =>
+            const results = await mapLimit(names, 2, async (n) =>
                 ({ n, r: await probe("s3.amazonaws.com", `/${encodeURIComponent(n)}?max-keys=2`, { cap: 4096 , timeout: 4500 }) }));
 
             const found = [];
@@ -301,8 +341,20 @@ module.exports = [
                 }
             }
 
-            return found.length
-                ? { passed: false, evidence: `The AWS S3 container "${found[0].bucket}" lists its contents publicly.`, detail: { found } }
+            if (found.length) {
+                return { passed: false, evidence: `The AWS S3 container "${found[0].bucket}" lists its contents publicly.`, detail: { found } };
+            }
+
+            /* Report what was actually TESTED, not what was planned.
+               S3 answers 403 for a bucket that is private or absent, which is
+               a normal reply — but four in a row trips the host governor and
+               the rest are skipped. Saying "none of 7" after testing 4 would
+               be exactly the kind of quietly-wrong claim this product exists
+               to avoid. */
+            const tested = results.filter(({ r }) => r.ok).length;
+            if (tested === 0) throw new Error("Storage provider did not answer any probe");
+            return tested < names.length
+                ? { passed: true, evidence: `No publicly listable storage found. ${tested} of ${names.length} predictable names were tested before the provider stopped answering.`, detail: { tested, planned: names.length } }
                 : { passed: true, evidence: `No publicly listable storage found for ${names.length} predictable names.` };
         },
     },

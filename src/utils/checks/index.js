@@ -58,4 +58,55 @@ function checksForTier(tier = "snapshot") {
     return ALL_CHECKS.filter((c) => (TIER_RANK[c.minTier] ?? 0) <= max);
 }
 
-module.exports = { ALL_CHECKS, checksForTier, TIER_RANK, BY_FILE: { surface, http, tls, email, intel } };
+/* ── scan order ───────────────────────────────────────────────────────────
+   Cheap and quiet first, speculative path probing last.
+
+   If a target's firewall decides it has seen enough of us, it does so partway
+   through — so whatever ran first is what we still have. Ordering by noise
+   means a blocked scan still carries its DNS, certificate and header results
+   rather than losing everything.
+
+   These are the checks that REQUEST PATHS NOBODY LINKED TO. They are the
+   reason a scan looks like directory brute-forcing to a firewall, and the
+   reason this scanner was blocked in task 05a. They run last, two at a time,
+   after everything cheap has already been banked. */
+const PATH_PROBING = new Set([
+    "SURF-ADMIN-02", "SURF-STAGING-03", "SURF-GIT-04", "SURF-ENVFILE-05",
+    "SURF-BACKUP-06", "SURF-DIRLIST-07", "SURF-BUCKET-12", "SURF-DEBUG-13",
+    "SURF-SECURITYTXT-64",
+]);
+
+/* Which other hosts a check talks to. Pacing meant for the customer's server
+   must not slow down crt.sh or a breach API — they are different hosts and
+   the governor already keeps them separate, but these also need not be
+   throttled to two at a time. */
+const OFF_TARGET = new Set([
+    "BREACH-CREDS-52", "BREACH-EXEC-53", "BREACH-SECRET-54", "BREACH-METADATA-55",
+    "SURF-INVENTORY-16", "SURF-TAKEOVER-01", "BRAND-TYPO-58", "BRAND-TYPO-59",
+    "SURF-BUCKET-12", "DNS-DNSSEC-49",
+]);
+
+const DNS_ONLY = new Set(email.map((c) => c.id));
+
+/** 0 quietest … 4 noisiest. Used to sort, and to pick a batch size. */
+function scanRank(check) {
+    if (PATH_PROBING.has(check.id)) return 4;              // speculative paths
+    if (OFF_TARGET.has(check.id)) return 3;                // other people's APIs
+    if (tls.some((c) => c.id === check.id)) return 1;      // one handshake
+    if (DNS_ONLY.has(check.id)) return 0;                  // DNS only, no HTTP
+    return 2;                                              // the shared homepage fetch
+}
+
+/** Quietest first. Stable within a rank so the order is reproducible. */
+function orderedForTier(tier = "snapshot") {
+    return checksForTier(tier)
+        .map((c, i) => ({ c, i, r: scanRank(c) }))
+        .sort((a, b) => (a.r - b.r) || (a.i - b.i))
+        .map((x) => x.c);
+}
+
+module.exports = {
+    ALL_CHECKS, checksForTier, orderedForTier, scanRank,
+    TIER_RANK, PATH_PROBING, OFF_TARGET,
+    BY_FILE: { surface, http, tls, email, intel },
+};

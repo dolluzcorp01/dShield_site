@@ -25,8 +25,9 @@ const dns = require("dns").promises;
 // from here.
 const {
     withTimeout, fetchUrl, getCertificate, txtRecords, typoVariants,
+    resetHostState, isHostBlocked, BLOCKED_MESSAGE,
 } = require("./net");
-const { ALL_CHECKS, checksForTier } = require("./checks");
+const { ALL_CHECKS, checksForTier, orderedForTier, scanRank } = require("./checks");
 
 // Severity weights. Identical to the paid engine — the published formula
 // depends on these, and a customer is invited to recompute a grade by hand.
@@ -84,10 +85,19 @@ const MIN_COVERAGE_CHECKS = 5;
 
 const PER_CHECK_TIMEOUT_MS = 12000;
 
-// How many checks run at once, and the wall clock for the whole scan.
-// See the note in runScan for why both exist.
-const BATCH = 8;
-const BUDGET_MS = 150000;
+/* How many checks run at once, and the wall clock for the whole scan.
+   See the note in runScan for why both exist.
+
+   Path-probing checks run TWO at a time against the target. The governor in
+   net.js already spaces requests to one host by 700ms, but a small batch
+   also keeps a slow host from holding eight check slots open at once.
+
+   The budget is 180s rather than 150s because pacing makes scans slower by
+   design — that is the trade this task exists to make. Free scans run 8
+   checks and are nowhere near it. */
+const BATCH_QUIET = 8;
+const BATCH_NOISY = 2;
+const BUDGET_MS = 180000;
 
 // ── scoring ──────────────────────────────────────────────────────────────
 //
@@ -232,12 +242,19 @@ async function runScan(domainInput, opts = {}) {
             { code: "PRIVATE_ADDRESS" });
     }
 
-    const target = { domain, hostname: domain, origin: `https://${domain}` };
+    /* Clean host state per scan. A target blocked on one visitor's scan must
+       not be treated as blocked for the next, and a host that has recovered
+       must get a fair hearing. */
+    resetHostState();
+
+    // `tier` is on the target so a check can vary HOW MUCH it probes without
+    // changing what it reports. See the probe-list note in checks/surface.js.
+    const target = { domain, hostname: domain, origin: `https://${domain}`, tier };
 
     /* Which checks this tier runs. A higher tier runs everything the lower
        tiers run plus its own — never a different set. Default is snapshot, so
        an unchanged caller (the free scan) still runs exactly 8. */
-    const checks = checksForTier(tier);
+    const checks = orderedForTier(tier);
 
     const findings = [];
     const inconclusive = [];
@@ -259,13 +276,29 @@ async function runScan(domainInput, opts = {}) {
     const deadline = Date.now() + BUDGET_MS;
     let completed = 0;
 
-    for (let i = 0; i < checks.length; i += BATCH) {
-        const batch = checks.slice(i, i + BATCH);
+    let i = 0;
+    while (i < checks.length) {
+        // Batch size follows the noisiest check in the run — two at a time
+        // once we are requesting speculative paths.
+        const size = scanRank(checks[i]) >= 4 ? BATCH_NOISY : BATCH_QUIET;
+        const batch = checks.slice(i, i + size);
+        i += size;
 
         if (Date.now() > deadline) {
             batch.forEach((c) => inconclusive.push({
                 checkId: c.id, domain: c.domain, title: c.title,
                 reason: "Not run — the scan reached its time budget",
+            }));
+            continue;
+        }
+
+        /* The target has told us to stop. Everything left that would talk to
+           it is inconclusive, and we make no further requests. Pressing on
+           lengthens the block and tells their security team we are hostile. */
+        if (isHostBlocked(domain)) {
+            batch.forEach((c) => inconclusive.push({
+                checkId: c.id, domain: c.domain, title: c.title,
+                reason: BLOCKED_MESSAGE,
             }));
             continue;
         }

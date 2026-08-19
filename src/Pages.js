@@ -182,9 +182,16 @@ export function HowItWorks() {
             <div className="ds-grid ds-grid--2" style={{ marginTop: 18 }}>
                 {[
                     ["No port scanning", "Scanning ports is active reconnaissance. It sets off intrusion detection and it is not what a customer agreed to when they typed a domain."],
-                    ["No attempts to break in", "We never try a login, never send input designed to find a weakness by breaking something, never touch anything we are not invited to."],
+                    /* Corrected. The previous wording — "never touch anything we
+                       are not invited to" — was literally true and gave a false
+                       impression: we do request common paths, and nobody invited
+                       us to ask for /wp-config.php.bak. For a company selling
+                       honesty about what it can and cannot see, a true-but-
+                       misleading claim is worse than an unflattering one. */
+                    ["No attempts to break in", "We never try a login, never submit input designed to make something fail, and never attempt to gain access. We do request a small number of common web paths — the sort an attacker checks first — because finding an exposed backup file or an open admin page is the point."],
                     ["No write access, ever", "Even at the highest tier, every connection to a customer's systems is read-only. A token carrying write access is refused by the code."],
                     ["No grade from a partial scan", "If too few checks complete, no score is published at all. A number built on checks that never ran is worse than no number."],
+                    ["We are not invisible, and we do not pretend to be", "Our scanner identifies itself in every request and comes from a fixed address. Your security tools may log the scan, and some firewalls will block it — if that happens we stop, and say so rather than pressing on. A tool that tried to hide from your defences would be a strange thing to buy from a security company."],
                 ].map(([t, d]) => (
                     <div className="ds-card" key={t}>
                         <h3>{t}</h3>
@@ -254,6 +261,10 @@ export function Trust() {
             <p className="ds-muted">
                 We do not store passwords or password hashes from the tool, and we do not sell or
                 share any of it. Write to us and we will delete your record.
+            </p>
+            <p className="ds-muted">
+                Every request we make identifies itself as dShield and links back to this site, so
+                anyone reviewing their own logs can see exactly who we were.
             </p>
 
             <h2 style={{ marginTop: 44 }}>Grade caps</h2>
