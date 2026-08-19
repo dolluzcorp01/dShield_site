@@ -348,6 +348,18 @@ async function runScan(domainInput, opts = {}) {
         domainScores: scores.domainScores,
         inconclusive,
         coverageMap: ALL_DOMAINS,
+        /* FULL FINDINGS ARE ATTACHED ONLY ABOVE THE FREE TIER.
+           The report builder needs each finding's title and evidence, but
+           Scan_server.js returns this object to the browser VERBATIM — it
+           does not filter it. So attaching findings unconditionally would
+           publish every title and evidence string on every free scan and
+           destroy the paywall that /result promises is "never sent".
+
+           Gating it on tier keeps the free response byte-identical and puts
+           the paywall in the engine as well as in the report builder. A
+           caller who wants findings has to ask for a paid tier. */
+        ...(tier !== "snapshot" ? { findings } : {}),
+
         // Titles only, and only for the domain they sit in. No evidence, no
         // remediation, no detail — that is what the paid tiers are. The
         // paywall lives on the server; withheld content never reaches the
