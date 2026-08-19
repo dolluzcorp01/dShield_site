@@ -240,7 +240,137 @@ ${"Received:".padEnd(16)}${p.receivedAt}
 ${footerText("internal", p)}`,
 };
 
-const TEMPLATES = { notify_confirm, scan_result, enquiry_ack, enquiry_alert };
+
+/* ── 5 · paid_report — TRANSACTIONAL ─────────────────────────────────── */
+//
+// THE PAYWALL APPLIES HERE TOO. Grade, counts and the link — no finding
+// titles, no evidence. An email is forwarded far more often than a page is,
+// so if anything the rule matters more here than on the report itself.
+
+const paid_report = {
+    subject: (p = {}) => `Your dShield ${p.tier || ""} report for ${p.domain || "your domain"}`.replace(/\s+/g, " "),
+    html: (p = {}) => {
+        const c = p.counts || {};
+        const url = `${SITE_URL}/report/${p.reportToken}`;
+        const row = (label, value, colour) =>
+            `<tr><td style="padding:5px 0;color:${MUTED};font-size:14px;">${esc(label)}</td>
+             <td style="padding:5px 0;text-align:right;font-weight:bold;color:${colour || TEXT};">${esc(value)}</td></tr>`;
+        return shell(`
+<p style="margin:0 0 18px;">Your report for <strong>${esc(p.domain)}</strong> is ready.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:8px;">
+  <tr><td style="padding:18px 20px;">
+    <div style="font-size:44px;line-height:1;font-weight:bold;color:${GOLD};">${esc(p.grade || "—")}</div>
+    <div style="color:${MUTED};font-size:13px;margin-top:4px;">${esc(p.score)} out of 100</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:14px;border-top:1px solid ${LINE};">
+      ${row("Critical", c.critical ?? 0, "#c0392b")}
+      ${row("High", c.high ?? 0, "#d35400")}
+      ${row("Medium", c.medium ?? 0, "#b7950b")}
+      ${row("Low", c.low ?? 0, TEXT)}
+      ${row("Checks passed", p.passedCount ?? 0, "#1e8449")}
+    </table>
+  </td></tr>
+</table>
+<p style="margin:20px 0 8px;">${btn(url, "Open your report")}</p>
+<p style="margin:16px 0 0;font-size:14px;color:${MUTED};">
+This link is private — anyone holding it can read the report, so treat it as you would the report itself.
+It works until <strong>${esc(p.expiresOn)}</strong>. If it expires, write to us and we will send a fresh one.
+</p>
+<p style="margin:14px 0 0;font-size:13px;color:${MUTED};">Order reference ${esc(p.orderRef)}</p>`,
+            footer("transactional", p));
+    },
+    text: (p = {}) => {
+        const c = p.counts || {};
+        return `Your dShield report for ${p.domain}
+
+Grade ${p.grade}  —  ${p.score} out of 100
+
+  Critical        ${c.critical ?? 0}
+  High            ${c.high ?? 0}
+  Medium          ${c.medium ?? 0}
+  Low             ${c.low ?? 0}
+  Checks passed   ${p.passedCount ?? 0}
+
+Open your report: ${SITE_URL}/report/${p.reportToken}
+
+This link is private — anyone holding it can read the report, so treat it as
+you would the report itself. It works until ${p.expiresOn}. If it expires,
+write to us and we will send a fresh one.
+
+Order reference ${p.orderRef}
+
+--
+${footerText("transactional", p)}`;
+    },
+};
+
+/* ── 6 · fulfilment_delayed — TRANSACTIONAL ──────────────────────────── */
+//
+// They have paid and we cannot deliver yet. Silence is the one unacceptable
+// outcome, so this goes out immediately and says a person is involved. It
+// does not promise a refund: that is a human decision, not an automatic one.
+
+const fulfilment_delayed = {
+    subject: (p = {}) => `We could not complete your dShield report for ${p.domain || "your domain"}`,
+    html: (p = {}) => shell(`
+<p style="margin:0 0 16px;">We have your payment, and we could not finish the assessment of <strong>${esc(p.domain)}</strong>.</p>
+<p style="margin:0 0 16px;">Too few of our checks completed to publish a report we would stand behind. This usually means a firewall stopped the scan partway through, which is your protection working rather than anything wrong on your side.</p>
+<p style="margin:0 0 16px;">We would rather tell you this than send you a number built on checks that did not run. Somebody here has already been alerted and will be in touch — you do not need to do anything.</p>
+<p style="margin:0;font-size:13px;color:${MUTED};">Order reference ${esc(p.orderRef)}</p>`,
+        footer("transactional", p)),
+    text: (p = {}) => `We could not complete your dShield report for ${p.domain}
+
+We have your payment, and we could not finish the assessment of ${p.domain}.
+
+Too few of our checks completed to publish a report we would stand behind.
+This usually means a firewall stopped the scan partway through, which is your
+protection working rather than anything wrong on your side.
+
+We would rather tell you this than send you a number built on checks that did
+not run. Somebody here has already been alerted and will be in touch — you do
+not need to do anything.
+
+Order reference ${p.orderRef}
+
+--
+${footerText("transactional", p)}`,
+};
+
+/* ── 7 · fulfilment_failed — INTERNAL ────────────────────────────────── */
+//
+// A paid order that could not be delivered. This is the alert that means a
+// person finds out before the customer does.
+
+const fulfilment_failed = {
+    subject: (p = {}) => `Fulfilment failed — ${p.orderRef || "unknown order"}`,
+    html: (p = {}) => shell(`
+<p style="margin:0 0 16px;font-size:16px;"><strong>A paid order was not delivered</strong></p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
+${[["orderRef", "Order"], ["tier", "Tier"], ["domain", "Domain"], ["email", "Customer"], ["amountInr", "Amount (INR)"], ["error", "Error"]]
+    .map(([k, label]) => `  <tr>
+    <td style="padding:7px 12px 7px 0;color:${MUTED};vertical-align:top;white-space:nowrap;">${label}</td>
+    <td style="padding:7px 0;vertical-align:top;">${p[k] ? esc(p[k]) : `<span style="color:#a9adb4;">—</span>`}</td>
+  </tr>`).join("")}
+</table>
+<p style="margin:18px 0 0;color:${MUTED};font-size:13px;">The customer has paid. Until somebody acts on this, they have money with us and nothing to show for it.</p>`,
+        footer("internal", p)),
+    text: (p = {}) => `A paid order was not delivered
+
+Order    : ${p.orderRef || "—"}
+Tier     : ${p.tier || "—"}
+Domain   : ${p.domain || "—"}
+Customer : ${p.email || "—"}
+Amount   : INR ${p.amountInr ?? "—"}
+Error    : ${p.error || "—"}
+
+The customer has paid. Until somebody acts on this, they have money with us
+and nothing to show for it.
+
+--
+${footerText("internal", p)}`,
+};
+
+const TEMPLATES = { notify_confirm, scan_result, enquiry_ack, enquiry_alert,
+    paid_report, fulfilment_delayed, fulfilment_failed };
 
 /** Render one outbox row. Throws on an unknown template so the worker can
  *  record it as a failure rather than sending a blank email. */

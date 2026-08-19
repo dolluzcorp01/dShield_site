@@ -13,6 +13,7 @@ function Pricing() {
 
     const [plans, setPlans] = useState([]);
     const [note, setNote] = useState("");
+    const [paymentsLive, setPaymentsLive] = useState(false);
     const [loading, setLoading] = useState(true);
 
     const [email, setEmail] = useState("");
@@ -25,7 +26,7 @@ function Pricing() {
         (async () => {
             const res = await apiGet("/api/leads/pricing");
             setLoading(false);
-            if (res.success) { setPlans(res.plans); setNote(res.note); }
+            if (res.success) { setPlans(res.plans); setNote(res.note); setPaymentsLive(!!res.paymentsLive); }
         })();
     }, []);
 
@@ -57,7 +58,9 @@ function Pricing() {
 
             {note && (
                 <div className="ds-note pricing__note">
-                    <strong>Reports are not on sale yet.</strong> {note}
+                    {paymentsLive
+                        ? note
+                        : <><strong>Reports are not on sale yet.</strong> {note}</>}
                 </div>
             )}
 
@@ -125,7 +128,8 @@ function Pricing() {
                             )}
 
                             {p.available ? (
-                                <Link to="/" className="ds-btn ds-btn--block plan__cta">{p.cta}</Link>
+                                // Buyable: carry the tier into checkout.
+                                <Link to={`/checkout?tier=${p.key}`} className="ds-btn ds-btn--block plan__cta">{p.cta}</Link>
                             ) : p.cta === "Talk to us" ? (
                                 <Link to="/contact" className="ds-btn ds-btn--ghost ds-btn--block plan__cta">{p.cta}</Link>
                             ) : (

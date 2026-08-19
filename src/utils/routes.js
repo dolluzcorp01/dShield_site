@@ -31,12 +31,13 @@ const EXACT_ROUTES = [
     "/contact",
     "/legal",
     "/data-request",
+    "/checkout",
 ];
 
 // Paths whose children are valid: /tools/ssl, /legal/privacy, /result/<uuid>,
 // /preferences/<token>. The trailing slash is required — "/tools" is matched
 // exactly above, and without it "/toolsomething" would match too.
-const PREFIX_ROUTES = ["/tools/", "/legal/", "/result/", "/preferences/"];
+const PREFIX_ROUTES = ["/tools/", "/legal/", "/result/", "/preferences/", "/order/", "/report/"];
 
 const TOOL_SLUGS = ["email-spoofing", "ssl", "headers", "lookalike", "password"];
 const LEGAL_KEYS = ["terms", "privacy", "refunds", "cookies"];

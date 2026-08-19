@@ -43,6 +43,17 @@ app.use(cors({
     exposedHeaders: ["Content-Disposition"],
 }));
 
+/* ⚠️  THE WEBHOOK NEEDS THE RAW BYTES, AND THIS MOUNT MUST STAY ABOVE
+   express.json(). THIS IS NOT A MISTAKE.
+
+   Razorpay signs the exact body it sent. express.json() would parse it, and
+   anything we then re-stringify differs by key order and whitespace, so the
+   HMAC never matches — and the failure looks exactly like a wrong secret,
+   which is a genuinely miserable afternoon.
+
+   Scoped to this one path, so every other route still gets parsed JSON. */
+app.use("/api/payments/webhook", express.raw({ type: "application/json", limit: "1mb" }));
+
 // ✅ Middleware for parsing JSON and reading HTTP-only cookies
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
@@ -64,12 +75,17 @@ const LeadRoutes = require('./src/backend_routes/Lead_server');
 // the mount point into each route string.
 const { legalRouter, preferencesRouter, dataRequestRouter } = require('./src/backend_routes/Legal_server');
 
+// Checkout, payment verification, fulfilment and report delivery.
+const { router: PaymentRoutes, reportsRouter: ReportRoutes } = require('./src/backend_routes/Payment_server');
+
 app.use("/api/scan", ScanRoutes);
 app.use("/api/tools", ToolsRoutes);
 app.use("/api/leads", LeadRoutes);
 app.use("/api/legal", legalRouter);
 app.use("/api/preferences", preferencesRouter);
 app.use("/api/data-request", dataRequestRouter);
+app.use("/api/payments", PaymentRoutes);
+app.use("/api/reports", ReportRoutes);
 
 // Mounted here, before the static and SPA-fallback block below. After them,
 // express.static would miss it and the fallback would answer with index.html.

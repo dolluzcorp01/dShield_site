@@ -1,0 +1,29 @@
+/* Checkout and the post-payment status page. Tokens only. */
+
+.checkout__grid { align-items: start; gap: 24px; }
+.checkout__form { display: flex; flex-direction: column; gap: 18px; }
+
+.checkout__terms { display: flex; gap: 10px; align-items: flex-start; font-size: .92rem; color: var(--bone-dim); line-height: 1.5; }
+.checkout__terms input { margin-top: 3px; flex: none; }
+.checkout__terms a { color: var(--gold); }
+
+.checkout__fine { margin: 0; text-align: center; }
+
+.checkout__summary h3 { margin: 0 0 10px; font-size: 1rem; }
+.checkout__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.checkout__list li { padding-left: 20px; position: relative; color: var(--bone-dim); font-size: .93rem; line-height: 1.5; }
+.checkout__list li::before { content: "✓"; position: absolute; left: 0; color: var(--pass); }
+.checkout__list--no li::before { content: "—"; color: var(--bone-faint); }
+
+.checkout__total {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line);
+}
+.checkout__total strong { font-size: 1.5rem; color: var(--gold); }
+
+/* ── order status ────────────────────────────────────────────────────── */
+
+.orderwait, .orderdone, .orderfail { max-width: 640px; }
+.orderwait__stage { display: flex; align-items: center; gap: 12px; margin: 18px 0; color: var(--bone); }
+.orderdone__actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+.orderfail { border-color: var(--gold-dim); }

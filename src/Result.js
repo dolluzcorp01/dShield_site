@@ -18,6 +18,7 @@ function Result() {
     const [result, setResult] = useState(location.state?.result || null);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(!location.state?.result);
+    const [canBuy, setCanBuy] = useState(false);
 
     /* noindex, and a GENERIC title with no domain in it.
        A result is an assessment of somebody else's company and often carries
@@ -28,6 +29,14 @@ function Result() {
         description: "A dShield free security scan result.",
         noindex: true,
     });
+
+    // Is anything actually on sale? The server decides; the page only asks.
+    useEffect(() => {
+        (async () => {
+            const res = await apiGet("/api/leads/pricing");
+            if (res.success) setCanBuy((res.plans || []).some((p) => p.available && p.key === "advanced"));
+        })();
+    }, []);
 
     useEffect(() => {
         if (result) return;
@@ -264,7 +273,12 @@ function Result() {
                         moment they open, or talk to us now if you would rather move sooner.
                     </p>
                     <div className="nextstep__actions">
-                        <Link to="/pricing" className="ds-btn">See what a full report covers</Link>
+                        {/* Carry the domain they just scanned into checkout, so
+                            nobody has to type it a second time. Falls back to
+                            /pricing until a tier is actually buyable. */}
+                        {canBuy
+                            ? <Link to={`/checkout?tier=advanced&domain=${encodeURIComponent(result.domain)}`} className="ds-btn">Get the full report</Link>
+                            : <Link to="/pricing" className="ds-btn">See what a full report covers</Link>}
                         {/* Somebody who has just been shown 18 dark tiles is the most
                             likely person on the site to want to know what is in them. */}
                         <Link to="/coverage" className="ds-btn ds-btn--ghost">What the other 18 cover</Link>

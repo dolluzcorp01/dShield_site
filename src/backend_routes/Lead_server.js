@@ -17,6 +17,7 @@ const crypto = require("crypto");
 const getDBConnection = require("../../config/db");
 const { isSuppressed } = require("../utils/suppression");
 const { queueMail } = require("../utils/mail");
+const { getPlans, paymentsConfigured } = require("../data/plans");
 
 /* Service slugs, mirrored from SERVICE_LABELS in src/Pages.js. Kept here so
    an enquiry alert reads "Penetration Testing" rather than
@@ -200,95 +201,19 @@ router.post("/notify", (req, res) => {
 // ── GET /api/leads/pricing ───────────────────────────────────────────────
 //
 // Served from the API rather than hardcoded in the React bundle so a price
-// change is a data change, not a rebuild and redeploy. When the console
-// exists this reads from pricing_plans instead.
-const PLANS = [
-    {
-        key: "snapshot", name: "Free scan", price: 0, display: "Free",
-        billing: "No card, no sign-up",
-        tagline: "Where you stand, from outside",
-        features: [
-            "Grade across the five domains a scan can measure",
-            "How many issues, and how serious",
-            "The full 23-domain coverage map",
-            "Unlimited, forever",
-        ],
-        notIncluded: ["What the issues actually are"],
-        available: true,
-        cta: "Run a free scan",
-    },
-    {
-        key: "basic", name: "Basic", price: 49, display: "$49",
-        billing: "one-time",
-        tagline: "Knowing what is wrong",
-        features: [
-            "Every finding named, with the evidence",
-            "Severity and priority for each",
-            "A timeline per finding",
-            "PDF and machine-readable export",
-        ],
-        notIncluded: ["How to fix any of it"],
-        available: false,
-        cta: "Notify me",
-    },
-    {
-        key: "advanced", name: "Advanced", price: 199, display: "$199",
-        billing: "one-time or monthly",
-        tagline: "Measuring, not just asking",
-        highlight: true,
-        features: [
-            "Everything in Basic",
-            "Step-by-step remediation for every finding",
-            "Effort estimate and verification step",
-            "A prioritised 90-day roadmap",
-            "Connect 3 of your own systems, read-only",
-            "We measure your posture directly",
-        ],
-        available: false,
-        cta: "Notify me",
-    },
-    {
-        key: "full_protection", name: "Full Protection", price: 499, display: "$499",
-        billing: "one-time or monthly",
-        tagline: "Seeing all 23 domains",
-        features: [
-            "Everything in Advanced",
-            "Connect 15 systems",
-            "222-question guided assessment",
-            "Covers the 18 domains no scan can reach",
-            "Two consultation sessions with a specialist",
-            "Log and document analysis",
-        ],
-        available: false,
-        cta: "Talk to us",
-    },
-    {
-        // Named for what it is: Extended Support is not an alternative to Full
-        // Protection, it is Full Protection with the remediation carried out.
-        // The key stays `extended_support` — it is written into leads and
-        // enquiries rows already, and renaming it would orphan them.
-        key: "extended_support", name: "Full Protection + Extended Support", price: 999, display: "$999+",
-        billing: "per month",
-        tagline: "Having it fixed, not documented",
-        features: [
-            "Everything in Full Protection",
-            "Connect 25 systems",
-            "Remediation carried out by our engineers",
-            "Four consultation hours every month",
-            "A named lead who knows your estate",
-            "Three months post-resolution support",
-        ],
-        available: false,
-        cta: "Talk to us",
-    },
-];
-
+// change is a data change, not a rebuild and redeploy.
+//
+// The list itself now lives in src/data/plans.js, shared with checkout —
+// the pricing page and the till disagreeing about what something costs is
+// the kind of problem you hear about from a customer.
 router.get("/pricing", (req, res) => {
     res.json({
         success: true,
-        plans: PLANS,
-        paymentsLive: false,
-        note: "Reports are not yet on sale. Leave your address and we will write the moment they are.",
+        plans: getPlans(),
+        paymentsLive: paymentsConfigured(),
+        note: paymentsConfigured()
+            ? "Prices are charged in Indian rupees."
+            : "Reports are not yet on sale. Leave your address and we will write the moment they are.",
     });
 });
 

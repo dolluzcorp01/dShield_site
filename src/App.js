@@ -10,6 +10,9 @@ import Services from "./Services";
 import Coverage from "./Coverage";
 import { LegalIndex, Legal, DataRequest } from "./Legal";
 import Preferences from "./Preferences";
+import Checkout from "./Checkout";
+import OrderStatus from "./OrderStatus";
+import Report from "./Report";
 import { Contact, HowItWorks, Trust, Footer, NotFound } from "./Pages";
 import "./App.css";
 
@@ -47,6 +50,9 @@ function App() {
                     <Route path="/legal/:key" element={<Legal />} />
                     <Route path="/preferences/:token" element={<Preferences />} />
                     <Route path="/data-request" element={<DataRequest />} />
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/order/:ref" element={<OrderStatus />} />
+                    <Route path="/report/:token" element={<Report />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </main>
