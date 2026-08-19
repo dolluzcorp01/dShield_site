@@ -18,9 +18,15 @@
 // ─────────────────────────────────────────────────────────────────────────
 
 const dns = require("dns").promises;
-const tls = require("tls");
-const https = require("https");
-const http = require("http");
+
+// The network helpers moved to ./net so the check files can use them
+// without requiring this module back and creating a cycle. They are
+// re-exported below, unchanged, because tools_engine.js imports them
+// from here.
+const {
+    withTimeout, fetchUrl, getCertificate, txtRecords, typoVariants,
+} = require("./net");
+const { ALL_CHECKS, checksForTier } = require("./checks");
 
 // Severity weights. Identical to the paid engine — the published formula
 // depends on these, and a customer is invited to recompute a grade by hand.
@@ -78,303 +84,10 @@ const MIN_COVERAGE_CHECKS = 5;
 
 const PER_CHECK_TIMEOUT_MS = 12000;
 
-// ── helpers ──────────────────────────────────────────────────────────────
-
-function withTimeout(promise, ms, label) {
-    let timer;
-    const timeout = new Promise((_, reject) => {
-        timer = setTimeout(() => reject(new Error(`${label} timed out`)), ms);
-    });
-    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
-}
-
-/**
- * Fetch a URL and return status, headers and a capped body.
- *
- * The cap matters. In the main engine a homepage over 256 KB hung every HTTP
- * check, because destroying the socket meant the 'end' event never fired —
- * one check took ten seconds against a 108ms raw request. Read a bounded
- * number of bytes and resolve rather than waiting for a body we do not want.
- */
-function fetchUrl(url, { method = "GET", maxBytes = 262144 } = {}) {
-    return new Promise((resolve, reject) => {
-        let lib;
-        try {
-            lib = new URL(url).protocol === "http:" ? http : https;
-        } catch (e) {
-            return reject(new Error("Invalid URL"));
-        }
-
-        const req = lib.request(url, {
-            method,
-            timeout: 10000,
-            rejectUnauthorized: false,   // we report certificate problems, not refuse on them
-            headers: { "User-Agent": "dShield-Scanner/1.0 (+https://dshield.dolluzcorp.com)" },
-        }, (res) => {
-            let body = "";
-            let bytes = 0;
-            res.on("data", (chunk) => {
-                bytes += chunk.length;
-                if (bytes <= maxBytes) body += chunk.toString("utf8");
-                else { res.destroy(); resolve({ status: res.statusCode, headers: res.headers, body, truncated: true }); }
-            });
-            res.on("end", () => resolve({ status: res.statusCode, headers: res.headers, body, truncated: false }));
-            res.on("error", reject);
-        });
-
-        req.on("timeout", () => { req.destroy(); reject(new Error("Request timed out")); });
-        req.on("error", reject);
-        req.end();
-    });
-}
-
-/** Read a TLS certificate without trusting it — an expired cert is the finding. */
-function getCertificate(hostname, port = 443) {
-    return new Promise((resolve, reject) => {
-        const socket = tls.connect({
-            host: hostname, port, servername: hostname,
-            rejectUnauthorized: false, timeout: 10000,
-        }, () => {
-            const cert = socket.getPeerCertificate(true);
-            const protocol = socket.getProtocol();
-            socket.end();
-            if (!cert || !Object.keys(cert).length) return reject(new Error("No certificate presented"));
-            resolve({ cert, protocol });
-        });
-        socket.on("timeout", () => { socket.destroy(); reject(new Error("TLS connection timed out")); });
-        socket.on("error", reject);
-    });
-}
-
-async function txtRecords(name) {
-    const records = await dns.resolveTxt(name);
-    return records.map((parts) => parts.join(""));
-}
-
-// ── the eight checks ─────────────────────────────────────────────────────
-//
-// Each returns { passed, evidence, detail } or throws. A throw becomes
-// INCONCLUSIVE — never a pass.
-
-const CHECKS = [
-
-    // ---- Domain 6 · Email & Domain Security -----------------------------
-    {
-        id: "EMAIL-SPF-38",
-        domain: 6,
-        severity: "high",
-        title: "No SPF record published",
-        why: "SPF tells the world which servers may send email using your domain. Without it, anyone can send mail that appears to come from you.",
-        async run(target) {
-            const records = await txtRecords(target.domain);
-            const spf = records.find((r) => r.toLowerCase().startsWith("v=spf1"));
-            return spf
-                ? { passed: true, evidence: `SPF record published: ${spf.slice(0, 120)}` }
-                : { passed: false, evidence: "No TXT record beginning v=spf1 was found." };
-        },
-    },
-    {
-        id: "EMAIL-DMARC-44",
-        domain: 6,
-        severity: "critical",
-        title: "No DMARC record published",
-        why: "DMARC tells receiving mail servers what to do with mail that fails your SPF and DKIM checks. Without it, those checks carry no instruction and forged mail is usually delivered.",
-        async run(target) {
-            const records = await txtRecords(`_dmarc.${target.domain}`).catch(() => []);
-            const dmarc = records.find((r) => r.toLowerCase().startsWith("v=dmarc1"));
-            target._dmarc = dmarc || null;
-            return dmarc
-                ? { passed: true, evidence: `DMARC record published: ${dmarc.slice(0, 120)}` }
-                : { passed: false, evidence: "No TXT record at _dmarc beginning v=DMARC1 was found." };
-        },
-    },
-    {
-        id: "EMAIL-DMARC-45",
-        domain: 6,
-        severity: "critical",
-        title: "DMARC policy set to monitor only",
-        why: "A policy of p=none reports forged mail but asks receivers to deliver it anyway. It is a listening post, not a defence.",
-        async run(target) {
-            let dmarc = target._dmarc;
-            if (dmarc === undefined) {
-                const records = await txtRecords(`_dmarc.${target.domain}`).catch(() => []);
-                dmarc = records.find((r) => r.toLowerCase().startsWith("v=dmarc1")) || null;
-            }
-            // No DMARC at all is reported by EMAIL-DMARC-44. Scoring it twice
-            // would punish one mistake in two places.
-            if (!dmarc) throw new Error("No DMARC record to evaluate");
-
-            const policy = (/p\s*=\s*(none|quarantine|reject)/i.exec(dmarc) || [])[1];
-            if (!policy) throw new Error("DMARC record has no p= tag");
-            return policy.toLowerCase() === "none"
-                ? { passed: false, evidence: `DMARC policy is p=none — forged mail is reported but still delivered.` }
-                : { passed: true, evidence: `DMARC policy is p=${policy.toLowerCase()}.` };
-        },
-    },
-
-    // ---- Domain 4 · Encryption & Certificates ---------------------------
-    {
-        id: "TLS-CERT-EXPIRED-29",
-        domain: 4,
-        severity: "critical",
-        title: "Certificate has expired",
-        why: "An expired certificate makes every visitor's browser show a full-page security warning. Most people leave, and those who continue have been taught to click through exactly the warning that protects them.",
-        async run(target) {
-            const { cert } = await getCertificate(target.hostname);
-            const notAfter = new Date(cert.valid_to);
-            target._cert = cert;
-            const days = Math.floor((notAfter - Date.now()) / 86400000);
-            target._certDays = days;
-            return days < 0
-                ? { passed: false, evidence: `Certificate expired ${Math.abs(days)} day(s) ago, on ${notAfter.toDateString()}.` }
-                : { passed: true, evidence: `Certificate valid until ${notAfter.toDateString()}.` };
-        },
-    },
-    {
-        id: "TLS-CERT-EXPIRING-28",
-        domain: 4,
-        severity: "high",
-        title: "Certificate expiring soon",
-        why: "Certificate renewal is the single most common cause of unplanned outage, and it always happens on a weekend.",
-        async run(target) {
-            let days = target._certDays;
-            if (days === undefined) {
-                const { cert } = await getCertificate(target.hostname);
-                days = Math.floor((new Date(cert.valid_to) - Date.now()) / 86400000);
-            }
-            if (days < 0) throw new Error("Certificate already expired");   // reported by -29
-
-            /* Fourteen days, not thirty.
-               Let's Encrypt issues 90-day certificates and renews at 30 days
-               remaining, and most other ACME issuers behave similarly. A
-               thirty-day threshold therefore fires on a perfectly healthy site
-               in the middle of its normal renewal window — tested against
-               stripe.com, which sat at 29 days while renewing automatically.
-               Fourteen days still leaves ample warning for a genuinely stalled
-               renewal without crying wolf at every well-run site. */
-            return days <= 14
-                ? { passed: false, evidence: `Certificate expires in ${days} day(s).` }
-                : { passed: true, evidence: `Certificate has ${days} day(s) remaining.` };
-        },
-    },
-
-    // ---- Domain 1 · External Attack Surface ------------------------------
-    {
-        id: "SURF-GIT-04",
-        domain: 1,
-        severity: "critical",
-        title: "Version control directory exposed",
-        why: "A published .git directory can often be reconstructed into your complete source code, including any password or key ever committed to it — even one deleted in a later commit.",
-        async run(target) {
-            const res = await fetchUrl(`${target.origin}/.git/config`, { maxBytes: 4096 });
-            const looksLikeGit = res.status === 200 &&
-                /\[core\]|repositoryformatversion/i.test(res.body || "");
-            return looksLikeGit
-                ? { passed: false, evidence: `${target.origin}/.git/config returned 200 and contains a git configuration block.` }
-                : { passed: true, evidence: `No readable .git directory (HTTP ${res.status}).` };
-        },
-    },
-
-    // ---- Domain 10 · Breach & Exposure Intelligence ----------------------
-    //
-    // Certificate Transparency only. It is the one domain-10 signal that does
-    // not call a breach corpus, so the free tier costs nothing per scan and
-    // the paid intelligence stays a real reason to upgrade.
-    {
-        id: "BREACH-METADATA-55",
-        domain: 10,
-        severity: "medium",
-        title: "Internal information disclosed in public sources",
-        why: "Every certificate issued for your domain is published in a public log. Names like vpn, jenkins, staging or backup tell an attacker where to aim before they touch you.",
-        async run(target) {
-            const res = await withTimeout(
-                fetchUrl(`https://crt.sh/?q=%25.${encodeURIComponent(target.domain)}&output=json`, { maxBytes: 524288 }),
-                11000, "Certificate transparency lookup");
-
-            if (res.status !== 200) throw new Error(`crt.sh returned HTTP ${res.status}`);
-
-            let rows;
-            try { rows = JSON.parse(res.body); }
-            catch (e) { throw new Error("Certificate transparency response was not readable"); }
-            if (!Array.isArray(rows)) throw new Error("Unexpected response shape");
-
-            const names = new Set();
-            rows.forEach((r) => String(r.name_value || "")
-                .split("\n")
-                .forEach((n) => {
-                    const clean = n.trim().toLowerCase().replace(/^\*\./, "");
-                    if (clean.endsWith(target.domain)) names.add(clean);
-                }));
-
-            const SENSITIVE = /(^|[.-])(vpn|jenkins|gitlab|jira|staging|stage|dev|test|uat|admin|internal|intranet|backup|db|database|sql|mail|smtp|ftp|rdp|citrix|sonar|nexus|grafana|kibana)([.-]|$)/;
-            const flagged = [...names].filter((n) => SENSITIVE.test(n.replace(`.${target.domain}`, "")));
-
-            target._subdomainCount = names.size;
-
-            return flagged.length
-                ? {
-                    passed: false,
-                    evidence: `${flagged.length} internal-looking hostname(s) are published in certificate transparency logs.`,
-                    detail: flagged.slice(0, 8),
-                }
-                : { passed: true, evidence: `${names.size} hostname(s) found in public certificate logs, none obviously internal.` };
-        },
-    },
-
-    // ---- Domain 20 · Brand & Digital Risk --------------------------------
-    {
-        id: "BRAND-TYPO-59",
-        domain: 20,
-        severity: "high",
-        title: "Lookalike domain configured for email",
-        why: "A misspelling of your domain that is merely registered is a nuisance. One with mail servers configured is an invoice-fraud campaign waiting to be sent, and your customers will not notice the difference.",
-        async run(target) {
-            const variants = typoVariants(target.domain).slice(0, 14);
-
-            const results = await Promise.all(variants.map(async (v) => {
-                try {
-                    const mx = await withTimeout(dns.resolveMx(v), 4000, "MX lookup");
-                    return mx && mx.length ? v : null;
-                } catch (e) { return null; }
-            }));
-
-            const live = results.filter(Boolean);
-            return live.length
-                ? {
-                    passed: false,
-                    evidence: `${live.length} lookalike domain(s) have mail servers configured and can send email today.`,
-                    detail: live,
-                }
-                : { passed: true, evidence: `No mail-configured lookalike found among ${variants.length} common variants.` };
-        },
-    },
-];
-
-/**
- * Common typo-squatting patterns: a dropped character, a doubled character,
- * two adjacent characters swapped, and the handful of substitutions that are
- * hardest to see in a mail client.
- */
-function typoVariants(domain) {
-    const dot = domain.indexOf(".");
-    if (dot < 3) return [];
-    const name = domain.slice(0, dot);
-    const tld = domain.slice(dot);
-    const out = new Set();
-
-    for (let i = 0; i < name.length; i++) out.add(name.slice(0, i) + name.slice(i + 1) + tld);          // omission
-    for (let i = 0; i < name.length; i++) out.add(name.slice(0, i) + name[i] + name.slice(i) + tld);    // duplication
-    for (let i = 0; i < name.length - 1; i++) {                                                          // transposition
-        out.add(name.slice(0, i) + name[i + 1] + name[i] + name.slice(i + 2) + tld);
-    }
-    const SUB = { o: "0", l: "1", i: "1", e: "3", a: "@", m: "rn", s: "5" };
-    Object.entries(SUB).forEach(([from, to]) => {
-        if (name.includes(from)) out.add(name.replace(from, to) + tld);
-    });
-
-    out.delete(domain);
-    return [...out];
-}
+// How many checks run at once, and the wall clock for the whole scan.
+// See the note in runScan for why both exist.
+const BATCH = 8;
+const BUDGET_MS = 150000;
 
 // ── scoring ──────────────────────────────────────────────────────────────
 //
@@ -499,7 +212,8 @@ function isPrivateAddress(ip) {
  * onProgress is called after each check so the site can show movement — a
  * blank screen for ninety seconds reads as broken however well it works.
  */
-async function runScan(domainInput, onProgress) {
+async function runScan(domainInput, opts = {}) {
+    const { tier = "snapshot", onProgress } = (typeof opts === "function") ? { onProgress: opts } : opts;
     const parsed = normaliseDomain(domainInput);
     if (!parsed.ok) throw Object.assign(new Error(parsed.message), { code: "INVALID_DOMAIN" });
 
@@ -520,28 +234,63 @@ async function runScan(domainInput, onProgress) {
 
     const target = { domain, hostname: domain, origin: `https://${domain}` };
 
+    /* Which checks this tier runs. A higher tier runs everything the lower
+       tiers run plus its own — never a different set. Default is snapshot, so
+       an unchanged caller (the free scan) still runs exactly 8. */
+    const checks = checksForTier(tier);
+
     const findings = [];
     const inconclusive = [];
 
-    for (let i = 0; i < CHECKS.length; i++) {
-        const check = CHECKS[i];
-        if (typeof onProgress === "function") {
-            onProgress({ index: i, total: CHECKS.length, checkId: check.id, title: check.title });
+    /* THE BUDGET.
+       Fifty-eight checks run one after another would exceed any sensible
+       request timeout. Two things keep that in hand.
+
+       Concurrency: BATCH at a time, not all of them. One site receiving 58
+       simultaneous requests from us looks like an attack, and is the opposite
+       of the passive scan printed on the site — it also gets our address
+       blocked, after which every scan is inconclusive.
+
+       A wall clock: once the budget is spent, whatever has not run is marked
+       inconclusive rather than the scan hanging or failing. A partial scan
+       that says so honestly is worth more than one that never returns, and an
+       inconclusive check is excluded from scoring on both sides, so the grade
+       stays defensible. */
+    const deadline = Date.now() + BUDGET_MS;
+    let completed = 0;
+
+    for (let i = 0; i < checks.length; i += BATCH) {
+        const batch = checks.slice(i, i + BATCH);
+
+        if (Date.now() > deadline) {
+            batch.forEach((c) => inconclusive.push({
+                checkId: c.id, domain: c.domain, title: c.title,
+                reason: "Not run — the scan reached its time budget",
+            }));
+            continue;
         }
-        try {
-            const out = await withTimeout(check.run(target), PER_CHECK_TIMEOUT_MS, check.title);
-            findings.push({
-                checkId: check.id, domain: check.domain, severity: check.severity,
-                title: check.title, why: check.why,
-                passed: !!out.passed, evidence: out.evidence || null, detail: out.detail || null,
-            });
-        } catch (err) {
-            // INCONCLUSIVE. Never a pass. See the note at the top of this file.
-            inconclusive.push({ checkId: check.id, domain: check.domain, title: check.title, reason: err.message });
-        }
+
+        await Promise.all(batch.map(async (check) => {
+            if (typeof onProgress === "function") {
+                onProgress({ index: completed, total: checks.length, checkId: check.id, title: check.title });
+            }
+            try {
+                const out = await withTimeout(check.run(target), PER_CHECK_TIMEOUT_MS, check.title);
+                findings.push({
+                    checkId: check.id, domain: check.domain, severity: check.severity,
+                    title: check.title, why: check.why,
+                    passed: !!out.passed, evidence: out.evidence || null, detail: out.detail || null,
+                });
+            } catch (err) {
+                // INCONCLUSIVE. Never a pass. See the note at the top of this file.
+                inconclusive.push({ checkId: check.id, domain: check.domain, title: check.title, reason: err.message });
+            } finally {
+                completed += 1;
+            }
+        }));
     }
 
-    const checksRun = CHECKS.map((c) => ({ id: c.id, domain: c.domain, severity: c.severity }));
+    const checksRun = checks.map((c) => ({ id: c.id, domain: c.domain, severity: c.severity }));
     const scores = computeScores(findings, checksRun, inconclusive.map((i) => i.checkId));
 
     const failed = findings.filter((f) => !f.passed);
@@ -551,14 +300,14 @@ async function runScan(domainInput, onProgress) {
     return {
         domain,
         scannedAt: new Date().toISOString(),
-        tier: "snapshot",
+        tier,
         status: scores.insufficientCoverage ? "inconclusive" : "complete",
         grade: scores.grade,
         score: scores.score,
         capped: scores.capped,
         capReason: scores.capReason,
         coverageRatio: Number(scores.coverageRatio.toFixed(2)),
-        checksRun: CHECKS.length,
+        checksRun: checks.length,
         checksCompleted: scores.executed,
         counts,
         totalIssues: failed.length,
@@ -582,13 +331,18 @@ module.exports = {
     runScan,
     normaliseDomain,
     isPrivateAddress,
-    typoVariants,
     computeScores,
+    // Re-exported from ./net so this module's public surface is unchanged.
+    // tools_engine.js imports these from here and was not touched.
     fetchUrl,
     getCertificate,
     txtRecords,
+    typoVariants,
     withTimeout,
-    CHECKS,
+    // The catalogue, for callers that want to inspect it.
+    CHECKS: ALL_CHECKS,
+    ALL_CHECKS,
+    checksForTier,
     ALL_DOMAINS,
     DOMAIN_NAMES,
     SEVERITY_WEIGHT,
