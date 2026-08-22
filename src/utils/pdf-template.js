@@ -23,15 +23,25 @@ const esc = (v) => String(v === null || v === undefined ? "" : v)
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 
+// THE PDF STAYS ON A LIGHT THEME. It is a fifteen-page document people
+// print and put in a board pack; the arcade palette belongs on a screen and
+// a near-black page is unprintable. Only the accent HUES follow the new
+// brand — darkened until each one passes AA on white, because the arcade
+// colours themselves do not: lime #C6FF3D is 1.3:1 on white and magenta
+// #FF2E9A is 3.4:1. Measured ratios are in the comments.
 const INK = "#0b0c10";
-const GOLD = "#9a6400";     // darker than the site's gold: on white, print
-const TEXT = "#15171a";     // and photocopiers need the contrast
+const GOLD = "#657300";     // dark lime, 5.24:1 on white — the brand accent,
+const TEXT = "#15171a";     // darkened until print and photocopiers hold it
 const MUTED = "#4a4f57";
 const FAINT = "#7b8189";
 const LINE = "#d8d5d0";
 
+// Same hue family as the site, dark enough to read on paper.
 const SEV_COLOUR = {
-    critical: "#a4262c", high: "#b25000", medium: "#8a6d00", low: "#3f6382",
+    critical: "#b3005e",    // 6.82:1  magenta
+    high: "#8a5a00",        // 5.93:1  amber
+    medium: "#0a6b7a",      // 6.18:1  cyan
+    low: "#5a5170",         // 7.38:1  faint
 };
 
 const GRADE_WORD = { A: "Strong", B: "Good", C: "Mixed", D: "Weak", E: "Poor" };

@@ -4,6 +4,63 @@ import { apiGet, apiPost } from "./utils/api";
 import "./Pricing.css";
 import { useDocumentMeta } from "./utils/meta";
 
+/* ─────────────────────────────────────────────────────────────────────────
+   How many of the 23 risk domains each tier covers.
+
+   This lives here rather than in src/data/plans.js because plans.js has no
+   such field and is out of scope for a theme change. It is presentation:
+   the same figures the copy already states, drawn instead of written.
+
+   The five and the twenty-three are checkable — ALL_DOMAINS in
+   scan_engine.js is 23 entries with 5 marked scanned. The 8 is five scanned
+   plus the three systems Advanced connects.
+
+   ⚠️  THE 21 FOR FULL PROTECTION DISAGREES WITH plans.js. Its feature list
+   says "Covers the 18 domains no scan can reach", which with the five
+   scanned makes 23, not 21. The frozen v5.9 design says 21 and so does the
+   task, so 21 is what is drawn — but one of the two is wrong and somebody
+   who knows the answer needs to settle it. Flagged in the task report.
+   ───────────────────────────────────────────────────────────────────────── */
+const COVERS = {
+    snapshot: 5,
+    basic: 5,
+    advanced: 8,
+    full_protection: 21,
+    extended_support: 21,
+};
+
+const TOTAL_DOMAINS = 23;
+
+/* The strongest idea in the frozen design. Five identical bars with
+   different fills say what a feature list cannot: that the tiers differ in
+   how much of you they can see, not in how many bullet points they have. */
+function CoverageBar({ covers, tone }) {
+    if (!covers) return null;
+    return (
+        <div className="covbar">
+            <div
+                className="covbar__segs"
+                role="img"
+                aria-label={`Covers ${covers} of ${TOTAL_DOMAINS} risk domains`}
+            >
+                {Array.from({ length: TOTAL_DOMAINS }).map((_, i) => (
+                    <span
+                        key={i}
+                        className={
+                            "covbar__seg"
+                            + (i < covers ? " is-on" : "")
+                            + (tone === "magenta" ? " is-magenta" : "")
+                        }
+                    />
+                ))}
+            </div>
+            <div className="covbar__label ds-mono" aria-hidden="true">
+                {covers}/{TOTAL_DOMAINS} AREAS
+            </div>
+        </div>
+    );
+}
+
 function Pricing() {
     useDocumentMeta({
         title: "Pricing — Security Assessment Reports | dShield",
@@ -50,7 +107,7 @@ function Pricing() {
     return (
         <div className="ds-wrap ds-section">
             <p className="ds-eyebrow">Pricing</p>
-            <h1>What each level gives you</h1>
+            <h1 className="ds-shout">What each level gives you</h1>
             <p className="ds-lead" style={{ marginBottom: 14 }}>
                 The free scan tells you your grade. Everything above it tells you what the
                 problems actually are, and how to close them.
@@ -81,6 +138,7 @@ function Pricing() {
                             </div>
                             <p className="ds-faint freeband__billing">{free.billing}</p>
                             <p className="freeband__tagline">{free.tagline}</p>
+                            <CoverageBar covers={COVERS[free.key]} />
                         </div>
 
                         <ul className="freeband__features">
@@ -104,12 +162,14 @@ function Pricing() {
 
                 <div className="plans">
                     {paid.map((p) => (
-                        <div className={`ds-card plan ${p.highlight ? "is-highlight" : ""}`} key={p.key}>
+                        <div className={`ds-card ds-card--live plan ${p.highlight ? "is-highlight" : ""}`} key={p.key}>
                             {p.highlight && <span className="plan__flag">Most chosen</span>}
 
                             <h3 className="plan__name">{p.name}</h3>
                             <div className="plan__price">{p.display}</div>
                             <div className="plan__billing ds-faint">{p.billing}</div>
+
+                            <CoverageBar covers={COVERS[p.key]} tone={p.highlight ? "magenta" : undefined} />
 
                             <p className="plan__tagline">{p.tagline}</p>
 
@@ -190,7 +250,7 @@ function Pricing() {
             </div>
 
             <div className="faq">
-                <h2>Questions people ask</h2>
+                <h2 className="ds-shout">Questions people ask</h2>
 
                 <div className="faq__item">
                     <h3>Why is the scan free?</h3>

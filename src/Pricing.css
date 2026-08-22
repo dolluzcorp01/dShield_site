@@ -1,5 +1,37 @@
 .pricing__note { margin: 22px 0 34px; max-width: 720px; }
 
+/* ── the coverage bar ───────────────────────────────────────────────────
+   Twenty-three segments on every tier, a different number lit. The point
+   is the comparison between cards, so the geometry must be identical in
+   all five — same count, same height, same gap — and only the fill moves.
+   ─────────────────────────────────────────────────────────────────────── */
+.covbar { margin: 14px 0 2px; }
+
+.covbar__segs { display: flex; gap: 2px; }
+
+.covbar__seg {
+    flex: 1;
+    height: 22px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, .08);
+    transition: background .4s ease, box-shadow .4s ease;
+}
+.covbar__seg.is-on {
+    background: var(--lime);
+    box-shadow: 0 0 8px rgba(198, 255, 61, .40);
+}
+.covbar__seg.is-on.is-magenta {
+    background: var(--magenta);
+    box-shadow: 0 0 8px rgba(255, 46, 154, .40);
+}
+
+.covbar__label {
+    margin-top: 8px;
+    font-size: .62rem;
+    letter-spacing: .12em;
+    color: var(--bone-faint);
+}
+
 /* ── the free band ──────────────────────────────────────────────────────
    Horizontal, above the paid row. Deliberately a different shape from the
    plan cards so it reads as the starting point rather than a fifth option. */
@@ -14,9 +46,13 @@
 
 .freeband__head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
 .freeband__name { margin: 0; font-size: 1.1rem; }
-.freeband__price { font-size: 1.9rem; font-weight: 700; letter-spacing: -.03em; color: var(--gold); line-height: 1; }
+.freeband__price {
+    font-family: var(--display);
+    font-size: 1.8rem; font-weight: 900; letter-spacing: -.02em;
+    color: var(--lime); line-height: 1;
+}
 .freeband__billing { margin: 6px 0 0; }
-.freeband__tagline { margin: 10px 0 0; font-style: italic; color: var(--gold); font-size: .92rem; }
+.freeband__tagline { margin: 10px 0 0; font-style: italic; color: var(--lime); font-size: .92rem; }
 
 .freeband__features {
     list-style: none; padding: 0; margin: 0;
@@ -46,29 +82,42 @@
 }
 
 .plan { position: relative; display: flex; flex-direction: column; }
-.plan.is-highlight { border-color: var(--gold); }
+.plan.is-highlight { border-color: var(--magenta); }
+.plan.is-highlight:hover {
+    border-color: var(--magenta);
+    box-shadow: 0 16px 44px rgba(255, 46, 154, .18);
+}
 
+/* Void on magenta, not white. White on #FF2E9A measures 3.44:1, which fails
+   for text this small — the frozen file uses it and should not. */
 .plan__flag {
     position: absolute; top: -11px; left: 22px;
-    background: var(--gold); color: #14100A;
+    background: var(--magenta); color: var(--void);
     font-family: var(--mono); font-size: .62rem;
     letter-spacing: .1em; text-transform: uppercase;
     padding: 4px 10px; border-radius: 4px; font-weight: 600;
+    box-shadow: 0 0 16px rgba(255, 46, 154, .45);
 }
 
 /* Two lines' worth of room, always. "Full Protection + Extended Support"
    wraps where the other three names do not, and without this its card's
    price sits a line lower than the rest of the row. */
 .plan__name { margin-bottom: 10px; font-size: 1.1rem; min-height: 2.4em; }
-.plan__price { font-size: 2.1rem; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
-.plan.is-highlight .plan__price { color: var(--gold); }
+.plan__price {
+    font-family: var(--display);
+    font-size: 1.95rem; font-weight: 900; letter-spacing: -.02em; line-height: 1;
+}
+.plan.is-highlight .plan__price {
+    color: var(--magenta);
+    text-shadow: 0 0 22px rgba(255, 46, 154, .40);
+}
 .plan__billing { margin-top: 4px; }
 
 .plan__tagline {
     margin: 16px 0; padding: 12px 0;
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
-    font-style: italic; color: var(--gold);
+    border-top: 1px solid var(--edge);
+    border-bottom: 1px solid var(--edge);
+    font-style: italic; color: var(--lime);
     font-size: .92rem;
 }
 
@@ -78,7 +127,8 @@
     font-size: .89rem; color: var(--bone-dim);
     margin-bottom: 9px; line-height: 1.45;
 }
-.plan__tick { color: var(--gold); flex-shrink: 0; }
+.plan__tick { color: var(--lime); flex-shrink: 0; font-weight: 900; }
+.plan.is-highlight .plan__tick { color: var(--magenta); }
 .plan__cross { color: var(--bone-faint); flex-shrink: 0; }
 .plan__features--not { margin-top: -8px; }
 .plan__features--not li { color: var(--bone-faint); }
@@ -91,7 +141,7 @@
 .notify__tier { max-width: 260px; }
 
 .faq { margin-top: 20px; max-width: 760px; }
-.faq__item { padding: 20px 0; border-bottom: 1px solid var(--line); }
+.faq__item { padding: 20px 0; border-bottom: 1px solid var(--edge); }
 .faq__item h3 { margin-bottom: 8px; font-size: 1.02rem; }
 .faq__item p { margin: 0; }
 

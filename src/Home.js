@@ -67,7 +67,7 @@ function Home() {
                 <div className="hero__glow" aria-hidden="true" />
                 <div className="ds-wrap hero__inner">
                     <p className="ds-eyebrow">Free · No sign-up · No card</p>
-                    <h1 className="hero__title">
+                    <h1 className="hero__title ds-shout">
                         See what an attacker<br />sees of your company.
                     </h1>
                     <p className="ds-lead hero__lead">
@@ -75,6 +75,13 @@ function Home() {
                         problems are visible from the public internet, and — just as
                         importantly — how much of your risk a scan like this cannot reach.
                     </p>
+
+                    {/* Bolt, the robot mascot in the frozen v5.9 file, would stand
+                        here — to the right of the scan box, arm out toward it,
+                        reacting as somebody types. He is deliberately not ported:
+                        200 lines of SVG with eye-tracking, four moods and a typed
+                        script is a brand decision rather than a theme, and needs
+                        its own task. */}
 
                     <form className="scanbox" onSubmit={submit}>
                         <div className="scanbox__row">
@@ -122,7 +129,7 @@ function Home() {
 
             <section className="ds-section ds-wrap">
                 <p className="ds-eyebrow">What the free scan covers</p>
-                <h2>Five ways in from the street</h2>
+                <h2 className="ds-shout">Five ways in from the street</h2>
                 <p className="ds-lead" style={{ marginBottom: 34 }}>
                     Eight checks across the five areas that need nothing from you but a web
                     address.
@@ -130,7 +137,7 @@ function Home() {
 
                 <div className="ds-grid ds-grid--3">
                     {PROMISED.map((c) => (
-                        <div className="ds-card promise" key={c.key}>
+                        <div className="ds-card ds-card--live promise" key={c.key}>
                             <h3>{c.title}</h3>
                             <p className="ds-muted" style={{ margin: 0 }}>{c.line}</p>
                         </div>
@@ -147,7 +154,7 @@ function Home() {
                         </div>
                         <div className="gap__body">
                             <p className="ds-eyebrow" style={{ marginBottom: 8 }}>The honest part</p>
-                            <h2 style={{ fontSize: "1.7rem" }}>A scan sees about a quarter of your risk.</h2>
+                            <h2 className="ds-shout" style={{ fontSize: "1.7rem" }}>A scan sees about a quarter of your risk.</h2>
                             <p className="ds-muted" style={{ marginBottom: 0 }}>
                                 We measure five risk domains from outside. Eighteen more — whether your
                                 backups actually restore, whether a junior would challenge a payment

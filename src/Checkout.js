@@ -103,7 +103,7 @@ function Checkout() {
             name: "dShield",
             description: `${order.planName} — ${order.domain}`,
             prefill: { email: form.email.trim(), name: form.name.trim() || undefined },
-            theme: { color: "#F5A524" },
+            theme: { color: "#C6FF3D" },
             handler: async (response) => {
                 /* This only makes the customer wait less. The webhook is the
                    authority and will fulfil the order regardless of what the

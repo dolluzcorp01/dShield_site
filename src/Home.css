@@ -5,7 +5,7 @@
     top: -280px; left: 50%;
     transform: translateX(-50%);
     width: 900px; height: 620px;
-    background: radial-gradient(ellipse at center, rgba(245,165,36,.13), transparent 66%);
+    background: radial-gradient(ellipse at center, rgba(198, 255, 61, .14), transparent 66%);
     pointer-events: none;
 }
 
@@ -13,12 +13,21 @@
 .hero__title { margin-bottom: 20px; }
 .hero__lead { margin-bottom: 34px; }
 
+/* The scan box is the one control the whole homepage exists to deliver
+   somebody to, so it is the only element on the page with a standing glow.
+   Everything else lights up on interaction. */
 .scanbox {
     max-width: 660px;
-    background: var(--ink-2);
-    border: 1px solid var(--line-2);
+    background: var(--void-2);
+    border: 2px solid var(--line-2);
     border-radius: var(--radius-lg);
     padding: 22px;
+    box-shadow: 0 18px 60px rgba(198, 255, 61, .10);
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+.scanbox:focus-within {
+    border-color: var(--lime);
+    box-shadow: 0 18px 70px rgba(198, 255, 61, .20);
 }
 
 .scanbox__row { display: flex; gap: 12px; margin-bottom: 12px; }
@@ -31,11 +40,12 @@
     margin-top: 14px;
     font-family: var(--mono);
     font-size: .84rem;
-    color: var(--gold);
+    color: var(--lime);
 }
 .scanbox__dot {
     width: 7px; height: 7px; border-radius: 50%;
-    background: var(--gold);
+    background: var(--lime);
+    box-shadow: 0 0 10px var(--lime);
     animation: ds-pulse 1.3s ease-in-out infinite;
 }
 @keyframes ds-pulse { 0%,100% { opacity: .25; } 50% { opacity: 1; } }
@@ -47,30 +57,41 @@
     line-height: 1.55;
 }
 
-.promise h3 { margin-bottom: 8px; font-size: 1.04rem; }
+.promise h3 { margin-bottom: 8px; font-size: 1.04rem; color: var(--bone); }
 
 .gap { display: flex; gap: 34px; align-items: center; }
 .gap__figure {
     flex-shrink: 0;
     text-align: center;
     padding: 22px 30px;
-    border-right: 1px solid var(--line);
+    border-right: 2px solid var(--edge);
 }
 .gap__num {
-    font-size: 3.6rem; font-weight: 700; line-height: 1;
-    color: var(--gold);
+    font-family: var(--display);
+    font-size: 3.6rem; font-weight: 900; line-height: 1;
+    color: var(--lime);
     letter-spacing: -.04em;
+    text-shadow: 0 0 28px rgba(198, 255, 61, .45);
 }
-.gap__of { font-family: var(--mono); font-size: .78rem; color: var(--bone-faint); letter-spacing: .1em; }
+.gap__of {
+    font-family: var(--mono); font-size: .78rem;
+    color: var(--bone-faint); letter-spacing: .1em;
+}
 
 @media (max-width: 720px) {
     .scanbox__row { flex-direction: column; }
     .scanbox__go { width: 100%; }
     .gap { flex-direction: column; gap: 20px; align-items: flex-start; }
-    .gap__figure { border-right: 0; border-bottom: 1px solid var(--line); padding: 0 0 16px; text-align: left; width: 100%; }
+    .gap__figure {
+        border-right: 0;
+        border-bottom: 2px solid var(--edge);
+        padding: 0 0 16px;
+        text-align: left;
+        width: 100%;
+    }
 }
 
 /* The gap card previously ended with no action. Someone persuaded by the
    argument had nowhere to go from it. */
-.gap__more { display: inline-block; margin-top: 16px; color: var(--gold); font-size: .92rem; }
-.gap__more:hover { color: #FFB93C; }
+.gap__more { display: inline-block; margin-top: 16px; color: var(--lime); font-size: .92rem; }
+.gap__more:hover { color: #D8FF6E; }

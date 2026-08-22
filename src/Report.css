@@ -1,10 +1,14 @@
 /* ─────────────────────────────────────────────────────────────────────────
    The paid report.
 
-   Includes a print stylesheet, which is not a nicety: until PDF export
-   exists, Ctrl+P is how a customer gets a file to send to their board or
-   their auditor. A report that prints as unreadable dark slabs would push
-   them to ask for something we cannot yet give them.
+   Includes a print stylesheet, which is not a nicety: it is how a customer
+   gets a copy to send to their board or their auditor when the PDF is
+   disabled or still being produced. A report that prints as unreadable dark
+   slabs would push them to ask for something we cannot always give them.
+
+   The arcade theme makes this MORE important, not less. Every surface on
+   screen is now a translucent panel over a purple-black page with a lime
+   hairline, and none of that survives contact with paper.
    ───────────────────────────────────────────────────────────────────────── */
 
 .report { max-width: 860px; }
@@ -13,7 +17,7 @@
 .report__print { margin-top: 14px; }
 .report__section { margin-top: 46px; }
 .report__section > h2 { margin-bottom: 10px; }
-.report__foot { margin-top: 54px; padding-top: 20px; border-top: 1px solid var(--line); line-height: 1.6; }
+.report__foot { margin-top: 54px; padding-top: 20px; border-top: 1px solid var(--edge); line-height: 1.6; }
 
 /* ── severity pill ───────────────────────────────────────────────────── */
 .sev {
@@ -33,7 +37,7 @@
 .band__list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; }
 .band__list li { line-height: 1.55; }
 .band__list a { color: var(--bone); }
-.band__list a:hover { color: var(--gold); }
+.band__list a:hover { color: var(--lime); }
 .band__notes { margin: 14px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
 
 /* ── findings ────────────────────────────────────────────────────────── */
@@ -46,14 +50,14 @@
     color: var(--bone-faint); margin-bottom: 5px;
 }
 .finding__evidence {
-    background: var(--ink-2); border-left: 2px solid var(--gold-dim);
+    background: var(--void-2); border-left: 2px solid var(--lime);
     padding: 12px 14px; border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 16px;
 }
 .finding__evidence p { margin: 0; font-family: var(--mono); font-size: .87rem; line-height: 1.55; color: var(--bone); }
 .finding__body { color: var(--bone-dim); line-height: 1.65; margin: 0 0 16px; }
 .finding__block { margin-top: 16px; }
 .finding__block p { color: var(--bone-dim); line-height: 1.65; margin: 0; }
-.finding__fix { border-top: 1px solid var(--line); padding-top: 16px; }
+.finding__fix { border-top: 1px solid var(--edge); padding-top: 16px; }
 .finding__summary { color: var(--bone) !important; margin-bottom: 12px !important; }
 .finding__fix ol { margin: 0 0 14px; padding-left: 20px; display: flex; flex-direction: column; gap: 9px; }
 .finding__fix li { color: var(--bone-dim); line-height: 1.6; }
@@ -66,37 +70,71 @@
 .incon__list li { line-height: 1.55; }
 
 /* ═════════════════════════════════════════════════════════════════════
-   PRINT — the interim answer for "can I have a PDF".
-   Dark backgrounds are stripped, links are shown as text, and a finding is
-   kept from splitting across a page break wherever the browser will allow.
+   PRINT — white page, dark text, no exceptions.
+
+   The token overrides below must cover EVERY colour token, including the
+   arcade names added in Task 08. A token left un-overridden prints as
+   neon on white, and the one that would hurt most is --panel: a card
+   background of rgba(255,255,255,.045) over a white page is invisible
+   rather than merely wrong.
+
+   The two fixed decorations in index.css are killed outright. The
+   scanline overlay in particular is a repeating black gradient across the
+   whole viewport, and printing it would put grey stripes over every line
+   of the report.
    ═════════════════════════════════════════════════════════════════════ */
 @media print {
     @page { margin: 16mm; }
 
     :root {
-        --ink: #fff; --ink-2: #f6f5f3; --ink-3: #eee;
-        --bone: #111; --bone-dim: #333; --bone-faint: #666;
-        --line: #ccc; --gold: #9a6400; --gold-dim: #9a6400;
+        /* arcade names */
+        --void: #fff; --void-2: #f6f5f3; --panel: #fff; --edge: #ccc;
+        --lime: #657300; --magenta: #b3005e; --cyan: #0a6b7a; --amber: #8a5a00;
+        /* original names */
+        --ink: #fff; --ink-2: #f6f5f3; --ink-3: #fff;
+        --bone: #111; --bone-dim: #333; --bone-faint: #555;
+        --line: #ccc; --line-2: #bbb;
+        --gold: #657300; --gold-dim: #657300; --gold-glow: #f4f7e6;
+        /* severities keep their meaning on paper — a critical finding that
+           prints the same black as a low one has lost the only thing the
+           pill was there to say */
+        --critical: #b3005e; --high: #8a5a00; --medium: #0a6b7a;
+        --low: #5a5170; --pass: #4a7a00;
     }
+
     body, .app, .report { background: #fff !important; color: #111 !important; }
 
-    /* Chrome that means nothing on paper. */
-    .nav, .footer, .report__print, .upsell, .hero__glow { display: none !important; }
+    /* The cabinet does not print. */
+    body::before, body::after { display: none !important; }
 
-    .ds-card { border: 1px solid #ccc !important; background: #fff !important; box-shadow: none !important; }
+    /* Chrome that means nothing on paper. */
+    .nav, .ticker, .footer, .report__print, .upsell, .hero__glow { display: none !important; }
+
+    .ds-card {
+        border: 1px solid #ccc !important;
+        background: #fff !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
     .finding, .band { page-break-inside: avoid; }
     .report__section { page-break-before: auto; }
     h1, h2, h3 { page-break-after: avoid; color: #111 !important; }
-    .finding__evidence { background: #f6f5f3 !important; border-left: 2px solid #9a6400 !important; }
+    /* Orbitron is a screen face and sets badly at paragraph-heading sizes on
+       paper. Headings print in the body face. */
+    h1, h2 { font-family: var(--sans) !important; text-transform: none !important; }
+    .finding__evidence { background: #f6f5f3 !important; border-left: 2px solid #657300 !important; }
     .finding__evidence p, .finding__summary, .band__list a { color: #111 !important; }
     .ds-muted, .ds-faint, .finding__body, .finding__block p, .finding__fix li { color: #333 !important; }
-    .sev { border-color: #666 !important; color: #111 !important; }
-    .covertile { border: 1px solid #ddd !important; }
+    .sev { border-color: currentColor !important; }
+    .gradecard__letter { text-shadow: none !important; }
+    .covertile { border: 1px solid #ddd !important; background: #fff !important; }
+    .covertile.is-scanned { border: 1px solid #657300 !important; background: #f4f7e6 !important; }
     a { text-decoration: underline; color: #111 !important; }
 }
 
 /* ── downloads ───────────────────────────────────────────────────────── */
 .report__downloads { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
 .report__json { text-decoration: underline; font-size: .88rem; }
-.report__json:hover { color: var(--gold); }
+.report__json:hover { color: var(--lime); }
 @media print { .report__downloads { display: none !important; } }

@@ -1,10 +1,56 @@
+/* ── the ticker ─────────────────────────────────────────────────────────
+   Lime bar above the header, scrolling right to left. It is the loudest
+   arcade element on the site and the first thing anybody sees, so it says
+   only things that are true and checkable.
+
+   It pauses on hover so a number can actually be read, and stops entirely
+   for anybody who has asked for reduced motion.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.ticker {
+    position: relative;
+    z-index: 3;
+    background: var(--lime);
+    color: var(--void);
+    overflow: hidden;
+    padding: 7px 0;
+}
+
+.ticker__track {
+    display: flex;
+    width: max-content;
+    white-space: nowrap;
+    animation: ticker-marq 30s linear infinite;
+}
+
+.ticker:hover .ticker__track,
+.ticker:focus-within .ticker__track { animation-play-state: paused; }
+
+.ticker__run { display: flex; flex-shrink: 0; }
+
+.ticker__item {
+    padding: 0 24px;
+    font-family: var(--mono);
+    font-size: 0.69rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+}
+
+@keyframes ticker-marq {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+/* ── header ─────────────────────────────────────────────────────────── */
+
 .nav {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(8, 9, 12, .88);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--line);
+    background: rgba(11, 3, 22, .82);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--edge);
 }
 
 .nav__inner {
@@ -15,15 +61,16 @@
 }
 
 .nav__brand { display: flex; align-items: center; gap: 10px; }
-.nav__mark { color: var(--gold); display: flex; }
+.nav__mark { color: var(--lime); display: flex; }
 
 .nav__name {
     display: flex;
     flex-direction: column;
-    font-weight: 700;
-    font-size: 1.16rem;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 1.08rem;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
 }
 .nav__name small {
     font-family: var(--mono);
@@ -34,8 +81,13 @@
 }
 
 .nav__links { display: flex; align-items: center; gap: 30px; }
-.nav__links a { color: var(--bone-dim); font-size: 0.95rem; transition: color .15s ease; }
-.nav__links a:hover, .nav__links a.is-active { color: var(--gold); }
+.nav__links a {
+    color: var(--bone-dim);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color .15s ease;
+}
+.nav__links a:hover, .nav__links a.is-active { color: var(--lime); }
 
 .nav__burger {
     display: none;
@@ -60,12 +112,12 @@
         flex-direction: column;
         align-items: stretch;
         gap: 0;
-        background: var(--ink-2);
-        border-bottom: 1px solid var(--line);
+        background: var(--void-2);
+        border-bottom: 1px solid var(--edge);
         padding: 8px 24px 20px;
         display: none;
     }
     .nav__links.is-open { display: flex; }
-    .nav__links a { padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .nav__links a { padding: 14px 0; border-bottom: 1px solid var(--edge); }
     .nav__cta { margin-top: 16px; }
 }

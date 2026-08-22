@@ -8,34 +8,50 @@
 
 .gradecard {
     display: flex; align-items: center; gap: 18px;
-    background: var(--ink-3);
-    border: 1px solid var(--line);
+    background: var(--panel);
+    border: 2px solid var(--edge);
     border-radius: var(--radius-lg);
     padding: 22px 30px;
     min-width: 230px;
 }
 .gradecard__letter {
-    font-size: 4rem; font-weight: 700; line-height: 1;
-    letter-spacing: -.05em;
+    font-family: var(--display);
+    font-size: 4rem; font-weight: 900; line-height: 1;
+    letter-spacing: -.04em;
 }
-.gradecard--A .gradecard__letter { color: var(--pass); }
-.gradecard--B .gradecard__letter { color: #8FC77E; }
-.gradecard--C .gradecard__letter { color: var(--medium); }
-.gradecard--D .gradecard__letter { color: var(--high); }
-.gradecard--E .gradecard__letter { color: var(--critical); }
+
+/* Five grades need five distinguishable colours and the palette carries
+   four accents, so B is a blend between lime and cyan — exactly as the old
+   theme blended between its green and its yellow. The ends matter most:
+   A must read as good at a glance and E as bad. */
+.gradecard--A .gradecard__letter { color: var(--lime);    text-shadow: 0 0 30px rgba(198, 255, 61, .45); }
+.gradecard--B .gradecard__letter { color: #8FE05A;        text-shadow: 0 0 30px rgba(143, 224, 90, .40); }
+.gradecard--C .gradecard__letter { color: var(--cyan);    text-shadow: 0 0 30px rgba(0, 229, 255, .40); }
+.gradecard--D .gradecard__letter { color: var(--amber);   text-shadow: 0 0 30px rgba(255, 176, 32, .40); }
+.gradecard--E .gradecard__letter { color: var(--magenta); text-shadow: 0 0 30px rgba(255, 46, 154, .45); }
+
 .gradecard__word { font-size: 1.06rem; font-weight: 600; }
 
 .counts {
     flex: 1; min-width: 300px;
     display: grid; grid-template-columns: repeat(5, 1fr);
-    background: var(--ink-3);
-    border: 1px solid var(--line);
+    background: var(--panel);
+    border: 2px solid var(--edge);
     border-radius: var(--radius-lg);
     overflow: hidden;
 }
-.counts__item { padding: 20px 8px; text-align: center; border-right: 1px solid var(--line); }
+.counts__item { padding: 20px 8px; text-align: center; border-right: 1px solid var(--edge); }
 .counts__item:last-child { border-right: 0; }
-.counts__n { font-size: 1.9rem; font-weight: 700; line-height: 1.1; }
+/* NOT Orbitron. Its zero is a filled rounded square with a diagonal through
+   it, which at this size reads as an icon rather than a digit — a magenta
+   block under the word CRITICAL looks like a warning when what it actually
+   says is "none". These five numbers are the most-read thing on the site
+   and have to be unambiguous before they are stylish. */
+.counts__n {
+    font-family: var(--sans);
+    font-size: 1.85rem; font-weight: 700; line-height: 1.1;
+    letter-spacing: -.01em;
+}
 .counts__n--critical { color: var(--critical); }
 .counts__n--high { color: var(--high); }
 .counts__n--medium { color: var(--medium); }
@@ -59,20 +75,29 @@
 
 .domainrow__bar {
     height: 4px; border-radius: 4px;
-    background: var(--line-2);
+    background: rgba(255, 255, 255, .08);
     margin-top: 14px; overflow: hidden;
 }
-.domainrow__bar span { display: block; height: 100%; background: var(--gold); border-radius: 4px; }
+.domainrow__bar span {
+    display: block; height: 100%;
+    background: var(--lime); border-radius: 4px;
+    box-shadow: 0 0 8px rgba(198, 255, 61, .45);
+}
 
 .locked {
     display: flex; gap: 16px; align-items: flex-start;
     margin-top: 22px; padding: 20px 22px;
-    background: var(--ink-2);
+    background: var(--void-2);
     border: 1px dashed var(--line-2);
     border-radius: var(--radius-lg);
 }
-.locked__icon { color: var(--gold); flex-shrink: 0; margin-top: 2px; }
+.locked__icon { color: var(--lime); flex-shrink: 0; margin-top: 2px; }
 
+/* ── the coverage map ───────────────────────────────────────────────────
+   Measured tiles are lit; the eighteen we cannot reach stay deliberately
+   dim. That contrast IS the argument the page is making, so the dark tiles
+   must stay legible rather than disappear — .46 opacity on the old near
+   black was darker than it looks on this background. */
 .covermap {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
@@ -82,11 +107,16 @@
     display: flex; flex-direction: column; gap: 3px;
     padding: 14px 16px;
     border-radius: var(--radius);
-    border: 1px solid var(--line);
-    background: var(--ink-2);
+    border: 1px solid var(--edge);
+    background: var(--void-2);
 }
-.covertile.is-scanned { border-color: var(--gold-dim); background: var(--gold-glow); }
-.covertile.is-dark { opacity: .46; }
+.covertile.is-scanned {
+    border: 2px solid var(--lime);
+    background: var(--gold-glow);
+    box-shadow: 0 0 18px rgba(198, 255, 61, .12);
+    padding: 13px 15px;
+}
+.covertile.is-dark { opacity: .58; }
 .covertile__no { font-size: .68rem; color: var(--bone-faint); letter-spacing: .08em; }
 .covertile__name { font-size: .92rem; font-weight: 500; line-height: 1.3; }
 .covertile__state {
@@ -94,7 +124,7 @@
     text-transform: uppercase; letter-spacing: .1em;
     color: var(--bone-faint); margin-top: 2px;
 }
-.covertile.is-scanned .covertile__state { color: var(--gold); }
+.covertile.is-scanned .covertile__state { color: var(--lime); }
 
 .inconclusive__list { margin: 18px 0; padding-left: 18px; color: var(--bone-dim); }
 .inconclusive__list li { margin-bottom: 7px; }
