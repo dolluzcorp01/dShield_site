@@ -61,7 +61,16 @@
 }
 
 .nav__brand { display: flex; align-items: center; gap: 10px; }
-.nav__mark { color: var(--lime); display: flex; }
+
+/* The eagle is a raster mark with its own gold gradient, so there is no
+   currentColor to set here — height drives it and the width follows the
+   bird's own proportions. */
+.nav__mark {
+    display: block;
+    height: 26px;
+    width: auto;
+    flex-shrink: 0;
+}
 
 .nav__name {
     display: flex;

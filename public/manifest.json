@@ -3,8 +3,8 @@
   "name": "dShield by Dolluz Corp",
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#08090C",
-  "background_color": "#08090C",
+  "theme_color": "#0B0316",
+  "background_color": "#0B0316",
   "icons": [
     {
       "src": "favicon.ico",

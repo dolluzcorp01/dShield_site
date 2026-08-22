@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Navbar.css";
+import eagle from "./assets/img/eagle-mark.png";
 
 /* Five plus the Free-scan button is the most that fits before the mobile
    breakpoint. /coverage is deliberately NOT here — it is reached from the
@@ -58,13 +59,12 @@ function Navbar() {
             <header className="nav">
                 <div className="ds-wrap nav__inner">
                     <Link to="/" className="nav__brand" onClick={() => setOpen(false)}>
-                        <span className="nav__mark" aria-hidden="true">
-                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 2.5 4 6v6c0 4.6 3.2 8.6 8 9.8 4.8-1.2 8-5.2 8-9.8V6l-8-3.5Z"
-                                      stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-                                <circle cx="12" cy="11.5" r="2.4" fill="currentColor" />
-                            </svg>
-                        </span>
+                        {/* The Dolluz eagle, in its own gold. It is the PARENT
+                            company's mark sitting inside a "BY DOLLUZ CORP"
+                            lockup, so it keeps its own colour rather than being
+                            repainted lime with the rest of dShield. */}
+                        <img className="nav__mark" src={eagle} alt="" aria-hidden="true"
+                             width="34" height="26" />
                         <span className="nav__name">
                             dShield
                             <small>BY DOLLUZ CORP</small>
