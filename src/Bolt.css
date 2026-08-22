@@ -1,0 +1,203 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Bolt — the guide.
+
+   Every colour here comes from the variables in index.css. There is no
+   second copy of the palette: two palettes drift, and the one that drifts
+   is always the one nobody is looking at.
+
+   The four shell tones below are Bolt's own material rather than brand
+   colours — they exist nowhere else and are derived from void and void-2.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.bolt {
+    --bolt-shell-a: #3A2260;
+    --bolt-shell-b: #1D0F38;
+    --bolt-visor-a: #120627;
+    --bolt-visor-b: #241046;
+    --bolt-metal:   #2A1750;
+
+    overflow: visible;
+    display: block;
+}
+
+/* transform-box is view-box by default for SVG, but stating it means the
+   arm rotates about the shoulder in every browser rather than about a
+   bounding box that changes as the pose changes. */
+.bolt__arm-l,
+.bolt__arm-r,
+.bolt__eyes,
+.bolt__sweep { transform-box: view-box; }
+
+.bolt__shell-a { stop-color: var(--bolt-shell-a); }
+.bolt__shell-b { stop-color: var(--bolt-shell-b); }
+.bolt__visor-a { stop-color: var(--bolt-visor-a); }
+.bolt__visor-b { stop-color: var(--bolt-visor-b); }
+
+.bolt__metal { fill: var(--bolt-metal); stroke: var(--lime); }
+
+.bolt__lime    { fill: var(--lime); }
+.bolt__magenta { fill: var(--magenta); }
+.bolt__cyan    { fill: var(--cyan); }
+.bolt__stroke-lime { stroke: var(--lime); }
+.bolt__stroke-cyan { stroke: var(--cyan); }
+.bolt__pupil   { fill: var(--void); }
+
+/* Eyes are lime at rest and cyan while he is scanning — the same shift the
+   visor makes when it becomes a radar. */
+.bolt__eye { fill: var(--lime); }
+.bolt--scanning .bolt__eye { fill: var(--cyan); }
+
+/* The mouth bar is the tell for "done": it turns magenta. */
+.bolt__mouth { fill: var(--bone-faint); }
+.bolt--done .bolt__mouth { fill: var(--magenta); }
+
+/* ── the arms ───────────────────────────────────────────────────────────
+   Rotation is an inline transform driven by mood, so it survives reduced
+   motion — he holds the correct POSE, he just stops moving between them. */
+.bolt__arm-l,
+.bolt__arm-r { transition: transform .55s cubic-bezier(.34, 1.56, .64, 1); }
+
+.bolt__eyes { transition: transform .16s ease-out; }
+
+/* ── the eleven keyframes ───────────────────────────────────────────── */
+
+@keyframes boltFloat {
+    0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+    50%      { transform: translateY(-13px) rotate(1.5deg); }
+}
+@keyframes boltShake {
+    0%, 100% { transform: translate(0, 0) rotate(0); }
+    25%      { transform: translate(-2px, 1px) rotate(-1.6deg); }
+    75%      { transform: translate(2px, -1px) rotate(1.6deg); }
+}
+@keyframes boltBlink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    95%           { transform: scaleY(.08); }
+}
+@keyframes boltArmIdle {
+    0%, 100% { transform: rotate(0); }
+    50%      { transform: rotate(-11deg); }
+}
+@keyframes boltCorePulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .45; }
+}
+@keyframes boltBlip {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .45; }
+}
+@keyframes boltSpark {
+    0%   { opacity: .85; transform: translateY(0); }
+    100% { opacity: 0;   transform: translateY(15px); }
+}
+@keyframes boltThrust {
+    0%, 100% { opacity: .16; transform: scaleX(1); }
+    50%      { opacity: .34; transform: scaleX(1.22); }
+}
+@keyframes boltSweep { to { transform: rotate(360deg); } }
+@keyframes boltChatter {
+    0%   { transform: scaleY(1); }
+    100% { transform: scaleY(.35); }
+}
+@keyframes boltCaret { 50% { opacity: 0; } }
+
+/* ── wiring ─────────────────────────────────────────────────────────── */
+
+.bolt              { animation: boltFloat 3.4s ease-in-out infinite; }
+.bolt--scanning    { animation: boltShake .28s infinite; }
+
+.bolt__eye         { animation: boltBlink 5.2s infinite; }
+.bolt--greet .bolt__arm-r { animation: boltArmIdle 3s ease-in-out infinite; }
+.bolt__core        { animation: boltCorePulse 1.9s ease-in-out infinite; }
+.bolt__blip        { animation: boltBlip 1.6s ease-in-out infinite; }
+.bolt__spark       { animation: boltSpark 1.1s ease-in infinite; }
+.bolt__thrust      { animation: boltThrust 1.5s ease-in-out infinite; }
+.bolt__sweep       { animation: boltSweep 1.1s linear infinite; }
+.bolt--scanning .bolt__mouth { animation: boltChatter .35s steps(2) infinite; }
+
+/* ── the speech bubble ──────────────────────────────────────────────── */
+
+.boltbox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.boltbox__bubble {
+    position: relative;
+    max-width: 250px;
+    padding: 13px 17px;
+    text-align: center;
+    background: var(--void-2);
+    border: 2px solid var(--lime);
+    border-radius: 18px;
+    box-shadow: 0 0 30px rgba(198, 255, 61, .20);
+    transition: border-color .3s ease, box-shadow .3s ease;
+}
+.boltbox__bubble.is-done {
+    border-color: var(--magenta);
+    box-shadow: 0 0 30px rgba(255, 46, 154, .20);
+}
+
+/* A fixed height for two lines. Without it the bubble grows a line as the
+   text types itself and shoves Bolt down the page mid-sentence. */
+.boltbox__line {
+    font-family: var(--mono);
+    font-size: .75rem;
+    line-height: 1.5;
+    color: var(--bone);
+    min-height: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.boltbox__tail {
+    position: absolute;
+    bottom: -9px; left: 50%;
+    width: 16px; height: 16px;
+    margin-left: -8px;
+    background: var(--void-2);
+    transform: rotate(45deg);
+    border-right: 2px solid var(--lime);
+    border-bottom: 2px solid var(--lime);
+    transition: border-color .3s ease;
+}
+.boltbox__bubble.is-done .boltbox__tail {
+    border-right-color: var(--magenta);
+    border-bottom-color: var(--magenta);
+}
+
+.boltbox__caret {
+    color: var(--magenta);
+    animation: boltCaret 1s step-end infinite;
+}
+
+.boltbox__label {
+    font-family: var(--mono);
+    font-size: .6rem;
+    letter-spacing: .2em;
+    color: var(--bone-faint);
+}
+
+/* ── reduced motion ─────────────────────────────────────────────────────
+   index.css already stops every animation globally, but Bolt is the one
+   component on the site that floats, shakes, sparks and pulses without
+   stopping. For somebody with vestibular sensitivity that is not a charming
+   detail, it is a reason to close the tab — so it is stated here too rather
+   than depending on a rule in another file staying where it is.
+
+   He keeps his pose. Only the motion goes. The caret is hidden outright
+   because a block character frozen mid-blink reads as a rendering fault.
+   ─────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .bolt,
+    .bolt--scanning,
+    .bolt *,
+    .boltbox * {
+        animation: none !important;
+        transition: none !important;
+    }
+    .boltbox__caret { display: none; }
+}

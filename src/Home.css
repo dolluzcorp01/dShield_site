@@ -13,6 +13,34 @@
 .hero__title { margin-bottom: 20px; }
 .hero__lead { margin-bottom: 34px; }
 
+/* ── the hero, in two columns ───────────────────────────────────────────
+   Copy and scan box on the left, Bolt on the right. His column is sized to
+   its content rather than a fraction, so the scan box keeps every pixel
+   left over instead of the two of them negotiating for space.
+
+   minmax(0, 1fr) on the copy column matters: without the 0 minimum, the
+   long lead paragraph sets the column's minimum width and pushes Bolt off
+   the wrap at narrow desktop sizes.
+   ─────────────────────────────────────────────────────────────────────── */
+.hero__cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 40px;
+    align-items: center;
+}
+
+.hero__copy { min-width: 0; }
+
+.hero__bolt {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    /* He is decoration with a job. Nothing here should ever take the
+       pointer away from the form beside him. */
+    pointer-events: none;
+    user-select: none;
+}
+
 /* The scan box is the one control the whole homepage exists to deliver
    somebody to, so it is the only element on the page with a standing glow.
    Everything else lights up on interaction. */
@@ -76,6 +104,17 @@
 .gap__of {
     font-family: var(--mono); font-size: .78rem;
     color: var(--bone-faint); letter-spacing: .1em;
+}
+
+/* Bolt is gone below 860px — display:none, not a scaled-down version.
+
+   He is 200×230 plus a speech bubble. On a phone that pushes the scan box
+   below the fold, and the scan box is the entire purpose of the page. Most
+   visitors here arrive on a phone; losing the mascot there costs nothing,
+   losing the scan box costs everything. */
+@media (max-width: 860px) {
+    .hero__cols { grid-template-columns: 1fr; gap: 0; }
+    .hero__bolt { display: none; }
 }
 
 @media (max-width: 720px) {
