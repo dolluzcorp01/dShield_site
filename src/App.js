@@ -14,6 +14,7 @@ import Checkout from "./Checkout";
 import OrderStatus from "./OrderStatus";
 import Report from "./Report";
 import { Contact, HowItWorks, Trust, Footer, NotFound } from "./Pages";
+import Floating from "./Floating";
 import "./App.css";
 
 /* Router keeps scroll position between pages, which on a marketing site means
@@ -76,6 +77,7 @@ function App() {
                 </Routes>
             </main>
             <Footer />
+            <Floating />
         </div>
     );
 }

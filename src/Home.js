@@ -149,14 +149,20 @@ function Home() {
                 <div className="ds-wrap hero__inner">
                   <div className="hero__cols">
                    <div className="hero__copy">
-                    <p className="ds-eyebrow">Free · No sign-up · No card</p>
+                    {/* The prototype's chip, dot and all — the product name
+                        rather than a list of what it does not cost. */}
+                    <p className="hero__chip">
+                        <span className="hero__dot" aria-hidden="true" />
+                        Cyber Resilience Check
+                    </p>
                     <h1 className="hero__title ds-shout">
-                        See what an attacker<br />sees of your company.
+                        Five ways in<br />from the street.<br />
+                        <span className="hero__title-lime">Eighteen behind<br />your door.</span>
                     </h1>
                     <p className="ds-lead hero__lead">
-                        Enter your domain. In under a minute you will know your grade, how many
-                        problems are visible from the public internet, and — just as
-                        importantly — how much of your risk a scan like this cannot reach.
+                        Give us your website address. In about half a minute we check the five
+                        things a stranger can see from outside — then we name the other
+                        eighteen, and show you what it takes to look inside.
                     </p>
 
                     <form className="scanbox" onSubmit={submit}>

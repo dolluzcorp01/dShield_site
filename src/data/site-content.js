@@ -240,6 +240,13 @@ export const OFFICE = {
     country: "India",
     email: "connect@dolluzcorp.com",
     hours: "Mon to Fri, 9:30am to 6:30pm IST",
+
+    /* WhatsApp, digits only in international format — "919876543210".
+       Empty means the floating WhatsApp button does not render at all.
+       See Floating.js: a green WhatsApp button that opens a chat with a
+       number nobody owns is worse than no button, and the prototype ships
+       exactly that. Fill this in and it appears. */
+    whatsapp: "",
 };
 
 /* ── Smart Checks ─────────────────────────────────────────────────────────

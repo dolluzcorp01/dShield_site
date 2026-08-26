@@ -1,0 +1,54 @@
+/* The floating pair — WhatsApp and back-to-top, from the prototype's
+   FLOATING section. Fixed bottom-right, above everything except a modal. */
+
+.float {
+    position: fixed;
+    right: 22px;
+    bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 70;
+}
+
+/* WhatsApp brand green. This is the one colour on the site that is not a
+   token — it belongs to WhatsApp, and a lime WhatsApp button would not be
+   recognised as one. */
+.float__wa {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #25D366;
+    box-shadow: 0 10px 34px rgba(37, 211, 102, .47);
+    display: grid;
+    place-items: center;
+    order: 2;
+    animation: float-bob 3.6s ease-in-out infinite;
+}
+
+.float__top {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    order: 1;
+    display: grid;
+    place-items: center;
+    font-size: 17px;
+    color: var(--bone);
+    background: var(--void-2);
+    border: 1px solid var(--edge);
+    cursor: pointer;
+}
+
+.float__top:hover { border-color: var(--lime); color: var(--lime); }
+
+@keyframes float-bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+}
+
+@media (max-width: 640px) {
+    .float { right: 14px; bottom: 16px; }
+    .float__wa { width: 50px; height: 50px; }
+    .float__top { width: 42px; height: 42px; }
+}

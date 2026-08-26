@@ -10,7 +10,49 @@
 }
 
 .hero__inner { position: relative; }
-.hero__title { margin-bottom: 20px; }
+
+/* ── the hero headline ────────────────────────────────────────────────
+   Two sentences, the second in lime: five things we can see, eighteen we
+   cannot. The whole argument of the product in four lines, which is why it
+   is set at display weight and uppercase. */
+.hero__title {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(30px, 4.8vw, 58px);
+    line-height: 1.02;
+    letter-spacing: -.02em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.hero__title-lime {
+    color: var(--lime);
+    text-shadow: 0 0 30px rgba(198, 255, 61, .4);
+}
+
+.hero__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+    border: 1px solid var(--edge);
+    border-radius: 99px;
+    padding: 8px 16px;
+    margin: 0 0 20px;
+}
+
+.hero__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--magenta);
+    box-shadow: 0 0 10px var(--magenta);
+    flex-shrink: 0;
+}
 .hero__lead { margin-bottom: 34px; }
 
 /* ── the hero, in two columns ───────────────────────────────────────────

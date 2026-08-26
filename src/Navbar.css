@@ -43,10 +43,11 @@
 
 /* ── header ─────────────────────────────────────────────────────────── */
 
+
 .nav {
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 60;
     background: rgba(11, 3, 22, .82);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
@@ -56,47 +57,194 @@
 .nav__inner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    height: 68px;
+    gap: 22px;
+    height: 70px;
 }
 
-.nav__brand { display: flex; align-items: center; gap: 10px; }
+/* ── the brand lockup ────────────────────────────────────────────────
+   Eagle plus wordmark plus tagline, composed rather than a single image.
+   DOLLUZ_Full_Logo.png is the vertical artwork with BLACK type — the exact
+   thing the prototype's comment says had to be recoloured before it could
+   sit on this ground. Set in type it needs no recolouring and no 150 kB. */
+.nav__brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+    color: inherit;
+    flex-shrink: 0;
+}
 
 /* The eagle is a raster mark with its own gold gradient, so there is no
-   currentColor to set here — height drives it and the width follows the
-   bird's own proportions. */
+   currentColor to set — height drives it and the width follows the bird. */
 .nav__mark {
     display: block;
-    height: 26px;
+    height: 31px;
     width: auto;
     flex-shrink: 0;
 }
 
-.nav__name {
+.nav__lockup {
     display: flex;
     flex-direction: column;
-    font-family: var(--display);
-    font-weight: 900;
-    font-size: 1.08rem;
-    letter-spacing: 0.01em;
-    line-height: 1.15;
-}
-.nav__name small {
-    font-family: var(--mono);
-    font-size: 0.56rem;
-    letter-spacing: 0.18em;
-    color: var(--bone-faint);
-    font-weight: 400;
+    line-height: 1.1;
 }
 
-.nav__links { display: flex; align-items: center; gap: 30px; }
-.nav__links a {
-    color: var(--bone-dim);
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: color .15s ease;
+.nav__word {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 1.12rem;
+    letter-spacing: .04em;
+    color: var(--bone);
 }
-.nav__links a:hover, .nav__links a.is-active { color: var(--lime); }
+
+.nav__tag {
+    font-family: var(--sans);
+    font-size: .5rem;
+    letter-spacing: .07em;
+    color: var(--bone-faint);
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+/* ── the links ───────────────────────────────────────────────────────── */
+
+.nav__links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 20px;
+}
+
+.nav__group { position: relative; }
+
+.nav__link {
+    padding: 9px 14px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--bone-dim);
+    background: none;
+    border: 0;
+    border-radius: 99px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color .15s ease, background .15s ease;
+}
+
+.nav__link:hover { color: var(--lime); }
+
+/* Open state inverts the pill — lime for services, cyan for compliance, the
+   prototype's own colour split. */
+.nav__link.is-open--svc  { background: var(--lime); color: var(--void); }
+.nav__link.is-open--comp { background: var(--cyan); color: var(--void); }
+
+/* Pushed to the far edge so the brand and the button anchor opposite ends. */
+.nav__cta {
+    margin-left: auto;
+    background: var(--magenta);
+    color: #fff;
+    border-radius: 99px;
+    padding: 11px 22px;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    white-space: nowrap;
+    text-decoration: none;
+    box-shadow: 0 6px 26px rgba(255, 46, 154, .4);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.nav__cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 32px rgba(255, 46, 154, .55);
+}
+
+/* ── the mega menu ───────────────────────────────────────────────────── */
+
+.mega {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 640px;
+    max-width: calc(100vw - 48px);
+    margin-top: 8px;
+    padding: 16px;
+    border-radius: var(--radius-lg);
+    background: var(--void-2);
+    border: 1px solid var(--edge);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, .72);
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 14px;
+    z-index: 70;
+}
+
+.mega__label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    padding: 0 13px 9px;
+    margin: 0;
+}
+.mega__label--alt { color: var(--magenta); }
+
+/* A vertical gradient that fades out at both ends rather than a hard 1px
+   rule, so it separates the columns without cutting the box in half. */
+.mega__rule {
+    width: 1px;
+    background: linear-gradient(180deg,
+        transparent, var(--edge) 18%, rgba(255, 255, 255, .3) 50%, var(--edge) 82%, transparent);
+}
+
+.mega__item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 11px 13px;
+    border: 0;
+    border-radius: 12px;
+    background: none;
+    cursor: pointer;
+    transition: background .2s ease;
+}
+.mega__item:hover,
+.mega__item:focus-visible { background: var(--panel); }
+
+.mega__name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 13.5px;
+    letter-spacing: -.005em;
+    color: var(--bone);
+}
+
+.mega__tag {
+    font-family: var(--mono);
+    font-size: 8px;
+    color: var(--void);
+    background: var(--lime);
+    padding: 2px 6px;
+    border-radius: 99px;
+    letter-spacing: .08em;
+    flex-shrink: 0;
+}
+
+.mega__note {
+    display: block;
+    font-size: 11.5px;
+    color: var(--bone-faint);
+    margin-top: 3px;
+    line-height: 1.4;
+}
+
+/* ── mobile ──────────────────────────────────────────────────────────── */
 
 .nav__burger {
     display: none;
@@ -106,6 +254,7 @@
     border: 0;
     cursor: pointer;
     padding: 8px;
+    margin-left: auto;
 }
 .nav__burger span {
     width: 22px; height: 2px;
@@ -113,20 +262,35 @@
     border-radius: 2px;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 980px) {
+    .nav__tag { display: none; }
     .nav__burger { display: flex; }
     .nav__links {
         position: absolute;
-        top: 68px; left: 0; right: 0;
+        top: 70px; left: 0; right: 0;
         flex-direction: column;
         align-items: stretch;
         gap: 0;
+        margin-left: 0;
         background: var(--void-2);
         border-bottom: 1px solid var(--edge);
         padding: 8px 24px 20px;
         display: none;
     }
     .nav__links.is-open { display: flex; }
-    .nav__links a { padding: 14px 0; border-bottom: 1px solid var(--edge); }
-    .nav__cta { margin-top: 16px; }
+    .nav__link { text-align: left; padding: 14px 0; border-bottom: 1px solid var(--edge); }
+    .nav__cta { margin: 16px 0 0; text-align: center; }
+
+    /* In the drawer the panel is part of the flow, not an overlay — a
+       640px absolutely-positioned box would hang off the screen. */
+    .mega {
+        position: static;
+        width: auto;
+        grid-template-columns: 1fr;
+        box-shadow: none;
+        padding: 4px 0 12px;
+        background: none;
+        border: 0;
+    }
+    .mega__rule { display: none; }
 }
