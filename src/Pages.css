@@ -24,22 +24,15 @@
 .plainlist { color: var(--bone-dim); padding-left: 20px; }
 .plainlist li { margin-bottom: 8px; }
 
-.footer { border-top: 1px solid var(--line); margin-top: 40px; padding: 40px 0 48px; background: var(--ink-2); }
-.footer__inner { display: flex; flex-direction: column; gap: 18px; }
-.footer__brand { display: flex; align-items: baseline; gap: 10px; }
-.footer__brand strong { font-size: 1.1rem; }
-.footer__links { display: flex; gap: 24px; flex-wrap: wrap; }
-.footer__links a { color: var(--bone-dim); font-size: .92rem; }
-.footer__links a:hover { color: var(--gold); }
-.footer__note { max-width: 640px; margin: 0; line-height: 1.6; }
+/* The old single-row footer's rules lived here. They are deleted rather
+   than left in place: .footer__brand set display:flex, and the rebuilt
+   footer reuses that class name for a stacked brand COLUMN, so the stale
+   rule laid its heading, mark, address and strapline out side by side and
+   overlapped them across the Platform column. The new rules are at the
+   bottom of this file.
 
-/* ── footer · legal row ──────────────────────────────────────────────── */
-/* Deliberately lighter than .footer__links above it. These have to be
-   findable — Razorpay and the DPDP Act both expect them reachable from every
-   page — without competing with the links people actually came to use. */
-.footer__legal { display: flex; gap: 18px; flex-wrap: wrap; }
-.footer__legal a { color: var(--bone-faint); font-size: .84rem; }
-.footer__legal a:hover { color: var(--bone-dim); }
+   Dead CSS for markup that no longer exists is not harmless when the class
+   names survive the rewrite. */
 
 /* ── preferences · unsubscribe landing ───────────────────────────────── */
 /* No stylesheet of its own: one card and a button. */
@@ -51,3 +44,166 @@
 /* A service arrived via ?topic= — shown as a read-only line rather than
    dropped into the tier dropdown, which lists prices a service does not have. */
 .contact__topic { color: var(--bone); display: flex; align-items: center; cursor: default; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   The footer, from the prototype's line 1851.
+   Brand column plus five link columns, a legal strip, and the outlined
+   wordmark sign-off.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.footer {
+    position: relative;
+    border-top: 1px solid var(--edge);
+    margin-top: 96px;
+    padding-top: 52px;
+}
+
+/* EXPLICIT TRACK COUNT, NOT auto-fit.
+
+   The prototype writes repeat(auto-fit, minmax(140px,1fr)) after the brand
+   column. auto-fit sizes tracks to the container, not to the number of
+   children, so at 1440px it lays out more tracks than there are columns:
+   the brand column collapsed to a sliver with its text overlapping
+   Platform, and Company wrapped onto a second row. Five link columns are
+   five link columns. */
+.footer__top {
+    display: grid;
+    gap: 34px;
+    grid-template-columns: minmax(230px, 1.25fr) repeat(5, minmax(120px, 1fr));
+    align-items: start;
+    padding-bottom: 40px;
+}
+
+@media (max-width: 1180px) {
+    .footer__top { grid-template-columns: repeat(3, 1fr); }
+}
+
+.footer__mark {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 26px;
+    text-transform: uppercase;
+    letter-spacing: .01em;
+    margin: 0 0 12px;
+    color: var(--bone);
+}
+
+.footer__eagle { display: block; height: 26px; width: auto; margin-bottom: 10px; }
+
+.footer__company {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: .06em;
+    color: var(--bone-dim);
+    margin: 0 0 14px;
+}
+
+.footer__line {
+    font-size: 14px;
+    color: var(--bone-dim);
+    line-height: 1.6;
+    margin: 0 0 18px;
+}
+
+.footer__email {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--lime);
+    text-decoration: none;
+}
+.footer__email:hover { text-decoration: underline; }
+
+.footer__addr {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--bone-faint);
+    margin: 12px 0 0;
+    line-height: 1.6;
+}
+
+.footer__brand { display: block; }
+.footer__col { display: flex; flex-direction: column; }
+
+.footer__head {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+}
+
+.footer__col a {
+    font-size: 13px;
+    color: var(--bone-dim);
+    text-decoration: none;
+    padding: 5px 0;
+    transition: color .15s ease;
+}
+.footer__col a:hover,
+.footer__col a:focus-visible { color: var(--lime); }
+
+.footer__legal {
+    border-top: 1px solid var(--edge);
+    padding: 20px 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.footer__copy {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--bone-faint);
+    margin: 0;
+}
+
+.footer__legallinks { display: flex; gap: 20px; flex-wrap: wrap; }
+.footer__legallinks a {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--bone-faint);
+    text-decoration: none;
+    transition: color .15s ease;
+}
+.footer__legallinks a:hover,
+.footer__legallinks a:focus-visible { color: var(--lime); }
+
+.footer__note {
+    font-size: .8rem;
+    line-height: 1.55;
+    max-width: 720px;
+    margin: 0 0 26px;
+}
+
+/* The sign-off. Transparent fill with a hairline stroke, so it reads as a
+   watermark rather than a heading. */
+.footer__sign {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(48px, 15vw, 190px);
+    letter-spacing: -.05em;
+    line-height: .8;
+    text-transform: uppercase;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--edge);
+    padding-bottom: 24px;
+    margin: 0;
+    user-select: none;
+}
+
+@media (max-width: 760px) {
+    .footer__top { grid-template-columns: 1fr 1fr; gap: 26px; }
+}
+@media (max-width: 460px) {
+    .footer__top { grid-template-columns: 1fr; }
+}
+
+/* The brand column spans the full width once the grid has collapsed, so its
+   paragraph is not squeezed into a 120px track. */
+@media (max-width: 1180px) {
+    .footer__brand { grid-column: 1 / -1; }
+}

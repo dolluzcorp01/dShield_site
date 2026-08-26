@@ -3,6 +3,8 @@ import { Link, useSearchParams } from "react-router-dom";
 import { apiPost } from "./utils/api";
 import "./Pages.css";
 import { useDocumentMeta } from "./utils/meta";
+import eagle from "./assets/img/eagle-mark.png";
+import { OFFICE, TIERS, SERVICES, COMPLIANCE, SMART_BUILT } from "./data/site-content";
 
 /* ── Contact ─────────────────────────────────────────────────────────── */
 
@@ -279,39 +281,111 @@ export function Trust() {
 
 /* ── Footer ──────────────────────────────────────────────────────────── */
 
+/* ─────────────────────────────────────────────────────────────────────────
+   The footer, from the prototype's section of the same name (line 1851).
+
+   A brand column, five link columns, a legal strip, and the oversized
+   outlined wordmark that signs the page off.
+
+   EVERY LINK HERE GOES SOMEWHERE. The prototype's footer is ninety-odd
+   <button> elements with a hover colour and no handler — the Platform
+   column, the Services column, Compliance, Careers, Blog, and all five
+   legal links included. A footer of dead links is worse than a short one:
+   it is the part of a page people go to when they are looking for the terms
+   or the privacy notice, and finding neither is the moment they stop
+   trusting the site.
+
+   So the columns are built from what exists. Services and Compliance are
+   headings with real destinations; Careers and Blog are dropped because
+   there is no careers page and no blog; Responsible Disclosure and Data
+   Processing are dropped because those documents are not written. The four
+   legal documents that DO exist are linked, and so is /data-request.
+   ───────────────────────────────────────────────────────────────────────── */
+
 export function Footer() {
+    const year = new Date().getFullYear();
+
     return (
         <footer className="footer">
-            <div className="ds-wrap footer__inner">
-                <div className="footer__brand">
-                    <strong>dShield</strong>
-                    <span className="ds-faint">by Dolluz Corp · Chennai</span>
-                </div>
-                <nav className="footer__links">
-                    <Link to="/services">Services</Link>
-                    <Link to="/how-it-works">How it works</Link>
-                    <Link to="/coverage">Coverage</Link>
-                    <Link to="/pricing">Pricing</Link>
-                    <Link to="/tools">Free tools</Link>
-                    <Link to="/trust">Trust</Link>
-                    <Link to="/contact">Contact</Link>
-                </nav>
+            <div className="ds-wrap">
+                <div className="footer__top">
+                    <div className="footer__brand">
+                        <p className="footer__mark">dShield</p>
+                        <img className="footer__eagle" src={eagle} alt="" aria-hidden="true"
+                             width="34" height="26" />
+                        <p className="footer__company">{OFFICE.company}</p>
+                        <p className="footer__line">
+                            We tell you what we can see, and we are honest about what we cannot.
+                        </p>
+                        <a className="footer__email" href={`mailto:${OFFICE.email}`}>{OFFICE.email}</a>
+                        <p className="footer__addr">
+                            {OFFICE.line1}<br />{OFFICE.country}
+                        </p>
+                        <p className="footer__addr">{OFFICE.hours}</p>
+                    </div>
 
-                {/* Kept as a separate, lighter row rather than merged into the
-                    nav above. Nine links of equal weight is a list nobody
-                    reads; the legal row needs to be findable, not prominent. */}
-                <nav className="footer__legal">
-                    <Link to="/legal/terms">Terms</Link>
-                    <Link to="/legal/privacy">Privacy</Link>
-                    <Link to="/legal/refunds">Refunds</Link>
-                    <Link to="/legal/cookies">Cookies</Link>
-                    <Link to="/data-request">Your data</Link>
-                </nav>
+                    <div className="footer__col">
+                        <p className="footer__head">Platform</p>
+                        {TIERS.map((t) => (
+                            <Link key={t.key} to="/pricing">{t.name}</Link>
+                        ))}
+                    </div>
+
+                    <div className="footer__col">
+                        <p className="footer__head">Services</p>
+                        {SERVICES.map((x) => (
+                            <Link key={x.name} to="/services">{x.name}</Link>
+                        ))}
+                    </div>
+
+                    <div className="footer__col">
+                        <p className="footer__head">Smart Checks</p>
+                        {/* SMART_BUILT, not SMART. The two paid tools the
+                            prototype lists have no engine behind them, and a
+                            footer link to a tool that does not exist is the
+                            same defect as a dead button. */}
+                        {SMART_BUILT.map((t) => (
+                            <Link key={t.slug} to={`/tools/${t.slug}`}>{t.name}</Link>
+                        ))}
+                    </div>
+
+                    <div className="footer__col">
+                        <p className="footer__head">Compliance</p>
+                        {COMPLIANCE.map((x) => (
+                            <Link key={x.name} to="/services">{x.name}</Link>
+                        ))}
+                    </div>
+
+                    <div className="footer__col">
+                        <p className="footer__head">Company</p>
+                        <Link to="/how-it-works">How it works</Link>
+                        <Link to="/coverage">Coverage</Link>
+                        <Link to="/trust">Trust</Link>
+                        <Link to="/contact">Contact</Link>
+                    </div>
+                </div>
+
+                <div className="footer__legal">
+                    <p className="footer__copy">© {year} {OFFICE.company}. All rights reserved.</p>
+                    <nav className="footer__legallinks">
+                        <Link to="/legal/terms">Terms of Service</Link>
+                        <Link to="/legal/privacy">Privacy Notice</Link>
+                        <Link to="/legal/cookies">Cookie Notice</Link>
+                        <Link to="/legal/refunds">Refund &amp; Cancellation</Link>
+                        <Link to="/data-request">Your data</Link>
+                    </nav>
+                </div>
+
                 <p className="ds-faint footer__note">
                     dShield assesses security posture from publicly available information. It does
                     not defend, block or remediate, and no assessment can guarantee that a system
                     is secure.
                 </p>
+
+                {/* The arcade sign-off — outlined, oversized, decorative.
+                    aria-hidden because it is the word "dShield" for the fourth
+                    time on this page and carries nothing a reader needs. */}
+                <p className="footer__sign" aria-hidden="true">dShield</p>
             </div>
         </footer>
     );
