@@ -15,17 +15,15 @@ with a matching `.css` beside each.
 
 | | |
 |---|---|
-| **Free scan** | 8 checks across the 5 domains a scan can measure |
+| **Free scan** | 8 checks across all 5 domains the site promises |
 | **Free tools** | Email spoofing · SSL/TLS · Security headers · Lookalike domains · Password exposure |
-| **Paid reports** | Basic, Advanced and Full Protection — 19 and 58 checks |
-| **Pricing** | All five tiers, real prices, checkout on the buyable three |
+| **Pricing** | All five tiers, real prices, "notify me" instead of checkout |
 | **Enquiries** | Stored in `enquiries` for follow-up |
 
-**Checkout is wired, and not yet switched on.** The chain — pay, scan, build
-the report, deliver it, email the link — is built and tested end to end. What
-is missing is the Razorpay webhook secret and live keys, so tiers fall back to
-"Notify me" until a key is configured. The seven legal placeholders are also
-outstanding. See `docs/DEPLOY.md`.
+**Payments are deliberately not wired.** Razorpay onboarding and the seven
+legal documents are outstanding. A checkout that takes a card and delivers
+nothing is the fastest way to lose a payment gateway, so the pricing page
+collects interest instead. Everything above is live and useful without it.
 
 ---
 
@@ -89,8 +87,7 @@ dshield-global/
     │   └── Lead_server.js       enquiries, notify-me, pricing content
     ├── utils/
     │   ├── api.js               API_BASE + apiFetch/apiGet/apiPost
-    │   ├── scan_engine.js       scoring, coverage floor, SSRF guards
-    │   ├── checks/             the 58 checks, 5 files by domain
+    │   ├── scan_engine.js       the 8 checks, scoring, SSRF guards
     │   └── tools_engine.js      the five tools
     ├── App.js                   routes
     ├── Navbar.js / .css
@@ -103,13 +100,7 @@ dshield-global/
 
 ---
 
-## The checks
-
-**58 checks across 5 domains**, split 8 / 19 / 58 by tier — the free scan runs
-8, Basic 19, Advanced and above all 58. `src/utils/checks/index.js` is the
-catalogue and `node scripts/verify-checks.js` proves it is sound.
-
-The eight the free scan runs:
+## The eight checks
 
 All read information your servers already publish to anyone who asks. Nothing
 is probed, nothing is attacked.
@@ -152,9 +143,9 @@ with a critical hole and otherwise good hygiene is not a B.
 on restart. Fine for a single process. If this ever runs under PM2 in cluster
 mode, four processes means four times the limit — move it to Redis then.
 
-**Email goes through an outbox.** Enquiries and report links are written to
-`mail_outbox` and sent by an in-process worker, so a SendGrid outage delays
-mail rather than losing it. Set `MAIL_WORKER_ENABLED=true` or nothing sends.
+**Enquiries do not email anybody yet.** SendGrid is not wired on this app. Rows
+land in `enquiries` and somebody has to watch that table. An enquiry that
+reaches nobody is worse than one never made, because the person is waiting.
 
 **Two checks need outbound access** that some networks block: `crt.sh` for
 certificate transparency, and `api.pwnedpasswords.com` for the password tool.
@@ -223,17 +214,9 @@ Deliberately, and it is worth saying out loud to anyone who asks:
 
 ## Next, in order
 
-The site is live at **https://dshield.dolluzcorp.com**. `docs/DEPLOY.md` holds
-the runbook, the live state and the full list; the short version:
-
-1. **The Razorpay webhook secret is empty.** Every webhook fails signature
-   validation and fulfils nothing, so a customer would pay and receive
-   nothing. Nothing can be sold until this is set.
-2. **Live Razorpay keys**, once KYC clears.
-3. **The seven legal placeholders.** Checkout asks customers to accept a
-   document that currently says it is not binding.
-4. Test the scan against 20 real Indian company domains — sites behind
+1. Test the scan against 20 real Indian company domains — sites behind
    Cloudflare, on shared hosting, with odd certificates. The engine has met
    test domains, not messy real ones.
-5. **Resize the droplet.** 1 GB with ten apps leaves ~50 MB free, which is why
-   `PDF_ENABLED=false` while the Basic tier advertises a PDF.
+2. Wire SendGrid so enquiries reach a person rather than a table.
+3. Razorpay KYC and the legal documents. When both land, the checkout flow from
+   the main dShield backend drops in behind the existing pricing page.
