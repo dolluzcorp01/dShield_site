@@ -97,6 +97,28 @@ app.get("/api/health", (req, res) => {
     res.json({ ok: true, app: "dshield-global", time: new Date().toISOString() });
 });
 
+/* ── unknown API paths answer in JSON ────────────────────────────────────
+ *
+ * MOUNTED AFTER EVERY /api ROUTER AND BEFORE THE STATIC BLOCK. Anything that
+ * reaches here matched no router, so it is a genuine unknown endpoint.
+ *
+ * Without it, Express's default handler replies with an HTML error page.
+ * utils/api.js calls res.json() on every response, so a typo in a path — or
+ * a route that was removed while the frontend still calls it — surfaced to
+ * the visitor as "Unexpected response from the server" instead of anything
+ * that says what happened, and to us as nothing at all.
+ *
+ * It also matters for the four preferences endpoints the frozen prototype
+ * calls and this app does not implement: POST /preferences/:token, /pause,
+ * /stop-product and /stop-all were returning an HTML page. They now say so
+ * in the shape every other endpoint uses.
+ *
+ * Deliberately below /api/health, so the health check keeps answering.
+ */
+app.use("/api", (req, res) => {
+    res.status(404).json({ success: false, message: "Unknown endpoint" });
+});
+
 // Serve the built React app in production. In development the React dev
 // server runs separately on 3000 and proxies here.
 if (isProd) {

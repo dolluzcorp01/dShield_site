@@ -216,10 +216,19 @@ function Navbar() {
                             {SECTIONS["smart-checks"]}
                         </button>
 
+                        {/* Scrolls to the section on the home page, routes to
+                            /contact from anywhere else. It stays an <a> with a
+                            real href either way, so it is still a link a
+                            middle-click or a screen reader can use — a button
+                            that navigates is neither. */}
                         <Link
                             to="/contact"
                             className="nav__cta"
-                            onClick={() => { setOpen(false); setMenu(null); }}
+                            onClick={(e) => {
+                                if (location.pathname !== "/") { setOpen(false); setMenu(null); return; }
+                                e.preventDefault();
+                                goSection("contact");
+                            }}
                         >
                             Talk to experts
                         </Link>

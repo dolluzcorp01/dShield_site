@@ -7,6 +7,7 @@ import Bolt, { Type } from "./Bolt";
 import TwentyThree from "./TwentyThree";
 import { Connect, WhatWeDo, SmartChecks, ServicesBlock, Compliance, Faq } from "./Sections";
 import Tiers from "./Tiers";
+import { ContactSection } from "./Pages";
 
 /* The five things a free scan actually looks at.
    These must stay in step with the eight checks in scan_engine.js. A site
@@ -302,6 +303,7 @@ function Home() {
             <ServicesBlock />
             <Compliance />
             <Faq />
+            <ContactSection />
         </div>
     );
 }

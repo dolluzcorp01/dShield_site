@@ -24,13 +24,17 @@ const SERVICE_LABELS = {
     "standards-compliance-audits": "Standards & Compliance Audits",
 };
 
-export function Contact() {
-    useDocumentMeta({
-        title: "Contact Dolluz Corp — Security Services | dShield",
-        description: "Talk to our engineers about audits, penetration testing, incident response or compliance.",
-        canonical: "/contact",
-    });
+/* ─────────────────────────────────────────────────────────────────────────
+   The enquiry form, shared by the /contact page and the section on the home
+   page. One component, so the two cannot drift into asking different
+   questions or posting different fields.
 
+   It keeps its own `sent` state, which is why the thank-you renders in
+   place: somebody who fills this in halfway down the home page should not be
+   thrown to another route to be told it worked.
+   ───────────────────────────────────────────────────────────────────────── */
+
+function ContactForm() {
     const [params] = useSearchParams();
     const topic = (params.get("topic") || "").trim().slice(0, 40);
     const topicIsTier = TIER_VALUES.includes(topic);
@@ -63,18 +67,86 @@ export function Contact() {
 
     if (sent) {
         return (
-            <div className="ds-wrap ds-section">
-                <div className="ds-card" style={{ maxWidth: 620 }}>
-                    <h1>Thank you</h1>
-                    <p className="ds-muted">
-                        We have your message and somebody will be in touch. If it is urgent, the free
-                        scan and all five tools are available now while you wait.
-                    </p>
-                    <Link to="/" className="ds-btn">Run a free scan</Link>
-                </div>
+            <div className="ds-card" style={{ maxWidth: 620 }}>
+                <h2>Thank you</h2>
+                <p className="ds-muted">
+                    We have your message and somebody will be in touch. If it is urgent, the free
+                    scan and all five tools are available now while you wait.
+                </p>
+                <Link to="/" className="ds-btn">Run a free scan</Link>
             </div>
         );
     }
+
+    return (
+    <form className="ds-card contactform" onSubmit={submit}>
+            <div className="ds-grid ds-grid--2">
+                <div className="ds-field">
+                    <label className="ds-label">Your name</label>
+                    <input className="ds-input" value={form.name} onChange={set("name")} disabled={busy} />
+                </div>
+                <div className="ds-field">
+                    <label className="ds-label">Email <span className="req">*</span></label>
+                    <input className="ds-input" type="email" value={form.email} onChange={set("email")} disabled={busy} />
+                </div>
+                <div className="ds-field">
+                    <label className="ds-label">Company</label>
+                    <input className="ds-input" value={form.company} onChange={set("company")} disabled={busy} />
+                </div>
+                <div className="ds-field">
+                    <label className="ds-label">Phone</label>
+                    <input className="ds-input" value={form.phone} onChange={set("phone")} disabled={busy} />
+                </div>
+                <div className="ds-field">
+                    <label className="ds-label">Your domain</label>
+                    <input className="ds-input" placeholder="yourcompany.com" value={form.domain} onChange={set("domain")} disabled={busy} />
+                </div>
+                <div className="ds-field">
+                    <label className="ds-label">Interested in</label>
+                    {serviceLabel ? (
+                        <>
+                            <div className="ds-input contact__topic" aria-readonly="true">{serviceLabel}</div>
+                            <p className="ds-faint" style={{ margin: "8px 0 0" }}>
+                                From the service you came in on. Tell us more below, or{" "}
+                                <Link to="/services">pick a different one</Link>.
+                            </p>
+                        </>
+                    ) : (
+                        <select className="ds-input" value={form.tier} onChange={set("tier")} disabled={busy}>
+                            <option value="">Not sure yet</option>
+                            <option value="basic">Basic — $49</option>
+                            <option value="advanced">Advanced — $199</option>
+                            <option value="full_protection">Full Protection — $499</option>
+                            <option value="extended_support">Full Protection + Extended Support — $999+/month</option>
+                        </select>
+                    )}
+                </div>
+            </div>
+
+            <div className="ds-field">
+                <label className="ds-label">What would you like to talk about?</label>
+                <textarea className="ds-input" value={form.message} onChange={set("message")} disabled={busy} />
+            </div>
+
+            {error && <div className="ds-error">{error}</div>}
+
+            <button className="ds-btn" disabled={busy}>
+                {busy ? <span className="ds-spin" /> : "Send enquiry"}
+            </button>
+        </form>
+    );
+}
+
+/* The /contact route. Kept as a real page with its own canonical URL and
+   meta even though the form now also sits on the home page — it is a
+   deep link people are sent, and it is what the footer and the nav point at
+   from every route that is not "/". */
+export function Contact() {
+    useDocumentMeta({
+        title: "Contact Dolluz Corp — Security Services | dShield",
+        description: "Talk to our engineers about audits, penetration testing, incident response or compliance.",
+        canonical: "/contact",
+    });
 
     return (
         <div className="ds-wrap ds-section">
@@ -84,63 +156,20 @@ export function Contact() {
                 For Full Protection, Extended Support, or anything you would rather discuss with a
                 person than read on a page.
             </p>
-
-            <form className="ds-card contactform" onSubmit={submit}>
-                <div className="ds-grid ds-grid--2">
-                    <div className="ds-field">
-                        <label className="ds-label">Your name</label>
-                        <input className="ds-input" value={form.name} onChange={set("name")} disabled={busy} />
-                    </div>
-                    <div className="ds-field">
-                        <label className="ds-label">Email <span className="req">*</span></label>
-                        <input className="ds-input" type="email" value={form.email} onChange={set("email")} disabled={busy} />
-                    </div>
-                    <div className="ds-field">
-                        <label className="ds-label">Company</label>
-                        <input className="ds-input" value={form.company} onChange={set("company")} disabled={busy} />
-                    </div>
-                    <div className="ds-field">
-                        <label className="ds-label">Phone</label>
-                        <input className="ds-input" value={form.phone} onChange={set("phone")} disabled={busy} />
-                    </div>
-                    <div className="ds-field">
-                        <label className="ds-label">Your domain</label>
-                        <input className="ds-input" placeholder="yourcompany.com" value={form.domain} onChange={set("domain")} disabled={busy} />
-                    </div>
-                    <div className="ds-field">
-                        <label className="ds-label">Interested in</label>
-                        {serviceLabel ? (
-                            <>
-                                <div className="ds-input contact__topic" aria-readonly="true">{serviceLabel}</div>
-                                <p className="ds-faint" style={{ margin: "8px 0 0" }}>
-                                    From the service you came in on. Tell us more below, or{" "}
-                                    <Link to="/services">pick a different one</Link>.
-                                </p>
-                            </>
-                        ) : (
-                            <select className="ds-input" value={form.tier} onChange={set("tier")} disabled={busy}>
-                                <option value="">Not sure yet</option>
-                                <option value="basic">Basic — $49</option>
-                                <option value="advanced">Advanced — $199</option>
-                                <option value="full_protection">Full Protection — $499</option>
-                                <option value="extended_support">Full Protection + Extended Support — $999+/month</option>
-                            </select>
-                        )}
-                    </div>
-                </div>
-
-                <div className="ds-field">
-                    <label className="ds-label">What would you like to talk about?</label>
-                    <textarea className="ds-input" value={form.message} onChange={set("message")} disabled={busy} />
-                </div>
-
-                {error && <div className="ds-error">{error}</div>}
-
-                <button className="ds-btn" disabled={busy}>
-                    {busy ? <span className="ds-spin" /> : "Send enquiry"}
-                </button>
-            </form>
+            <ContactForm />
         </div>
+    );
+}
+
+/* Section 12 of the home page, with the prototype's own headings. The
+   header's "Talk to experts" scrolls here rather than leaving the page. */
+export function ContactSection() {
+    return (
+        <section id="contact" className="ds-section ds-wrap">
+            <p className="ds-eyebrow contact__eyebrow">Talk to a person</p>
+            <h2 className="ds-shout contact__h2">Tell us what is worrying you</h2>
+            <ContactForm />
+        </section>
     );
 }
 

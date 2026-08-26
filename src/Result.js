@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
-import { apiGet } from "./utils/api";
+import { apiGet, apiPost } from "./utils/api";
 import "./Result.css";
 import { useDocumentMeta } from "./utils/meta";
 import TwentyThree from "./TwentyThree";
@@ -10,6 +10,115 @@ const GRADE_WORD = {
 };
 
 const SEVERITY_ORDER = ["critical", "high", "medium", "low"];
+
+/* ─────────────────────────────────────────────────────────────────────────
+   "Send me a copy of this" — the lead capture, from the prototype's
+   #leadoptin block (line 1320 of 01-customer-website-v5.9-FROZEN.jsx).
+
+   IT IS HERE AND NOT IN THE HERO, WHICH IS THE WHOLE POINT. The prototype's
+   comment on this block:
+
+     Offered after the result, never before it. The scan is free and the
+     result is theirs whether or not they give us an address — asking first
+     would make the address the price of the check.
+
+   The scan box used to carry an optional email field. Removing it without
+   building this left the site capturing no leads at all; this closes that.
+
+   It posts to /api/leads/notify with source 'free_scan' rather than
+   re-posting to /api/scan. Re-posting would run a SECOND live scan of the
+   same domain, spend the visitor's rate-limit allowance and take another
+   thirty seconds to tell them something they are already looking at.
+   Scan_server.js is unchanged.
+
+   A FAILURE HERE IS NEVER SHOWN. They already have their result; this is us
+   asking for an address. An error on a courtesy step reads as a broken
+   product, so the thank-you renders either way and the problem goes to the
+   console. That is the prototype's behaviour too, and it is the right one —
+   nothing the visitor could do about it, and nothing they lose.
+   ───────────────────────────────────────────────────────────────────────── */
+
+const LEAD_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function ScanLeadCapture({ domain, scanId }) {
+    const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
+    const [busy, setBusy] = useState(false);
+    const [sent, setSent] = useState(false);
+
+    const valid = LEAD_EMAIL_RE.test(email.trim());
+
+    const send = async (e) => {
+        e.preventDefault();
+        if (!valid || busy) return;
+        setBusy(true);
+        try {
+            await apiPost("/api/leads/notify", {
+                email: email.trim(),
+                name: name.trim() || undefined,
+                domain,
+                scanId,
+                source: "free_scan",
+            });
+        } catch (err) {
+            console.error("⚠️  Scan lead could not be sent:", err.message);
+        } finally {
+            setBusy(false);
+            setSent(true);
+        }
+    };
+
+    if (sent) {
+        return (
+            <section className="ds-wrap ds-section ds-section--tight">
+                <div className="ds-card leadcap leadcap--done">
+                    <p className="ds-eyebrow">On its way</p>
+                    <h2 className="leadcap__title">Check your inbox</h2>
+                    <p className="ds-muted leadcap__sub">
+                        We have sent this result to {email.trim()}. Every message we send carries
+                        an unsubscribe link, and it works.
+                    </p>
+                </div>
+            </section>
+        );
+    }
+
+    return (
+        <section className="ds-wrap ds-section ds-section--tight">
+            <form className="ds-card leadcap" onSubmit={send}>
+                <p className="ds-eyebrow">Send me a copy of this</p>
+                <h2 className="leadcap__title">The result above is yours either way</h2>
+                <p className="ds-muted leadcap__sub">
+                    This just puts it in your inbox.
+                </p>
+
+                <div className="leadcap__row">
+                    <input
+                        className="ds-input"
+                        type="email"
+                        value={email}
+                        onChange={(ev) => setEmail(ev.target.value)}
+                        placeholder="you@company.com"
+                        aria-label="Your email address"
+                        disabled={busy}
+                    />
+                    <input
+                        className="ds-input"
+                        value={name}
+                        onChange={(ev) => setName(ev.target.value)}
+                        placeholder="Your name (optional)"
+                        aria-label="Your name, optional"
+                        disabled={busy}
+                    />
+                </div>
+
+                <button className="ds-btn leadcap__go" disabled={!valid || busy}>
+                    {busy ? "Sending…" : "Send me the result"}
+                </button>
+            </form>
+        </section>
+    );
+}
 
 function Result() {
     const { id } = useParams();
@@ -302,6 +411,8 @@ function Result() {
                     state, so the two cannot drift. */}
                 <TwentyThree result={result} />
             </section>
+
+            <ScanLeadCapture domain={result.domain} scanId={id} />
 
             <section className="ds-wrap ds-section">
                 <div className="ds-card nextstep">

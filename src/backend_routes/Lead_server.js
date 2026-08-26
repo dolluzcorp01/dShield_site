@@ -125,6 +125,19 @@ router.post("/enquiry", (req, res) => {
     });
 });
 
+/* Where a lead came from.
+
+   ALLOW-LISTED, NOT TAKEN FROM THE BODY AS-IS. `source` is how we tell a
+   "tell me when reports open" signup from somebody who asked for a copy of
+   their free scan, and those two get different follow-up. Letting a caller
+   write an arbitrary string into it would turn a reporting column into a
+   free-text field nobody can group by, and the value reaches the database,
+   so it is validated rather than cleaned.
+
+   Anything unrecognised falls back to notify_me, which is what this endpoint
+   did before it took the parameter at all. */
+const LEAD_SOURCES = ["notify_me", "free_scan"];
+
 // ── POST /api/leads/notify ───────────────────────────────────────────────
 router.post("/notify", (req, res) => {
     const email = clean(req.body?.email, 190);
@@ -132,6 +145,22 @@ router.post("/notify", (req, res) => {
         return res.status(400).json({ success: false, message: "Enter a valid email address." });
     }
     const address = email.toLowerCase();
+
+    const source = LEAD_SOURCES.includes(req.body?.source) ? req.body.source : "notify_me";
+
+    /* What we say back. Somebody who asked for a copy of their scan is not
+       joining a waiting list, and telling them "we will write when reports
+       open" reads as though we ignored what they clicked. */
+    const done = source === "free_scan"
+        ? "Thank you. We have your address and your result is on its way."
+        : "You are on the list. We will write when reports open.";
+
+    /* The scan this address was offered for, when there is one. Validated as
+       a UUID rather than cleaned: it is a foreign key, and a malformed one
+       stored is a row that joins to nothing. */
+    const rawScan = clean(req.body?.scanId, 36);
+    const scanId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawScan)
+        ? rawScan : null;
 
     /* Check the suppression list BEFORE writing anything.
        Somebody who has unsubscribed and later fills in a form must not be
@@ -145,21 +174,31 @@ router.post("/notify", (req, res) => {
             return res.status(500).json({ success: false, message: "We could not record that. Please try again." });
         }
         if (suppressed) {
-            return res.json({ success: true, message: "You are on the list. We will write when reports open." });
+            /* Suppressed: the same answer as the ordinary path, and no row.
+               Saying anything different would let anyone test whether a given
+               address had ever unsubscribed. */
+            return res.json({ success: true, message: done });
         }
 
         db.query(
-            `INSERT INTO leads (email, name, company, domain, source, tier_interest, unsubscribe_token)
-             VALUES (?, ?, ?, ?, 'notify_me', ?, ?)
+            `INSERT INTO leads (email, name, company, domain, source, tier_interest, scan_id, unsubscribe_token)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE
                tier_interest = VALUES(tier_interest),
+               -- Fill these in only when this request carried them, so a
+               -- scan signup does not blank the domain a previous one
+               -- recorded, and a later notify_me does not erase the scan a
+               -- free_scan lead was captured against.
+               domain  = COALESCE(VALUES(domain), domain),
+               scan_id = COALESCE(VALUES(scan_id), scan_id),
                -- Keep the token already printed in an email they may still
                -- have. Reissuing it would break every unsubscribe link we
                -- have ever sent this person.
                unsubscribe_token = COALESCE(unsubscribe_token, VALUES(unsubscribe_token)),
                updated_at = CURRENT_TIMESTAMP`,
             [address, clean(req.body?.name, 120), clean(req.body?.company, 160),
-             clean(req.body?.domain, 253), clean(req.body?.tier, 40), crypto.randomUUID()],
+             clean(req.body?.domain, 253) || null, source, clean(req.body?.tier, 40),
+             scanId, crypto.randomUUID()],
             (err) => {
                 if (err) {
                     console.error("❌ Notify signup failed:", err.sqlMessage || err.message);
@@ -168,7 +207,7 @@ router.post("/notify", (req, res) => {
 
                 /* Answer the visitor first. Everything below is bookkeeping
                    and must not delay or endanger the response. */
-                res.json({ success: true, message: "You are on the list. We will write when reports open." });
+                res.json({ success: true, message: done });
 
                 /* Read the token BACK rather than using the one generated
                    above. On the duplicate-key path COALESCE keeps whatever
