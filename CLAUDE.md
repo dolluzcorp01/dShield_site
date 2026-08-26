@@ -114,27 +114,54 @@ Do not add these. Their absence is the plan, not an oversight.
 
 | Missing | Why |
 |---|---|
-| **Checkout / payments** | Razorpay KYC and legal review outstanding. A checkout that takes a card and delivers nothing is how you lose a payment gateway in week one. |
 | **Login / accounts** | Portal access is for recurring subscribers only, and lives in a different app. One-time buyers never log in. |
 | **The 222-question assessment** | Full Protection and above. Different app. |
 | **Connectors** | Advanced and above. Different app. |
 | **Cookie consent banner** | The site sets no non-essential cookies. A banner asking permission for cookies we do not set is theatre. **This changes the moment analytics is added** — then a banner becomes required. |
 
+Checkout **is** here now, built in task 06. It is a one-time purchase that
+delivers a report; it is still not an account.
+
+---
+
+## Where the work has got to
+
+Tasks 01 through 09 are complete and merged; the files are in
+`docs/claude-tasks/done/`. In summary:
+
+| | |
+|---|---|
+| 01 | Legal documents, preference centre, data requests |
+| 02 | `/services` and `/coverage` — the selling sections |
+| 03 | Per-route metadata, sitemap, real 404s |
+| 04 | Email delivery through a `mail_outbox` worker |
+| 05a–c | 8 checks to **58**; scan politeness; the remediation library |
+| 06 | The checkout chain: pay, scan, report, deliver |
+| 07 | PDF reports alongside the report page |
+| 08 | The arcade theme — the current visual identity |
+| 09 | Bolt, the guide in the hero |
+
+**The site is live** at `https://dshield.dolluzcorp.com`.
+
 ---
 
 ## Known gaps, in priority order
 
-1. **Legal pages** — Terms, Privacy Notice, Refund & Cancellation, Cookie
-   Notice. Blocking: the site already stores IP and email, and Razorpay
-   onboarding generally requires published policy pages.
-2. **Selling sections** — "What we do", Services, Compliance, "Six of the
-   eighteen". The consulting work is the actual business and the site
-   currently has no path to it.
-3. **SEO** — per-route meta tags and a sitemap. The five tools are meant to be
-   five separate front doors; without unique titles they are one page to a
-   search engine.
-4. **Enquiries reach nobody.** They land in the `enquiries` table and SendGrid
-   is not wired. Somebody has to watch that table until it is.
+**Read `docs/DEPLOY.md` before touching the server.** It carries the deploy
+routine, the live state, and a permissions trap that has taken the site down
+twice.
+
+1. **`RAZORPAY_WEBHOOK_SECRET` is empty.** Every webhook fails signature
+   validation and fulfils nothing, so a customer would pay and receive
+   nothing. This blocks all payments.
+2. **Razorpay keys are still `rzp_test_*`.**
+3. **The legal documents carry seven unfilled `[[MARKERS]]`** and say they are
+   not binding — while checkout asks customers to accept them.
+4. **Mojibake in the live legal documents.** `ÔÇö` where em-dashes belong. The
+   SQL source is clean UTF-8; it was corrupted on import.
+5. **PDF generation is off in production** (`PDF_ENABLED=false`) because the
+   droplet has ~50 MB of memory free and Chrome needs ~700 MB — while the
+   Basic tier advertises a PDF at $49.
 
 ---
 
