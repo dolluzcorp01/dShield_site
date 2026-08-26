@@ -6,6 +6,7 @@ import { useDocumentMeta } from "./utils/meta";
 import Bolt, { Type } from "./Bolt";
 import TwentyThree from "./TwentyThree";
 import { Connect, WhatWeDo, SmartChecks, ServicesBlock, Compliance, Faq } from "./Sections";
+import Tiers from "./Tiers";
 
 /* The five things a free scan actually looks at.
    These must stay in step with the eight checks in scan_engine.js. A site
@@ -28,7 +29,6 @@ function Home() {
     });
 
     const [domain, setDomain] = useState("");
-    const [email, setEmail] = useState("");
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState("");
     const [phase, setPhase] = useState(0);
@@ -103,10 +103,7 @@ function Home() {
         if (!domain.trim()) return setError("Enter a domain to scan.");
 
         setBusy(true);
-        const res = await apiPost("/api/scan", {
-            domain: domain.trim(),
-            email: email.trim() || undefined,
-        });
+        const res = await apiPost("/api/scan", { domain: domain.trim() });
         setBusy(false);
 
         if (!res.success) return setError(res.message || "The scan could not be completed.");
@@ -165,6 +162,21 @@ function Home() {
                         eighteen, and show you what it takes to look inside.
                     </p>
 
+                    {/* THE ADDRESS IS NOT ASKED FOR HERE.
+
+                        This box used to carry a second field, "Email (optional
+                        — we will send you the result)". The prototype has no
+                        such field: one input, one GO, and the address is
+                        requested AFTER the result, in the block its own comment
+                        explains —
+
+                          Offered after the result, never before it. The scan is
+                          free and the result is theirs whether or not they give
+                          us an address — asking first would make the address
+                          the price of the check.
+
+                        A free check that opens by asking who you are is not the
+                        same offer. The capture now lives on the result page. */}
                     <form className="scanbox" onSubmit={submit}>
                         <div className="scanbox__row">
                             <input
@@ -176,36 +188,32 @@ function Home() {
                                 disabled={busy}
                                 autoComplete="off"
                                 spellCheck="false"
-                                aria-label="Your domain"
+                                aria-label="Your website address"
                             />
                             <button className="ds-btn scanbox__go" disabled={busy}>
-                                {busy ? <><span className="ds-spin" /> Scanning…</> : "Run free scan"}
+                                {busy ? "Scanning" : "Go"}
                             </button>
                         </div>
 
-                        <input
-                            className="ds-input scanbox__email"
-                            placeholder="Email (optional — we will send you the result)"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            disabled={busy}
-                            type="email"
-                            aria-label="Email address, optional"
-                        />
-
                         {error && <div className="ds-error">{error}</div>}
 
+                        {/* The level meter — five bars, one per area a free
+                            check reaches. It fills from the same rotating
+                            index that drives the theatre, so it is pace, not a
+                            measurement: the server returns everything at once
+                            and there is no per-area progress to report. */}
                         {busy && (
-                            <div className="scanbox__progress">
-                                <span className="scanbox__dot" />
-                                Checking {PROMISED[phase].title.toLowerCase()}…
+                            <div className="scanbox__meter" aria-hidden="true">
+                                {PROMISED.map((c, i) => (
+                                    <span key={c.key} className={i <= phase ? "is-lit" : ""} />
+                                ))}
                             </div>
                         )}
-
-                        <p className="scanbox__fineprint">
-                            We only read what your servers already publish to anyone who asks.
-                            Nothing is probed, nothing is attacked, and no account is required.
-                        </p>
+                        {busy && (
+                            <p className="scanbox__progress" role="status">
+                                Checking {PROMISED[phase].title.toLowerCase()}…
+                            </p>
+                        )}
                     </form>
                    </div>
 
@@ -233,23 +241,11 @@ function Home() {
                 </div>
             </section>
 
-            <section className="ds-section ds-wrap">
-                <p className="ds-eyebrow">What the free scan covers</p>
-                <h2 className="ds-shout">Five ways in from the street</h2>
-                <p className="ds-lead" style={{ marginBottom: 34 }}>
-                    Eight checks across the five areas that need nothing from you but a web
-                    address.
-                </p>
-
-                <div className="ds-grid ds-grid--3">
-                    {PROMISED.map((c) => (
-                        <div className="ds-card ds-card--live promise" key={c.key}>
-                            <h3>{c.title}</h3>
-                            <p className="ds-muted" style={{ margin: 0 }}>{c.line}</p>
-                        </div>
-                    ))}
-                </div>
-            </section>
+            {/* The five-card "Five ways in from the street" block that used to
+                sit here is gone. It repeated the hero headline word for word,
+                two screens apart, and listed five of the areas the grid below
+                already names all twenty-three of. PROMISED survives as the
+                source of the scanning theatre and the level meter. */}
 
             {/* THE 23, in its idle state. The frozen prototype puts the full
                 grid on the home page before anything has been scanned — every
@@ -300,6 +296,7 @@ function Home() {
                 would mean two of each to keep in step, which is the failure
                 this whole port is arranged against. */}
             <Connect />
+            <Tiers />
             <WhatWeDo />
             <SmartChecks />
             <ServicesBlock />

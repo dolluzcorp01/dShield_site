@@ -1,0 +1,153 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   TIERS — five cards, each with a 23-segment bar.
+
+   Five columns, then two, then one: the prototype's .tiers breakpoints.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.tiers__h2 { margin-bottom: 24px; }
+
+.tiers__grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+@media (max-width: 1040px) { .tiers__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 540px)  { .tiers__grid { grid-template-columns: 1fr; } }
+
+.tier {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    padding: 20px 18px;
+    border-radius: var(--radius-lg);
+    background: var(--panel);
+    border: 1px solid var(--edge);
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    transition: border-color .3s ease, box-shadow .3s ease, transform .3s ease;
+}
+
+.tier--open {
+    border-color: var(--lime);
+    box-shadow: 0 16px 44px rgba(198, 255, 61, .15);
+}
+.tier--star.tier--open {
+    border-color: var(--magenta);
+    box-shadow: 0 16px 44px rgba(255, 46, 154, .18);
+}
+
+.tier__star {
+    align-self: flex-start;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: #fff;
+    background: var(--magenta);
+    border-radius: 99px;
+    padding: 3px 9px;
+    letter-spacing: .1em;
+    margin-bottom: 11px;
+}
+
+.tier__name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--bone-dim);
+}
+
+.tier__price {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 27px;
+    margin: 4px 0 15px;
+    color: var(--bone);
+}
+.tier--star .tier__price { text-shadow: 0 0 22px rgba(255, 46, 154, .4); }
+
+/* The bar. One segment per risk area — the whole argument of the table. */
+.tier__bar {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 10px;
+}
+.tier__bar span {
+    flex: 1;
+    height: 24px;
+    border-radius: 3px;
+    background: var(--panel);
+    border: 1px solid var(--edge);
+}
+.tier__bar span.is-on {
+    background: var(--lime);
+    border-color: var(--lime);
+    box-shadow: 0 0 8px rgba(198, 255, 61, .4);
+}
+.tier--star .tier__bar span.is-on {
+    background: var(--magenta);
+    border-color: var(--magenta);
+    box-shadow: 0 0 8px rgba(255, 46, 154, .4);
+}
+
+.tier__covers {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--bone-faint);
+    margin-bottom: 11px;
+}
+
+.tier__line {
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--bone-dim);
+}
+
+/* Collapsed to nothing until hovered, focused or pinned. max-height rather
+   than display so it animates; the prototype uses 340px and so does this. */
+.tier__gets {
+    display: block;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .4s cubic-bezier(.34, 1.36, .64, 1);
+}
+.tier__gets.is-open { max-height: 340px; }
+
+.tier__gets-inner {
+    display: block;
+    border-top: 1px solid var(--edge);
+    margin-top: 14px;
+    padding-top: 13px;
+}
+
+.tier__get {
+    display: flex;
+    gap: 9px;
+    margin-bottom: 8px;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--bone);
+}
+
+.tier__tick {
+    color: var(--lime);
+    font-weight: 900;
+    flex-shrink: 0;
+}
+.tier--star .tier__tick { color: var(--magenta); }
+
+.tier__hint {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--bone-faint);
+    letter-spacing: .12em;
+    margin-top: 12px;
+}
+
+/* The bar is the one thing that must survive a monochrome print: it is how
+   the tiers differ. Filled segments keep a solid fill, empty ones an
+   outline, so the comparison holds without colour. */
+@media print {
+    .tier__gets { max-height: none; }
+    .tier__hint { display: none; }
+}

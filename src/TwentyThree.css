@@ -41,11 +41,17 @@
     margin: 0;
 }
 
+/* Six columns, then three, then two — the prototype's .g23 exactly.
+   auto-fill/minmax was close but not the same: at 1440px it produces eight
+   columns and the grid reads as a wall rather than the four tidy rows of six
+   the layout was drawn for. */
 .t23s__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 11px;
 }
+@media (max-width: 900px) { .t23s__grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 540px) { .t23s__grid { grid-template-columns: repeat(2, 1fr); } }
 
 .t23s__foot {
     margin-top: 18px;
@@ -246,7 +252,6 @@
 }
 
 @media (max-width: 560px) {
-    .t23s__grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
     .t23d { padding: 20px 18px; }
 }
 

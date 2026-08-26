@@ -83,31 +83,79 @@
     user-select: none;
 }
 
-/* The scan box is the one control the whole homepage exists to deliver
-   somebody to, so it is the only element on the page with a standing glow.
-   Everything else lights up on interaction. */
+/* NO OUTER CARD. The prototype's scan row is a bare flex container at
+   maxWidth 560 — the input pill and the button ARE the control, and the
+   glow belongs to them. Wrapping them in a bordered panel put a box inside
+   a box and made the input look like a field on a form rather than the one
+   thing the page is asking you to use.
+
+   The lit state lives on the input instead, which is also what Bolt's
+   "typing" mood keys off. */
 .scanbox {
-    max-width: 660px;
-    background: var(--void-2);
-    border: 2px solid var(--line-2);
-    border-radius: var(--radius-lg);
-    padding: 22px;
-    box-shadow: 0 18px 60px rgba(198, 255, 61, .10);
-    transition: border-color .2s ease, box-shadow .2s ease;
-}
-.scanbox:focus-within {
-    border-color: var(--lime);
-    box-shadow: 0 18px 70px rgba(198, 255, 61, .20);
+    max-width: 560px;
 }
 
-.scanbox__row { display: flex; gap: 12px; margin-bottom: 12px; }
-.scanbox__domain { flex: 1; font-size: 1.05rem; }
-.scanbox__go { min-width: 168px; }
-.scanbox__email { font-size: .95rem; }
+/* One row, one input, one button — the prototype's shape. The pill radius
+   and the 250px flex basis are its numbers. */
+.scanbox__row { display: flex; gap: 10px; flex-wrap: wrap; }
+.scanbox__domain {
+    flex: 1 1 250px;
+    border-radius: 99px;
+    padding: 16px 22px;
+    font-family: var(--mono);
+    font-size: 15px;
+    transition: border-color .3s ease, box-shadow .3s ease;
+}
+.scanbox__domain:focus {
+    border-color: var(--lime);
+    box-shadow: 0 0 0 4px rgba(198, 255, 61, .13);
+}
+/* Lime to cyan, the prototype's gradient, and set in the display face
+   uppercase. A flat lime pill reads as any other button on the page; this
+   one is the call to action the whole hero exists for. */
+.scanbox__go {
+    border-radius: 99px;
+    padding: 16px 30px;
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    background: linear-gradient(120deg, var(--lime), var(--cyan));
+    box-shadow: 0 8px 30px rgba(198, 255, 61, .33);
+}
+.scanbox__go:hover:not(:disabled) {
+    background: linear-gradient(120deg, var(--lime), var(--cyan));
+    box-shadow: 0 10px 38px rgba(198, 255, 61, .5);
+}
+.scanbox__go:disabled {
+    background: var(--panel);
+    color: var(--bone-faint);
+    box-shadow: none;
+}
+
+/* The level meter — five bars under the box while a scan runs. */
+.scanbox__meter {
+    display: flex;
+    gap: 5px;
+    margin-top: 18px;
+    max-width: 280px;
+}
+.scanbox__meter span {
+    flex: 1;
+    height: 8px;
+    border-radius: 99px;
+    background: var(--panel);
+    transition: background .4s ease, box-shadow .4s ease;
+}
+.scanbox__meter span.is-lit {
+    background: var(--lime);
+    box-shadow: 0 0 14px rgba(198, 255, 61, .53);
+}
 
 .scanbox__progress {
     display: flex; align-items: center; gap: 10px;
-    margin-top: 14px;
+    margin-top: 12px;
     font-family: var(--mono);
     font-size: .84rem;
     color: var(--lime);
@@ -120,12 +168,10 @@
 }
 @keyframes ds-pulse { 0%,100% { opacity: .25; } 50% { opacity: 1; } }
 
-.scanbox__fineprint {
-    margin: 16px 0 0;
-    font-size: .84rem;
-    color: var(--bone-faint);
-    line-height: 1.55;
-}
+/* .scanbox__fineprint was removed with the markup. The passive-scan promise
+   it carried is still made on the page — it is the FAQ answer to "Is this
+   safe to run on my live website?" — and the prototype keeps it there rather
+   than under the input. */
 
 .promise h3 { margin-bottom: 8px; font-size: 1.04rem; color: var(--bone); }
 

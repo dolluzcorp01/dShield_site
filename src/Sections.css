@@ -29,8 +29,8 @@
 
 .proof {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+    gap: 13px;
 }
 
 .proof__cell {
@@ -69,7 +69,7 @@
 
 .conn {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
     gap: 14px;
 }
 
@@ -118,7 +118,7 @@
 
 .smart {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
     gap: 12px;
 }
 
@@ -211,7 +211,8 @@
     font-size: .88rem;
 }
 
-@media (max-width: 720px) {
+/* .svc2 in the prototype collapses at 760px, not 720. */
+@media (max-width: 760px) {
     .two { grid-template-columns: 1fr; gap: 24px; }
 }
 
