@@ -26,14 +26,28 @@
     "dev": "concurrently -n API,WEB -c yellow,cyan \"npm run server\" \"npm start\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "verify:checks": "node scripts/verify-checks.js",
+    "verify:remediation": "node scripts/verify-remediation.js",
+    "verify:content": "node scripts/verify-site-content.mjs",
+    "verify": "npm run verify:checks && npm run verify:remediation && npm run verify:content"
   },
   "proxy": "http://localhost:4008",
   "eslintConfig": {
-    "extends": ["react-app"]
+    "extends": [
+      "react-app"
+    ]
   },
   "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
-    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
