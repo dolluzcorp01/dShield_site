@@ -1,0 +1,274 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   The home page content sections.
+
+   Hover effects here are CSS, not the prototype's inline onMouseEnter /
+   onMouseLeave handlers writing to element.style. Those never fire for
+   somebody navigating by keyboard, so every card they decorate is invisible
+   to tab focus. :hover and :focus-visible share a rule below instead.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.sec__h2 {
+    margin-bottom: 14px;
+}
+
+.sec__lead {
+    max-width: 660px;
+    margin-bottom: 32px;
+}
+
+.sec__em {
+    color: var(--lime);
+    font-style: italic;
+}
+
+.sec__more {
+    margin-top: 26px;
+}
+
+/* ── the proof figures ───────────────────────────────────────────────── */
+
+.proof {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
+}
+
+.proof__cell {
+    padding: 24px 22px;
+    border-radius: var(--radius-lg);
+    background: var(--ink-3);
+    border: 1px solid var(--edge);
+    height: 100%;
+}
+
+.proof__big {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(38px, 5vw, 54px);
+    line-height: 1;
+    color: var(--lime);
+    text-shadow: 0 0 26px rgba(198, 255, 61, .33);
+}
+
+.proof__label {
+    font-family: var(--display);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--bone);
+    margin: 10px 0 9px;
+}
+
+.proof__sub {
+    margin: 0;
+    font-size: .88rem;
+}
+
+/* ── connect ─────────────────────────────────────────────────────────── */
+
+.conn {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+}
+
+.conn__card {
+    height: 100%;
+    padding: 20px 22px;
+    border-radius: var(--radius);
+    background: var(--ink-3);
+    border: 1px solid var(--edge);
+    border-left: 3px solid var(--magenta);
+}
+
+.conn__tool {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    color: var(--magenta);
+    margin: 0 0 9px;
+}
+
+.conn__name {
+    font-size: 1rem;
+    margin: 0 0 8px;
+}
+
+.conn__hides {
+    margin: 0;
+    font-size: .9rem;
+}
+
+.conn__twice {
+    margin-top: 22px;
+    padding: 22px 26px;
+    border-radius: var(--radius-lg);
+    background: var(--ink-3);
+    border: 1px solid var(--lime);
+    box-shadow: 0 0 50px rgba(198, 255, 61, .09);
+    line-height: 1.65;
+}
+
+.conn__twice-lead {
+    color: var(--lime);
+}
+
+/* ── smart checks ────────────────────────────────────────────────────── */
+
+.smart {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.smart__card {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    height: 100%;
+    padding: 20px;
+    border-radius: var(--radius);
+    background: var(--ink-3);
+    border: 1px solid var(--edge);
+    text-decoration: none;
+    color: inherit;
+    transition: transform .3s cubic-bezier(.34, 1.36, .64, 1),
+                border-color .3s ease, box-shadow .3s ease;
+}
+
+/* Hover AND focus. The prototype decorates hover only, through JS handlers
+   that a keyboard never triggers. */
+.smart__card:hover,
+.smart__card:focus-visible {
+    transform: translateY(-6px) rotate(-1.2deg);
+    border-color: var(--lime);
+    box-shadow: 0 16px 40px rgba(198, 255, 61, .15);
+}
+
+.smart__name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: .95rem;
+    text-transform: uppercase;
+    line-height: 1.3;
+    letter-spacing: -.01em;
+}
+
+.smart__price {
+    font-family: var(--mono);
+    font-size: 10px;
+    flex-shrink: 0;
+    color: var(--lime);
+    padding-top: 3px;
+}
+
+.smart__soon {
+    margin-top: 18px;
+    font-size: .85rem;
+}
+
+/* ── the two-column blocks, services and compliance ──────────────────── */
+
+.two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.two__label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin: 0 0 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--edge);
+}
+
+.two__label--alt {
+    color: var(--magenta);
+}
+
+.two__row {
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .045);
+}
+
+.two__row--platform .two__name {
+    color: var(--lime);
+}
+
+.two__name {
+    font-size: .98rem;
+    margin: 0 0 4px;
+}
+
+.two__note {
+    margin: 0;
+    font-size: .88rem;
+}
+
+@media (max-width: 720px) {
+    .two { grid-template-columns: 1fr; gap: 24px; }
+}
+
+/* ── faq ─────────────────────────────────────────────────────────────── */
+
+.faq {
+    display: grid;
+    gap: 10px;
+    max-width: 780px;
+}
+
+.faq__item {
+    border-radius: var(--radius);
+    background: var(--ink-3);
+    border: 1px solid var(--edge);
+    padding: 0 20px;
+}
+
+.faq__q {
+    cursor: pointer;
+    list-style: none;
+    padding: 18px 0;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: .95rem;
+    text-transform: uppercase;
+    letter-spacing: -.01em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+}
+
+.faq__q::-webkit-details-marker { display: none; }
+
+/* The open/closed affordance. A caret rather than a colour change, because
+   the state has to survive both a monochrome print and a reader who cannot
+   separate the lime from the ground. */
+.faq__q::after {
+    content: "+";
+    font-size: 1.3rem;
+    color: var(--lime);
+    flex-shrink: 0;
+    line-height: 1;
+}
+.faq__item[open] .faq__q::after { content: "−"; }
+
+.faq__a {
+    margin: 0;
+    padding: 0 0 20px;
+    max-width: 70ch;
+}
+
+/* Answers print open. Ctrl+P is currently how a customer gets a file out of
+   a report, and a printed FAQ of five questions and no answers is a wasted
+   page. */
+@media print {
+    .faq__a { display: block !important; }
+    .faq__q::after { content: ""; }
+}

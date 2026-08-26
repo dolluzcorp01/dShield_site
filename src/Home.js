@@ -5,6 +5,7 @@ import "./Home.css";
 import { useDocumentMeta } from "./utils/meta";
 import Bolt, { Type } from "./Bolt";
 import TwentyThree from "./TwentyThree";
+import { Connect, WhatWeDo, SmartChecks, ServicesBlock, Compliance, Faq } from "./Sections";
 
 /* The five things a free scan actually looks at.
    These must stay in step with the eight checks in scan_engine.js. A site
@@ -280,6 +281,24 @@ function Home() {
                     </div>
                 </div>
             </section>
+
+            {/* The rest of the frozen prototype's page, in its order:
+                CONNECT · WHAT WE DO · SPOT CHECKS · SERVICES · COMPLIANCE ·
+                FAQ. Each is a section in Sections.js reading the shared
+                tables, so /services, /tools and /pricing show the same words
+                as the home page rather than a second copy of them.
+
+                TIERS and CONTACT are not here. They already exist as
+                /pricing and /contact and are reached from the nav — putting
+                a second pricing table and a second enquiry form on this page
+                would mean two of each to keep in step, which is the failure
+                this whole port is arranged against. */}
+            <Connect />
+            <WhatWeDo />
+            <SmartChecks />
+            <ServicesBlock />
+            <Compliance />
+            <Faq />
         </div>
     );
 }
