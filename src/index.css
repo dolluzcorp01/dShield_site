@@ -330,12 +330,91 @@ textarea.ds-input { resize: vertical; min-height: 110px; }
     .ds-card { padding: 20px; }
 }
 
+/* ── Reveal ───────────────────────────────────────────────────────────────
+   Blocks fade up as they scroll into view. The class is applied by
+   Motion.js, which does not attach an observer at all under reduced motion —
+   so the rules below simply never get used in that case. */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px) scale(.98);
+    transition: opacity .7s cubic-bezier(.34, 1.36, .64, 1),
+                transform .7s cubic-bezier(.34, 1.36, .64, 1);
+}
+.reveal--on {
+    opacity: 1;
+    transform: none;
+}
+
+/* ── keyboard access ──────────────────────────────────────────────────────
+
+   THE FROZEN PROTOTYPE HAS NO VISIBLE FOCUS AT ALL. Tabbing through it gives
+   no indication of where you are, which makes the page unusable without a
+   mouse and fails WCAG 2.4.7.
+
+   The fix is in the same zip — ARCHIVE/ui-explorations/dShield-arcade-v5.9.1
+   is the frozen file plus exactly this, a skip link, and the contrast repair
+   already applied to --bone-faint above. The package marked the version
+   without them CURRENT and filed the accessible one under ARCHIVE.
+
+   On a site selling security this is a poor look in front of the one buyer
+   likely to run the check.
+
+   :focus-visible rather than :focus, so a mouse click does not leave a ring
+   behind — the ring appears for keyboard users and nobody else. Lime because
+   it already means "this is the thing to act on" here, and the dark outer
+   shadow keeps it readable over the lime and magenta buttons where a lime
+   ring alone would disappear into its own background. */
+:focus { outline: none; }
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--lime);
+    outline-offset: 3px;
+    border-radius: 6px;
+    box-shadow: 0 0 0 5px var(--void), 0 0 20px rgba(198, 255, 61, .33);
+}
+
+/* The skip link — the first thing a keyboard user meets. Off-screen until
+   focused, then it lands top-left like any other site.
+
+   Without it, tabbing into the page means walking the entire nav before
+   reaching the one control that matters. */
+.skip {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 999;
+}
+.skip:focus-visible {
+    left: 14px;
+    top: 14px;
+    padding: 12px 18px;
+    border-radius: 99px;
+    background: var(--lime);
+    color: var(--void);
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    text-decoration: none;
+}
+
 /* Somebody who has asked their operating system to stop moving things gets a
    still page — the ticker included, which is the one element here that would
-   otherwise never stop. */
+   otherwise never stop.
+
+   The focus ring is deliberately NOT covered by this. It is not decoration,
+   and removing it would take the page straight back to the defect above. */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation: none !important;
         transition: none !important;
     }
+    .reveal { opacity: 1; transform: none; }
 }

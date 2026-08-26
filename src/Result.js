@@ -3,6 +3,7 @@ import { useParams, useLocation, Link } from "react-router-dom";
 import { apiGet } from "./utils/api";
 import "./Result.css";
 import { useDocumentMeta } from "./utils/meta";
+import TwentyThree from "./TwentyThree";
 
 const GRADE_WORD = {
     A: "Strong", B: "Good", C: "Mixed", D: "Weak", E: "Poor",
@@ -137,9 +138,28 @@ function Result() {
         );
     }
 
-    const scanned = result.coverageMap.filter((d) => d.scanned).length;
-    const unscanned = result.coverageMap.length - scanned;
-    const pct = Math.round((unscanned / result.coverageMap.length) * 100);
+    /* WHAT WE ACTUALLY MEASURED, not what we set out to measure.
+
+       coverageMap.filter(d => d.scanned) counts the domains this tier
+       ATTEMPTS — a fixed five, always. domainScores holds the ones that
+       produced a number, which is a smaller set whenever a check could not
+       run: a scan of dolluzcorp.com attempts five and scores four, because
+       crt.sh answered 404 and domain 10 was excluded from the grade.
+
+       Counting attempts and calling them measurements is the same mistake
+       the old coverage grid below made. The sentence a customer reads has to
+       be the true one, so `scanned` is derived from results, and the ones
+       that were tried and failed get counted and named separately. */
+    const total = result.coverageMap.length;
+    const scanned = Object.keys(result.domainScores || {}).length;
+    const attempted = result.coverageMap.filter((d) => d.scanned).length;
+    const unreachable = attempted - scanned;
+    const unscanned = total - attempted;
+    /* pct describes `unscanned` and nothing else — the areas no outside scan
+       can reach. Deriving it from `scanned` instead would fold the
+       unreachable ones in and quietly disagree with the number printed
+       beside it. */
+    const pct = Math.round((unscanned / total) * 100);
 
     return (
         <div className="result">
@@ -246,22 +266,41 @@ function Result() {
                 <p className="ds-eyebrow">Coverage</p>
                 <h2>What this score does not tell you</h2>
                 <p className="ds-lead" style={{ marginBottom: 26 }}>
-                    We measured {scanned} of 23 risk domains. The other {unscanned} — {pct}% of
-                    what determines whether an incident becomes a crisis — cannot be seen from
-                    outside by anyone, including us.
+                    We measured {scanned} of 23 risk domains
+                    {unreachable > 0 && (
+                        <>
+                            {" "}and could not reach {unreachable} more that we tried
+                        </>
+                    )}. The other {unscanned} — {pct}% of what determines whether an incident
+                    becomes a crisis — cannot be seen from outside by anyone, including us.
                 </p>
 
-                <div className="covermap">
-                    {result.coverageMap.map((d) => (
-                        <div key={d.no} className={`covertile ${d.scanned ? "is-scanned" : "is-dark"}`}>
-                            <span className="covertile__no ds-mono">{String(d.no).padStart(2, "0")}</span>
-                            <span className="covertile__name">{d.name}</span>
-                            <span className="covertile__state">
-                                {d.scanned ? "Measured" : "Assessment required"}
-                            </span>
-                        </div>
-                    ))}
-                </div>
+                {/* THIS USED TO SAY "Measured" FOR A DOMAIN NOTHING MEASURED.
+
+                    The old grid here rendered coverageMap with two states and
+                    labelled them "Measured" / "Assessment required":
+
+                        {d.scanned ? "Measured" : "Assessment required"}
+
+                    coverageMap is ALL_DOMAINS — a static list where 1, 4, 6,
+                    10 and 20 are permanently scanned:true. It records which
+                    domains the tier ATTEMPTS, not which ones returned an
+                    answer. So a scan of dolluzcorp.com printed "Measured" for
+                    domain 10, whose only snapshot check is BREACH-METADATA-55
+                    and whose actual result was "crt.sh returned HTTP 404" —
+                    recorded inconclusive and excluded from the grade.
+
+                    An inconclusive check shown as measured is the rule this
+                    product exists to hold. It was also visibly inconsistent:
+                    the domain rows above come from domainScores, which drops
+                    domain 10 correctly, so the page showed four scored areas
+                    and five marked Measured.
+
+                    TwentyThree reads coverageMap, domainScores and
+                    inconclusive together and can tell the three cases apart.
+                    It is the same component the home page renders in its idle
+                    state, so the two cannot drift. */}
+                <TwentyThree result={result} />
             </section>
 
             <section className="ds-wrap ds-section">

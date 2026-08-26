@@ -1,4 +1,5 @@
 import React, { useEffect, useId, useState } from "react";
+import { usePrefersReducedMotion } from "./Motion";
 import "./Bolt.css";
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -18,24 +19,9 @@ import "./Bolt.css";
    there is deliberately no palette object in this file.
    ───────────────────────────────────────────────────────────────────────── */
 
-/** True when the visitor has asked their system to stop moving things. */
-function usePrefersReducedMotion() {
-    const [reduced, setReduced] = useState(() =>
-        typeof window !== "undefined"
-        && typeof window.matchMedia === "function"
-        && window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    );
-
-    useEffect(() => {
-        if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
-        const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-        const on = (e) => setReduced(e.matches);
-        mq.addEventListener("change", on);
-        return () => mq.removeEventListener("change", on);
-    }, []);
-
-    return reduced;
-}
+/* The reduced-motion hook used to live here. It moved to Motion.js when the
+   tile grid needed it too — Count and Reveal are guarded by the same setting,
+   and a second copy of it is a second thing to forget to update. */
 
 /* ─────────────────────────────────────────────────────────────────────────
    Type — the typewriter.

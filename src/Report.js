@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { apiGet, API_BASE } from "./utils/api";
 import { useDocumentMeta } from "./utils/meta";
 import "./Report.css";
+import TwentyThree from "./TwentyThree";
 
 /* ─────────────────────────────────────────────────────────────────────────
    The paid report.
@@ -231,19 +232,20 @@ function Report() {
             {r.coverageMap?.length > 0 && (
                 <section className="report__section">
                     <h2>What a scan cannot reach</h2>
+                    {/* Counted from domainScores, not from coverageMap.
+
+                        coverageMap says which domains the tier ATTEMPTS and
+                        never changes; domainScores says which ones produced a
+                        number. When a check cannot run the two disagree, and
+                        the old line here reported the attempt as a
+                        measurement — the same defect that was in Result.js.
+                        This is a report somebody paid for, so it is the last
+                        place a count should flatter itself. */}
                     <p className="ds-lead">
-                        We measured {r.coverageMap.filter((d) => d.scanned).length} of {r.coverageMap.length} risk
+                        We measured {Object.keys(r.domainScores || {}).length} of {r.coverageMap.length} risk
                         domains. The rest cannot be seen from outside by anyone, including us.
                     </p>
-                    <div className="covermap">
-                        {r.coverageMap.map((d) => (
-                            <div key={d.no} className={`covertile ${d.scanned ? "is-scanned" : "is-dark"}`}>
-                                <span className="covertile__no ds-mono">{String(d.no).padStart(2, "0")}</span>
-                                <span className="covertile__name">{d.name}</span>
-                                <span className="covertile__state">{d.scanned ? "Measured" : "Assessment required"}</span>
-                            </div>
-                        ))}
-                    </div>
+                    <TwentyThree result={r} />
                 </section>
             )}
 

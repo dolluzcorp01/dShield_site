@@ -4,6 +4,7 @@ import { apiPost } from "./utils/api";
 import "./Home.css";
 import { useDocumentMeta } from "./utils/meta";
 import Bolt, { Type } from "./Bolt";
+import TwentyThree from "./TwentyThree";
 
 /* The five things a free scan actually looks at.
    These must stay in step with the eight checks in scan_engine.js. A site
@@ -160,6 +161,7 @@ function Home() {
                     <form className="scanbox" onSubmit={submit}>
                         <div className="scanbox__row">
                             <input
+                                id="scan-box"
                                 className="ds-input scanbox__domain"
                                 placeholder="yourcompany.com"
                                 value={domain}
@@ -241,6 +243,17 @@ function Home() {
                     ))}
                 </div>
             </section>
+
+            {/* THE 23, in its idle state. The frozen prototype puts the full
+                grid on the home page before anything has been scanned — every
+                tile dim with a "?" — so the size of what a free check does
+                NOT cover is visible before you run one. That is the whole
+                commercial argument, and it is also the honest one.
+
+                It takes result={null} here. The same component renders the
+                real thing on /result, so the two can never drift into showing
+                different numbers of areas. */}
+            <TwentyThree result={null} />
 
             <section className="ds-section ds-section--tight">
                 <div className="ds-wrap">

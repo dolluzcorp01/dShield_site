@@ -1,0 +1,262 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   THE 23 — the tile grid.
+
+   Colours come from the tokens in index.css. There is no palette object and
+   no hex literal below that is not an alpha wash of an existing token.
+
+   Three tile states, and they are distinguished by more than colour:
+
+     lit           lime border, a number
+     unreachable   amber border, an exclamation mark
+     unseen        faint border, a question mark
+
+   The mark matters. Roughly one man in twelve cannot separate the lime from
+   the amber, and "we scored this" against "we could not check this" is the
+   single most important distinction on the page — it is the difference
+   between a measurement and a gap. Colour alone would hide it from exactly
+   the people the product is meant to be honest with.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.t23s {
+    padding-top: 20px;
+}
+
+.t23s__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.t23s__eyebrow--done {
+    color: var(--lime);
+}
+
+.t23s__hint {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--magenta);
+    margin: 0;
+}
+
+.t23s__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 10px;
+}
+
+.t23s__foot {
+    margin-top: 18px;
+    font-size: 0.92rem;
+}
+
+/* ── a tile ──────────────────────────────────────────────────────────── */
+
+.t23 {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 9px;
+
+    min-height: 104px;
+    padding: 15px 14px;
+    border-radius: 18px;
+
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+
+    background: var(--panel);
+    border: 1px solid var(--edge);
+
+    transition: transform .35s cubic-bezier(.34, 1.36, .64, 1),
+                border-color .35s ease,
+                background .35s ease,
+                box-shadow .35s ease;
+}
+
+.t23__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.t23__no {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--bone-faint);
+}
+
+.t23__score {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 19px;
+    color: var(--lime);
+    text-shadow: 0 0 18px rgba(198, 255, 61, .53);
+}
+
+.t23__mark {
+    font-family: var(--display);
+    font-size: 15px;
+    color: var(--bone-faint);
+}
+
+.t23__name {
+    font-size: 12.5px;
+    line-height: 1.34;
+    font-weight: 600;
+    color: var(--bone-faint);
+}
+
+/* idle — before anybody has scanned. Dimmed as a whole, because nothing
+   here means anything yet. */
+.t23--idle {
+    opacity: .5;
+    cursor: default;
+}
+
+.t23--lit {
+    border-color: var(--lime);
+    background: rgba(198, 255, 61, .055);
+    box-shadow: 0 10px 34px rgba(198, 255, 61, .15);
+}
+.t23--lit .t23__no   { color: var(--lime); }
+.t23--lit .t23__name { color: var(--bone); }
+
+/* unreachable — we tried and got nothing back. Amber, never lime, and never
+   the same treatment as "you need to buy this to see it". */
+.t23--unreachable {
+    border-color: var(--amber);
+    background: rgba(255, 176, 32, .06);
+    box-shadow: 0 10px 34px rgba(255, 176, 32, .13);
+}
+.t23--unreachable .t23__no   { color: var(--amber); }
+.t23--unreachable .t23__name { color: var(--bone); }
+
+.t23__mark--warn {
+    color: var(--amber);
+    font-weight: 900;
+}
+
+.t23--open {
+    transform: translateY(-4px) rotate(-1deg);
+    border-color: var(--magenta);
+    background: rgba(255, 46, 154, .07);
+    box-shadow: 0 10px 34px rgba(255, 46, 154, .15);
+}
+.t23--open .t23__no,
+.t23--open .t23__name { color: var(--magenta); }
+
+.t23:hover:not(.t23--idle) {
+    transform: translateY(-2px);
+}
+
+/* ── the detail panel ────────────────────────────────────────────────── */
+
+.t23d {
+    margin-top: 16px;
+    padding: 24px 26px;
+    border-radius: var(--radius-lg);
+    background: var(--ink-3);
+    border: 1px solid var(--edge);
+}
+
+.t23d--lit    { border-color: var(--lime);    box-shadow: 0 0 44px rgba(198, 255, 61, .12); }
+.t23d--warn   { border-color: var(--amber);   box-shadow: 0 0 44px rgba(255, 176, 32, .12); }
+.t23d--unseen { border-color: var(--magenta); box-shadow: 0 0 44px rgba(255, 46, 154, .12); }
+
+.t23d--lit    .t23d__eyebrow { color: var(--lime); }
+.t23d--warn   .t23d__eyebrow { color: var(--amber); }
+.t23d--unseen .t23d__eyebrow { color: var(--magenta); }
+
+.t23d__title {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(20px, 2.6vw, 30px);
+    text-transform: uppercase;
+    letter-spacing: -.01em;
+    margin: 0 0 12px;
+}
+
+.t23d__found {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    margin: 0;
+}
+.t23d--lit    .t23d__found { color: var(--lime); }
+.t23d--warn   .t23d__found { color: var(--amber); }
+.t23d--unseen .t23d__found {
+    font-family: var(--sans);
+    font-size: 18px;
+    line-height: 1.55;
+    max-width: 700px;
+    color: var(--bone);
+    margin-bottom: 18px;
+}
+
+.t23d__sub {
+    margin: 12px 0 0;
+    font-size: 0.88rem;
+}
+
+/* The engine's own words for why a check could not run. Monospaced because
+   these are check ids and provider responses, not prose. */
+.t23d__reasons {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 7px;
+}
+
+.t23d__reasons li {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--bone-dim);
+    padding-left: 14px;
+    border-left: 2px solid var(--amber);
+}
+
+.t23d__check {
+    color: var(--amber);
+    margin-right: 8px;
+}
+
+.t23d__how {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 46, 154, .09);
+    border: 1px solid var(--magenta);
+    border-radius: 99px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.t23d__howtag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--magenta);
+    letter-spacing: .14em;
+}
+
+@media (max-width: 560px) {
+    .t23s__grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    .t23d { padding: 20px 18px; }
+}
+
+/* The tile lift and the open-tile rotation are decoration. The three states
+   remain fully distinguishable without them — border, mark and text all stay. */
+@media (prefers-reduced-motion: reduce) {
+    .t23,
+    .t23--open,
+    .t23:hover:not(.t23--idle) {
+        transition: none;
+        transform: none;
+    }
+}
