@@ -164,7 +164,12 @@
 
 .leadcap__go { min-width: 200px; }
 
-.leadcap--done { text-align: left; }
+/* The confirmation arrives rather than replaces — prototype pop .4s. */
+.leadcap--done {
+    text-align: left;
+    animation: pop .4s both;
+    transform-origin: 50% 0;
+}
 
 @media (max-width: 620px) {
     .leadcap__row { grid-template-columns: 1fr; }

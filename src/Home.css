@@ -23,6 +23,10 @@
     letter-spacing: -.02em;
     text-transform: uppercase;
     margin-bottom: 20px;
+
+    /* A CRT stutter, twice in every seven seconds. Still for 88% of the
+       cycle — see the keyframes note in index.css. */
+    animation: glitch 7s infinite;
 }
 
 .hero__title-lime {

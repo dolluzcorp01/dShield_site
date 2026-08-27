@@ -22,7 +22,10 @@
     box-shadow: 0 10px 34px rgba(37, 211, 102, .47);
     display: grid;
     place-items: center;
-    order: 2;
+    /* WhatsApp sits ABOVE the back-to-top, which is the prototype's order:1
+       against its order:2 in a column. I had these the wrong way round, so
+       the arrow appeared on top. */
+    order: 1;
     animation: float-bob 3.6s ease-in-out infinite;
 }
 
@@ -30,7 +33,7 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    order: 1;
+    order: 2;
     display: grid;
     place-items: center;
     font-size: 17px;

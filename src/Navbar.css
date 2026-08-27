@@ -66,6 +66,12 @@
    DOLLUZ_Full_Logo.png is the vertical artwork with BLACK type — the exact
    thing the prototype's comment says had to be recoloured before it could
    sit on this ground. Set in type it needs no recolouring and no 150 kB. */
+/* The mark tilts slowly, for ever. The prototype wraps the lockup in a span
+   carrying wob 5s — it is the one piece of the header that is never still. */
+.nav__mark {
+    animation: wob 5s ease-in-out infinite;
+}
+
 .nav__brand {
     display: flex;
     align-items: center;
@@ -179,6 +185,15 @@
     grid-template-columns: 1fr 1px 1fr;
     gap: 14px;
     z-index: 70;
+
+    /* The open "jump". The panel scales up from half size with a 12deg
+       tilt, overshoots to 1.16 and settles — the prototype's
+       animation:"pop .28s both". Without it the menu simply appears, which
+       is the difference between a cabinet and a corporate dropdown.
+       transform-origin at the top-left anchors it to the trigger rather
+       than letting it inflate from its own middle. */
+    transform-origin: 20% 0;
+    animation: pop .28s both;
 }
 
 .mega__label {

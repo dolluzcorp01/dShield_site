@@ -21,9 +21,18 @@ import "./Floating.css";
    ever gets put there.
    ───────────────────────────────────────────────────────────────────────── */
 
-/* wa.me wants digits only: no +, no spaces, no dashes. */
+/* wa.me wants digits only: no +, no spaces, no dashes. Stripping them here
+   rather than demanding a clean value means the number can be written in
+   site-content.js however it is easiest to read and check against a phone.
+
+   The ?text= is encoded, not interpolated raw: the message contains spaces,
+   a comma and a question mark, and an unencoded "?" would truncate the
+   query string at exactly the wrong place. */
 const waNumber = String(OFFICE.whatsapp || "").replace(/\D/g, "");
-const waHref = waNumber ? `https://wa.me/${waNumber}` : null;
+const waHref = waNumber
+    ? `https://wa.me/${waNumber}`
+      + (OFFICE.whatsappMessage ? `?text=${encodeURIComponent(OFFICE.whatsappMessage)}` : "")
+    : null;
 
 function Floating() {
     const [scrolled, setScrolled] = useState(false);

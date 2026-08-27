@@ -97,7 +97,9 @@
     color: var(--bone-faint);
 }
 
+/* The number lands rather than appears. */
 .t23__score {
+    animation: pop .5s both;
     font-family: var(--display);
     font-weight: 900;
     font-size: 19px;
@@ -109,6 +111,14 @@
     font-family: var(--display);
     font-size: 15px;
     color: var(--bone-faint);
+}
+
+/* The unanswered ones fidget; the idle grid does not. Before a scan nothing
+   on this grid means anything yet, and twenty-three wobbling question marks
+   on a page nobody has interacted with is noise. */
+.t23:not(.t23--idle) .t23__mark {
+    animation: wob 2.6s ease-in-out infinite;
+    display: inline-block;
 }
 
 .t23__name {
@@ -164,6 +174,8 @@
 /* ── the detail panel ────────────────────────────────────────────────── */
 
 .t23d {
+    animation: pop .4s both;
+    transform-origin: 50% 0;
     margin-top: 16px;
     padding: 24px 26px;
     border-radius: var(--radius-lg);

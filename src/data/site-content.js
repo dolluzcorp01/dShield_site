@@ -241,12 +241,20 @@ export const OFFICE = {
     email: "connect@dolluzcorp.com",
     hours: "Mon to Fri, 9:30am to 6:30pm IST",
 
-    /* WhatsApp, digits only in international format — "919876543210".
-       Empty means the floating WhatsApp button does not render at all.
-       See Floating.js: a green WhatsApp button that opens a chat with a
-       number nobody owns is worse than no button, and the prototype ships
-       exactly that. Fill this in and it appears. */
-    whatsapp: "",
+    /* WhatsApp, digits only in international format. Empty would mean the
+       floating button does not render at all — see Floating.js. The
+       prototype ships "+91 00000 00000" here and a button with no handler;
+       this is the real number.
+
+       Written with the country code and no punctuation because that is what
+       wa.me takes. Floating.js strips non-digits anyway, so "+91 77790
+       79666" would also work — this form is just what reaches the URL. */
+    whatsapp: "917779079666",
+
+    /* Pre-filled into the chat so the person does not have to open with
+       "hi". A message already in the box is the difference between a button
+       people tap and a button people think about tapping. */
+    whatsappMessage: "Hello, I have a question about your service. Can you please help me?",
 };
 
 /* ── Smart Checks ─────────────────────────────────────────────────────────
