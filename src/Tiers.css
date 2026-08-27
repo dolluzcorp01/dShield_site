@@ -151,3 +151,5 @@
     .tier__gets { max-height: none; }
     .tier__hint { display: none; }
 }
+
+.tiers__more { margin-top: 26px; }

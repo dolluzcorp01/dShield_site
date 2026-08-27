@@ -1,10 +1,16 @@
 import React, { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { apiPost } from "./utils/api";
 import "./Pages.css";
 import { useDocumentMeta } from "./utils/meta";
-import eagle from "./assets/img/eagle-mark.png";
-import { OFFICE, TIERS, SERVICES, COMPLIANCE, SMART_BUILT } from "./data/site-content";
+/* The lockup, not the bare eagle. DOLLUZ_CORP.png is the artwork as
+   supplied — gold bird, wordmark set in BLACK — which is invisible against
+   #0B0316. DOLLUZ_CORP_dark.png is that same file with its near-black pixels
+   recoloured to bone and every gold pixel left exactly as supplied, which is
+   what the frozen prototype does to produce its own lockup. It is generated
+   by scripts/make-dark-lockup.mjs; re-run that if the artwork is resupplied. */
+import lockup from "./assets/img/DOLLUZ_CORP_dark.png";
+import { OFFICE, TIERS, SERVICES, COMPLIANCE, SMART_BUILT, WHATSAPP_HREF } from "./data/site-content";
 
 /* ── Contact ─────────────────────────────────────────────────────────── */
 
@@ -130,9 +136,23 @@ function ContactForm() {
 
             {error && <div className="ds-error">{error}</div>}
 
-            <button className="ds-btn" disabled={busy}>
+            {/* Disabled until there is an address to reply to. The form has
+                always refused to submit without one — it just did it by
+                showing an error AFTER the click, which teaches somebody that
+                the button is unreliable rather than that the field is
+                required. The gradient draining out of the button says the
+                same thing before the click instead. */}
+            <button className="ds-btn ds-btn--send" disabled={busy || !form.email.trim()}>
                 {busy ? <span className="ds-spin" /> : "Send enquiry"}
             </button>
+
+            {/* The two questions everybody has about a form like this, and
+                the reason they do not fill it in. Both are true: enquiries
+                are alerted to a monitored inbox, and nothing here is sold or
+                passed on. */}
+            <p className="contactform__note">
+                We reply within one working day. We never pass your details to anyone.
+            </p>
         </form>
     );
 }
@@ -156,8 +176,100 @@ export function Contact() {
                 For Full Protection, Extended Support, or anything you would rather discuss with a
                 person than read on a page.
             </p>
-            <ContactForm />
+            {/* The same pairing as the home page section. Somebody who
+                followed a footer link here should not get less than somebody
+                who scrolled. */}
+            <div className="contact__split">
+                <ContactForm />
+                <OfficeCard />
+            </div>
         </div>
+    );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   The office card that sits beside the form.
+
+   IT IS NOT DECORATION. A page that asks for your name and email and offers
+   nothing back is a lead-capture form; the same page next to an address, a
+   number and opening hours is a company you can reach whether or not you
+   fill anything in. The frozen prototype pairs the two for that reason, and
+   dropping it left the section's whole right half empty.
+
+   Rows render only where there is something real to print. The prototype
+   ships a "PHONE" row reading "+91 00000 00000", which under a FAQ
+   promising "a phone number that a person answers" is worse than no row at
+   all — so there is no phone field in OFFICE and no phone row here. WhatsApp
+   is a real number, so it is a real link.
+   ───────────────────────────────────────────────────────────────────────── */
+function OfficeCard() {
+    const { pathname } = useLocation();
+
+    /* Only intercept when there is nothing to navigate to. Anywhere other
+       than "/" this stays a plain link, so the route change carries the
+       reader to the top of the home page on its own. */
+    const toScanBox = (e) => {
+        if (pathname !== "/") return;
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    return (
+        <aside className="office">
+            <p className="office__company">{OFFICE.company}</p>
+
+            <div className="office__row">
+                <p className="office__k">Where</p>
+                <p className="office__v">{OFFICE.line1}, {OFFICE.country}</p>
+            </div>
+
+            <div className="office__row">
+                <p className="office__k">Email</p>
+                <p className="office__v">
+                    <a href={`mailto:${OFFICE.email}`}>{OFFICE.email}</a>
+                </p>
+            </div>
+
+            {WHATSAPP_HREF && (
+                <div className="office__row">
+                    <p className="office__k">WhatsApp</p>
+                    <p className="office__v">
+                        <a href={WHATSAPP_HREF} target="_blank" rel="noopener noreferrer">
+                            {OFFICE.whatsappDisplay}
+                        </a>
+                    </p>
+                </div>
+            )}
+
+            <div className="office__row">
+                <p className="office__k">Hours</p>
+                <p className="office__v">{OFFICE.hours}</p>
+            </div>
+
+            {/* The way out for somebody who opened the form and would rather
+                not talk to anybody yet. Losing them to a form they did not
+                want to fill in costs us a scan they would have run. */}
+            <div className="office__foot">
+                <p className="ds-muted office__nudge">
+                    Prefer to just look first? The free check needs nothing from you but a
+                    website address.
+                </p>
+                {/* THIS DID NOTHING ON THE HOME PAGE.
+
+                    It is a <Link to="/">, and the app scrolls to the top on
+                    pathname CHANGE. Clicked from the contact section of the
+                    home page the pathname is already "/", so React Router
+                    re-rendered the same route, the scroll effect never fired,
+                    and the arrow pointed up at a page that did not move.
+
+                    The scan box is the whole point of the arrow, so it now
+                    scrolls there itself when it is already home, and falls
+                    through to ordinary navigation from /contact. */}
+                <Link className="office__go" to="/" onClick={toScanBox}>
+                    Run the free check ↑
+                </Link>
+            </div>
+        </aside>
     );
 }
 
@@ -166,9 +278,12 @@ export function Contact() {
 export function ContactSection() {
     return (
         <section id="contact" className="ds-section ds-wrap">
-            <p className="ds-eyebrow contact__eyebrow">Talk to a person</p>
+            <p className="ds-eyebrow ds-eyebrow--magenta contact__eyebrow">Talk to a person</p>
             <h2 className="ds-shout contact__h2">Tell us what is worrying you</h2>
-            <ContactForm />
+            <div className="contact__split">
+                <ContactForm />
+                <OfficeCard />
+            </div>
         </section>
     );
 }
@@ -340,13 +455,55 @@ export function Footer() {
                 <div className="footer__top">
                     <div className="footer__brand">
                         <p className="footer__mark">dShield</p>
-                        <img className="footer__eagle" src={eagle} alt="" aria-hidden="true"
-                             width="34" height="26" />
-                        <p className="footer__company">{OFFICE.company}</p>
+
+                        {/* The full lockup: bird, wordmark and tagline in one
+                            asset. It replaces the eagle-plus-typed-company-name
+                            pairing that was here, which set "Dolluz Corp" in
+                            Orbitron beside artwork that already says "DOLLUZ
+                            CORP" in the real brand face — the same words twice,
+                            in two different typefaces, six pixels apart.
+
+                            alt carries the wordmark AND the tagline because
+                            that is what the image says; a screen reader gets
+                            the same sign-off a sighted reader does. */}
+                        <img
+                            className="footer__lockup"
+                            src={lockup}
+                            alt="Dolluz Corp — One Place. One Start. One Team."
+                            width="3945"
+                            height="994"
+                        />
+
                         <p className="footer__line">
                             We tell you what we can see, and we are honest about what we cannot.
                         </p>
-                        <a className="footer__email" href={`mailto:${OFFICE.email}`}>{OFFICE.email}</a>
+
+                        <div className="footer__reach">
+                            <a className="footer__email" href={`mailto:${OFFICE.email}`}>
+                                {OFFICE.email}
+                            </a>
+                            {/* Under the address, because the two together are
+                                "here is how you reach us" and a number stranded
+                                below the postal address reads as part of it.
+                                Renders only when there is a real number — see
+                                WHATSAPP_HREF in site-content.js. */}
+                            {WHATSAPP_HREF && (
+                                <a
+                                    className="footer__wa"
+                                    href={WHATSAPP_HREF}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <svg className="footer__waicon" viewBox="0 0 24 24"
+                                         width="13" height="13" fill="currentColor" aria-hidden="true">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12c0 1.77.46 3.42 1.27 4.86L2 22l5.28-1.24A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18.2c-1.6 0-3.09-.47-4.34-1.28l-.31-.19-3.13.74.75-3.05-.2-.32A8.16 8.16 0 0 1 3.8 12c0-4.52 3.68-8.2 8.2-8.2s8.2 3.68 8.2 8.2-3.68 8.2-8.2 8.2z" />
+                                        <path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.06-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35z" />
+                                    </svg>
+                                    {OFFICE.whatsappDisplay}
+                                </a>
+                            )}
+                        </div>
+
                         <p className="footer__addr">
                             {OFFICE.line1}<br />{OFFICE.country}
                         </p>

@@ -146,7 +146,7 @@ function ScanLeadCapture({ domain, scanId }) {
                     <span className="leadcap__consent">{OPT_IN_TEXT}</span>
                 </label>
 
-                <button className="ds-btn leadcap__go" disabled={!valid || busy}>
+                <button className="ds-btn ds-btn--send leadcap__go" disabled={!valid || busy}>
                     {busy ? "Sending…" : "Send me the result"}
                 </button>
             </form>
@@ -205,6 +205,17 @@ function RescanBox() {
     );
 }
 
+/* Smooth-scroll to the plan bars, with the plain hash jump left intact as
+   the fallback: the href is real, so the link works with JavaScript broken,
+   can be opened in a new tab, and reads correctly to a screen reader.
+   preventDefault only fires once we know the target is actually there. */
+function toPlans(e) {
+    const el = document.getElementById("plans");
+    if (!el) return;
+    e.preventDefault();
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function Result() {
     const { id } = useParams();
     const location = useLocation();
@@ -213,7 +224,6 @@ function Result() {
     const [result, setResult] = useState(location.state?.result || null);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(!location.state?.result);
-    const [canBuy, setCanBuy] = useState(false);
 
     /* noindex, and a GENERIC title with no domain in it.
        A result is an assessment of somebody else's company and often carries
@@ -224,14 +234,6 @@ function Result() {
         description: "A dShield free security scan result.",
         noindex: true,
     });
-
-    // Is anything actually on sale? The server decides; the page only asks.
-    useEffect(() => {
-        (async () => {
-            const res = await apiGet("/api/leads/pricing");
-            if (res.success) setCanBuy((res.plans || []).some((p) => p.available && p.key === "advanced"));
-        })();
-    }, []);
 
     useEffect(() => {
         if (result) return;
@@ -500,28 +502,33 @@ function Result() {
 
             <ScanLeadCapture domain={result.domain} scanId={id} />
 
-            <section className="ds-wrap ds-section">
-                <div className="ds-card nextstep">
-                    <h2>What happens next</h2>
-                    <p className="ds-muted">
-                        Paid reports are not on sale yet — our payment onboarding is still in
-                        progress. Leave your address on the pricing page and we will write the
-                        moment they open, or talk to us now if you would rather move sooner.
-                    </p>
-                    <div className="nextstep__actions">
-                        {/* Carry the domain they just scanned into checkout, so
-                            nobody has to type it a second time. Falls back to
-                            /pricing until a tier is actually buyable. */}
-                        {canBuy
-                            ? <Link to={`/checkout?tier=advanced&domain=${encodeURIComponent(result.domain)}`} className="ds-btn">Get the full report</Link>
-                            : <Link to="/pricing" className="ds-btn">See what a full report covers</Link>}
-                        {/* Somebody who has just been shown 18 dark tiles is the most
-                            likely person on the site to want to know what is in them. */}
-                        <Link to="/coverage" className="ds-btn ds-btn--ghost">What the other 18 cover</Link>
-                        <Link to="/contact" className="ds-btn ds-btn--ghost">Talk to us</Link>
-                    </div>
-                </div>
-            </section>
+            {/* ─────────────────────────────────────────────────────────────
+                THE NUDGE. One line, and it replaces a card.
+
+                What stood here was a "What happens next" panel carrying three
+                buttons and a hardcoded sentence reading "Paid reports are not
+                on sale yet". That sentence was a lie waiting to happen: the
+                button beside it was driven by a live canBuy flag from the
+                server, so the moment payments opened the card would offer
+                "Get the full report" directly underneath a paragraph telling
+                the reader they could not buy one.
+
+                /pricing already carries that message, driven by the same
+                server flag rather than typed into the JSX, so it cannot fall
+                out of step. Deleting the duplicate removes the contradiction
+                and the extra request that fed it.
+
+                What the prototype does at this point in the flow is simply
+                point downward: the page continues into the plan bars, the
+                eighteen unreachable areas and the contact form, and the one
+                thing a reader needs is to be told to keep going. A person who
+                has just been handed a grade is reading, not deciding.
+                ───────────────────────────────────────────────────────────── */}
+            <p className="ds-wrap nudge">
+                <a className="nudge__link" href="#plans" onClick={toPlans}>
+                    ↓ Full report and what else we can do, below
+                </a>
+            </p>
 
             {/* THE PAGE CONTINUES BELOW THE RESULT.
 

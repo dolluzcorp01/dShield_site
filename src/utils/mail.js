@@ -10,7 +10,17 @@ const sgMail = require("@sendgrid/mail");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-const FROM = process.env.SENDGRID_FROM || "noreply@dolluzcorp.com";
+/* Everything this application sends leaves as connect@dolluzcorp.com — the
+   mailbox the SendGrid sender identity is verified against, and the one whose
+   SPF and DKIM records are published. The fallback matches the deployed
+   SENDGRID_FROM rather than an address nobody has authenticated: a missing
+   env var should not silently start sending from a domain identity that will
+   fail DMARC at the receiving end.
+
+   This is NOT the address printed on the site. What a visitor is told to
+   write to is OFFICE.email in src/data/site-content.js, and it is
+   deliberately a different, monitored inbox — see the note there. */
+const FROM = process.env.SENDGRID_FROM || "connect@dolluzcorp.com";
 const FROM_NAME = process.env.SENDGRID_FROM_NAME || "dShield";
 
 /**

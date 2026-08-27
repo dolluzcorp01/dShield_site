@@ -35,6 +35,7 @@ export function WhatWeDo() {
     return (
         <section id="what-we-do" className="ds-section ds-wrap sec">
             <Reveal>
+                <p className="ds-eyebrow">What we do</p>
                 <h2 className="ds-shout sec__h2">
                     We tell you what we can see —<br />and what we cannot
                 </h2>
@@ -70,6 +71,7 @@ export function Connect() {
     return (
         <section id="connect-more" className="ds-section ds-wrap sec">
             <Reveal>
+                <p className="ds-eyebrow ds-eyebrow--magenta">The part nobody shows you first</p>
                 <h2 className="ds-shout sec__h2">
                     Six of the eighteen<br />open in two minutes
                 </h2>
@@ -157,34 +159,52 @@ export function SmartChecks() {
    continuously, the right is what we do when something needs proving or has
    already gone wrong. */
 export function ServicesBlock() {
+    /* One flat run of eight, laid out two-up. The prototype numbers them
+       01–08 straight through, which only works if the left and right halves
+       are cells of ONE grid rather than two independent lists — numbering
+       per column would restart at 01 halfway across the row. */
+    const all = [...SERVICES_LEFT, ...SERVICES_RIGHT];
+
     return (
         <section id="services" className="ds-section ds-wrap sec">
             <Reveal>
+                <p className="ds-eyebrow">Services</p>
                 <h2 className="ds-shout sec__h2">When the report is not enough</h2>
                 <p className="ds-lead sec__lead">
-                    The platform is the first column. Everything to the right is people — our
+                    The platform is the first card. Everything after it is people — our
                     engineers, on your side of the problem.
                 </p>
             </Reveal>
 
-            <div className="two">
-                {[["Running", SERVICES_LEFT], ["When it matters", SERVICES_RIGHT]].map(([label, items], ci) => (
-                    <div className="two__col" key={label}>
-                        <p className={`two__label${ci ? " two__label--alt" : ""}`}>{label}</p>
-                        {items.map((s, i) => (
-                            <Reveal key={s.name} delay={i * 45}>
-                                <div className={`two__row${s.platform ? " two__row--platform" : ""}`}>
-                                    <h3 className="two__name">{s.name}</h3>
-                                    <p className="ds-muted two__note">{s.note}</p>
-                                </div>
-                            </Reveal>
-                        ))}
-                    </div>
+            <div className="svc2">
+                {all.map((s, i) => (
+                    <Reveal key={s.name} delay={i * 65}>
+                        {/* A real destination, not the prototype's <button> with a
+                            hover effect and no handler. The platform card goes to
+                            the scan at the top of this page; every other card
+                            carries its slug into the enquiry form, which then
+                            names the service instead of asking the person to find
+                            it a second time in a dropdown. */}
+                        <Link
+                            className={`svc${s.platform ? " svc--platform" : ""}`}
+                            to={s.platform ? "/" : `/contact?topic=${s.slug}`}
+                        >
+                            <span className="svc__no">
+                                {String(i + 1).padStart(2, "0")}
+                                {s.platform && <span className="svc__tag"> / PLATFORM</span>}
+                            </span>
+                            <h3 className="svc__name">{s.name}</h3>
+                            <p className="ds-muted svc__note">{s.note}</p>
+                            <span className="svc__go">
+                                {s.platform ? "Start free ↑" : "Enquire →"}
+                            </span>
+                        </Link>
+                    </Reveal>
                 ))}
             </div>
 
             <Link className="ds-btn ds-btn--ghost sec__more" to="/services">
-                All eight services →
+                All eight services in full →
             </Link>
         </section>
     );
@@ -197,6 +217,7 @@ export function Compliance() {
     return (
         <section id="compliance" className="ds-section ds-wrap sec">
             <Reveal>
+                <p className="ds-eyebrow ds-eyebrow--cyan">Compliance</p>
                 <h2 className="ds-shout sec__h2">
                     The frameworks your clients<br />will ask you about
                 </h2>
@@ -206,19 +227,37 @@ export function Compliance() {
                 </p>
             </Reveal>
 
-            <div className="two">
+            {/* Two panels, not two bare columns. Each framework is a row that
+                reacts to the pointer and carries its index on the right —
+                01–04 down the left panel, 05–08 down the right, which is why
+                the counter is offset by the panel index rather than restarting.
+
+                Every row is a link. The prototype's rows are buttons that
+                scroll to the contact form; here they carry the audits slug
+                into it, so somebody who clicked "SOC 2" arrives at a form that
+                already knows what they came about. */}
+            <div className="svc2">
                 {[["Standards", COMPLY_LEFT], ["Data & privacy", COMPLY_RIGHT]].map(([label, items], ci) => (
-                    <div className="two__col" key={label}>
-                        <p className={`two__label${ci ? " two__label--alt" : ""}`}>{label}</p>
-                        {items.map((s, i) => (
-                            <Reveal key={s.name} delay={i * 45}>
-                                <div className="two__row">
-                                    <h3 className="two__name">{s.name}</h3>
-                                    <p className="ds-muted two__note">{s.note}</p>
-                                </div>
-                            </Reveal>
-                        ))}
-                    </div>
+                    <Reveal key={label} delay={ci * 80}>
+                        <div className="frame">
+                            <p className={`frame__label${ci ? " frame__label--alt" : ""}`}>{label}</p>
+                            {items.map((s, i) => (
+                                <Link
+                                    className="frame__row"
+                                    key={s.name}
+                                    to="/contact?topic=standards-compliance-audits"
+                                >
+                                    <span className="frame__head">
+                                        <span className="frame__name">{s.name}</span>
+                                        <span className="frame__no">
+                                            {String(ci * items.length + i + 1).padStart(2, "0")}
+                                        </span>
+                                    </span>
+                                    <span className="ds-muted frame__note">{s.note}</span>
+                                </Link>
+                            ))}
+                        </div>
+                    </Reveal>
                 ))}
             </div>
         </section>

@@ -7,6 +7,13 @@
     bottom: 24px;
     display: flex;
     flex-direction: column;
+    /* The two buttons are different sizes — 56px and 48px. In a column with
+       the default align-items:stretch they both sit flush to the LEFT edge
+       of the track, which puts the smaller one 8px off centre under the
+       larger. Two round buttons stacked and not concentric reads as a
+       rendering fault, and it is the sort of thing you see once and cannot
+       stop seeing. */
+    align-items: center;
     gap: 12px;
     z-index: 70;
 }

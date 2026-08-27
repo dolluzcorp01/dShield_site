@@ -203,7 +203,28 @@ h3 { font-size: 1.2rem; }
 /* Opt-in arcade shout. Applied to marketing headings, never to one that has
    to deliver bad news — SOMETHING WENT WRONG set in Orbitron 900 is
    shouting at somebody who has just had a problem. */
-.ds-shout { text-transform: uppercase; letter-spacing: 0.01em; }
+/* AND THE FROZEN FILE'S SIZE, not just its case.
+
+   The prototype sets every marketing section heading to
+   clamp(24px, 3.4vw, 42px). The global h2 here is
+   clamp(1.4rem, 2.9vw, 2.05rem) — 32.8px at 1440px against the prototype's
+   42px, a quarter smaller, which is why "Six of the eighteen open in two
+   minutes" read as a subheading rather than as the thing the section is
+   about.
+
+   Applied to .ds-shout rather than to h2, because h2 is also the tag over
+   "Something went wrong" and over finding detail on a report. Those are not
+   marketing headings and must not grow with this one. */
+.ds-shout {
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    font-size: clamp(1.5rem, 3.4vw, 2.625rem);
+    line-height: 1.02;
+}
+
+/* h1.ds-shout keeps the h1 scale — it is already the larger of the two, and
+   letting this rule shrink a page title would be a regression on /pricing. */
+h1.ds-shout { font-size: clamp(1.85rem, 4.6vw, 3.1rem); }
 
 p { margin: 0 0 14px; }
 
@@ -229,6 +250,13 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
     color: var(--lime);
     margin-bottom: 14px;
 }
+
+/* The frozen file recolours this label per section — magenta where it is
+   introducing the part of the product you cannot see, cyan over compliance.
+   It is the only thing distinguishing one uppercase mono label from the next
+   as you scroll past six of them. */
+.ds-eyebrow--magenta { color: var(--magenta); }
+.ds-eyebrow--cyan    { color: var(--cyan); }
 
 .ds-lead {
     font-size: 1.12rem;
@@ -282,6 +310,43 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
 .ds-btn--sm { padding: 9px 16px; font-size: 0.9rem; }
 .ds-btn--block { width: 100%; }
 
+/* ── the submit button ───────────────────────────────────────────────────
+   The frozen file's primary form action: full width, pill, Orbitron 900
+   uppercase, and a lime→cyan gradient that drops to a flat panel with faint
+   text while the form is incomplete.
+
+   That disabled state is doing real work. It is the only thing telling
+   somebody the form is not ready yet — a bright button that silently
+   refuses to submit reads as a broken page, and it is the state this button
+   spends most of its life in.
+
+   Shared, not copied: the scan-result lead capture already had exactly these
+   rules under .leadcap__go, and two hand-maintained copies of one button is
+   how the site ends up with two of them. */
+.ds-btn--send {
+    display: block;
+    width: 100%;
+    border-radius: 99px;
+    padding: 15px;
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    background: linear-gradient(120deg, var(--lime), var(--cyan));
+    box-shadow: 0 8px 28px rgba(198, 255, 61, .27);
+}
+
+.ds-btn--send:hover:not(:disabled) {
+    background: linear-gradient(120deg, var(--lime), var(--cyan));
+}
+
+.ds-btn--send:disabled {
+    background: var(--panel);
+    color: var(--bone-faint);
+    box-shadow: none;
+}
+
 /* ── cards ──────────────────────────────────────────────────────────── */
 
 .ds-card {
@@ -308,11 +373,19 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
 
 .ds-field { margin-bottom: 16px; }
 
+/* MONO, CYAN, UPPERCASE — the frozen file's field label, not a sentence in
+   grey. It is the same label treatment as .office__k across the gap and as
+   every eyebrow on the page, which is what makes a form read as part of this
+   interface rather than as a generic form dropped into it. */
 .ds-label {
     display: block;
-    font-size: 0.86rem;
-    color: var(--bone-dim);
-    margin-bottom: 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 7px;
 }
 
 .ds-input {

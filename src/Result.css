@@ -129,7 +129,34 @@
 .inconclusive__list { margin: 18px 0; padding-left: 18px; color: var(--bone-dim); }
 .inconclusive__list li { margin-bottom: 7px; }
 
-.nextstep__actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+/* The nudge that replaced the "What happens next" card. Centred, mono,
+   quiet, and drifting down a few pixels on a loop — the animation IS the
+   instruction, which is why it is worth having at all. */
+.nudge {
+    text-align: center;
+    margin: 26px auto 0;
+}
+
+.nudge__link {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--lime);
+    text-decoration: none;
+    display: inline-block;
+    padding: 6px 10px;
+    animation: nudge 2s ease-in-out infinite;
+}
+
+.nudge__link:hover,
+.nudge__link:focus-visible { text-decoration: underline; }
+
+/* A looping animation is exactly what a reduced-motion preference is for.
+   The line still says "below" and still scrolls; it just holds still. */
+@media (prefers-reduced-motion: reduce) {
+    .nudge__link { animation: none; }
+}
 
 @media (max-width: 700px) {
     .counts { grid-template-columns: repeat(3, 1fr); }
@@ -164,26 +191,10 @@
 
 /* FULL WIDTH, like the prototype's. A short button beside a wide form reads
    as a secondary action; this is the only action in the block. */
-.leadcap__go {
-    display: block;
-    width: 100%;
-    border-radius: 99px;
-    padding: 14px;
-    font-family: var(--display);
-    font-weight: 900;
-    font-size: 13.5px;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    background: linear-gradient(120deg, var(--lime), var(--cyan));
-}
-.leadcap__go:hover:not(:disabled) {
-    background: linear-gradient(120deg, var(--lime), var(--cyan));
-}
-.leadcap__go:disabled {
-    background: var(--panel);
-    color: var(--bone-faint);
-    box-shadow: none;
-}
+/* Everything this button needs now lives on .ds-btn--send in index.css,
+   which the enquiry form uses too. The markup carries both classes; only the
+   14px padding differs, because this one sits in a narrower card. */
+.leadcap__go { padding: 14px; }
 
 /* ── the marketing opt-in ────────────────────────────────────────────────
    A real checkbox, visually restyled — not a div pretending to be one. It

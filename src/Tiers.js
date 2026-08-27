@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Reveal } from "./Motion";
 import { TIERS, DOMAINS } from "./data/site-content";
 import "./Tiers.css";
@@ -90,6 +91,22 @@ function Tiers() {
                     );
                 })}
             </div>
+
+            {/* The way out of this section.
+
+                The prototype's tier cards are inert — it has no pricing page
+                to send anybody to. We do, and until now nothing in this
+                section pointed at it: the cards expand to show what a tier
+                includes and then stop.
+
+                That was survivable while the result page carried a "Get the
+                full report" button. It no longer does, so without this line
+                the only route from a finished scan to /pricing is the footer,
+                and /pricing is where the live on-sale state and the notify-me
+                form actually live. */}
+            <Link className="ds-btn ds-btn--ghost tiers__more" to="/pricing">
+                Full pricing, and what is on sale today →
+            </Link>
         </section>
     );
 }

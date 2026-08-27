@@ -159,17 +159,25 @@ export const TIERS = [
    SOC 2, PCI DSS and India's DPDP Act. Naming one loses enquiries about the
    rest, so the menu says "Standards & Compliance Audits" and the description
    names them. */
+/* The slug is what turns each card into a link. /contact?topic=<slug> is
+   read by ContactForm, which shows the service as a read-only line rather
+   than dropping it into the tier dropdown — a service has no list price, and
+   putting one in a menu of prices would misrepresent it.
+
+   The platform card carries no slug: it points back at the free scan at the
+   top of the page. Asking somebody to enquire about the thing they can
+   simply use, for nothing, right now, would be absurd. */
 export const SERVICES_LEFT = [
     { name: "Cyber Resilience Check", note: "Our platform. Start free, above.", platform: true },
-    { name: "Technical Assurance", note: "Independent testing of what you built." },
-    { name: "Third-Party Risk Management", note: "Know what your suppliers can reach." },
-    { name: "SOC Setup & Monitoring", note: "Someone watching, around the clock." },
+    { name: "Technical Assurance", note: "Independent testing of what you built.", slug: "technical-assurance" },
+    { name: "Third-Party Risk Management", note: "Know what your suppliers can reach.", slug: "third-party-risk-management" },
+    { name: "SOC Setup & Monitoring", note: "Someone watching, around the clock.", slug: "soc-setup-monitoring" },
 ];
 export const SERVICES_RIGHT = [
-    { name: "Incident Response & Forensics", note: "When it has already happened, and the clock is running." },
-    { name: "Penetration Testing", note: "We try to break in, so nobody else does first." },
-    { name: "Continuous GRC", note: "Governance that stays current between audits." },
-    { name: "Standards & Compliance Audits", note: "ISO/IEC 27001, SOC 2, PCI DSS, DPDP." },
+    { name: "Incident Response & Forensics", note: "When it has already happened, and the clock is running.", slug: "incident-response-forensics" },
+    { name: "Penetration Testing", note: "We try to break in, so nobody else does first.", slug: "penetration-testing" },
+    { name: "Continuous GRC", note: "Governance that stays current between audits.", slug: "continuous-grc" },
+    { name: "Standards & Compliance Audits", note: "ISO/IEC 27001, SOC 2, PCI DSS, DPDP.", slug: "standards-compliance-audits" },
 ];
 export const SERVICES = [...SERVICES_LEFT, ...SERVICES_RIGHT];
 
@@ -238,7 +246,23 @@ export const OFFICE = {
     company: "Dolluz Corp",
     line1: "Chennai, Tamil Nadu",
     country: "India",
-    email: "connect@dolluzcorp.com",
+    /* THE ADDRESS WE PRINT IS NOT THE ADDRESS WE SEND FROM, and that is
+       deliberate.
+
+       Outbound mail leaves as connect@dolluzcorp.com (SENDGRID_FROM), which
+       is the mailbox the sending infrastructure is authenticated against —
+       its SPF and DKIM records are what make our mail arrive rather than
+       land in a spam folder. Publishing that address on a public page puts
+       it in front of every scraper that reads this site, and a sending
+       address sitting in spam lists is a deliverability problem that takes
+       months to undo.
+
+       So every address rendered in the interface is admin@dolluzcorp.com:
+       the monitored inbox a person writes to when they want help, and the
+       same address enquiry alerts already land in (ENQUIRY_ALERT_TO).
+       Change this one line and every "contact us" on the site changes with
+       it. */
+    email: "admin@dolluzcorp.com",
     hours: "Mon to Fri, 9:30am to 6:30pm IST",
 
     /* WhatsApp, digits only in international format. Empty would mean the
@@ -251,11 +275,43 @@ export const OFFICE = {
        79666" would also work — this form is just what reaches the URL. */
     whatsapp: "917779079666",
 
+    /* The same number, punctuated for a person to read off the page. The
+       digits-only form above is what wa.me takes; this is what the footer
+       and the contact card print. Kept immediately beside it so the two
+       cannot drift — a printed number that does not match the one the
+       button dials is a support call nobody can explain. */
+    whatsappDisplay: "+91 77790 79666",
+
     /* Pre-filled into the chat so the person does not have to open with
        "hi". A message already in the box is the difference between a button
        people tap and a button people think about tapping. */
     whatsappMessage: "Hello, I have a question about your service. Can you please help me?",
 };
+
+/* The chat URL, built once.
+
+   The floating button, the footer and the contact card all offer WhatsApp,
+   and until now only the floating button knew how to construct the link.
+   Three copies of this expression is three places for the number to go stale
+   and two of them nobody would think to check.
+
+   wa.me wants digits only — no +, no spaces, no dashes — so the display form
+   is stripped here rather than demanding a clean value in OFFICE. The
+   pre-filled message is encoded, not interpolated: it contains a comma and a
+   question mark, and a raw "?" would truncate the query string at exactly
+   the wrong place.
+
+   Null when there is no number, which is what makes the floating button and
+   the footer line disappear together rather than one of them rendering a
+   link to nowhere. */
+export const WHATSAPP_HREF = (() => {
+    const digits = String(OFFICE.whatsapp || "").replace(/\D/g, "");
+    if (!digits) return null;
+    const text = OFFICE.whatsappMessage
+        ? `?text=${encodeURIComponent(OFFICE.whatsappMessage)}`
+        : "";
+    return `https://wa.me/${digits}${text}`;
+})();
 
 /* ── Smart Checks ─────────────────────────────────────────────────────────
 

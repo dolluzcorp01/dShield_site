@@ -1,5 +1,133 @@
-.contactform { max-width: 780px; }
+/* ─────────────────────────────────────────────────────────────────────────
+   Contact — the form and the office card, side by side.
+
+   1.15fr / .85fr, which is the frozen file's own ratio: the form is the
+   thing being asked for, so it takes the larger share, but the card is wide
+   enough that "Mon to Fri, 9:30am to 6:30pm IST" does not wrap.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.contact__split {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: minmax(280px, 1.15fr) minmax(260px, .85fr);
+    /* stretch, not start. The card carries far less text than the form, so
+       left to size itself it stops halfway down and leaves the section
+       looking like the right column ran out. Two panels of equal height read
+       as one deliberate pairing. */
+    align-items: stretch;
+}
+
+@media (max-width: 900px) {
+    .contact__split { grid-template-columns: 1fr; }
+}
+
+/* The max-width belonged to a form that sat alone on the page. In a grid
+   cell it now fights the track, leaving a gap between the form and the card
+   on wide screens. The cell is the constraint. */
+.contactform { width: 100%; }
+
+.contactform__note {
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 1.5;
+    color: var(--bone-faint);
+    text-align: center;
+    margin: 11px 0 0;
+}
+
+/* MAGENTA, NOT LIME.
+
+   Every card on this site is lime-edged, which is correct for the ones that
+   report a finding — it is the palette's "we looked at this" colour. This
+   one is not reporting anything; it is the single place on the page that
+   asks the visitor for something, and it is the destination of the header's
+   magenta "Talk to experts" button.
+
+   The frozen file borders it magenta for that reason. A magenta button that
+   scrolls to a lime card gives no sense of having arrived anywhere. */
+/* Qualified with .ds-card so it beats .ds-card's own border shorthand
+   regardless of which stylesheet the bundler emits first. Relying on source
+   order across two files is how a card silently reverts to lime in a
+   production build and nowhere else. */
+.ds-card.contactform {
+    border-color: var(--magenta);
+    box-shadow: 0 0 44px rgba(255, 46, 154, .10);
+}
+
+.contactform .req { color: var(--magenta); }
+
 .req { color: var(--gold); }
+
+/* ── the office card ─────────────────────────────────────────────────── */
+
+.office {
+    height: 100%;
+    padding: 26px 24px;
+    border-radius: var(--radius-lg);
+    background: var(--panel);
+    border: 1px solid var(--edge);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.office__company {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 1.12rem;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: .01em;
+    margin: 0 0 18px;
+}
+
+.office__row { margin-bottom: 15px; }
+
+.office__k {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin: 0 0 4px;
+}
+
+.office__v {
+    font-size: .92rem;
+    line-height: 1.45;
+    color: var(--bone);
+    margin: 0;
+    /* Addresses and numbers must not push the card wider than its track. */
+    overflow-wrap: anywhere;
+}
+
+.office__v a { color: var(--bone); transition: color .15s ease; }
+.office__v a:hover,
+.office__v a:focus-visible { color: var(--lime); }
+
+.office__foot {
+    border-top: 1px solid var(--edge);
+    margin-top: 20px;
+    padding-top: 18px;
+}
+
+.office__nudge {
+    font-size: .86rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.office__go {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--lime);
+}
+
+.office__go:hover,
+.office__go:focus-visible { text-decoration: underline; }
 
 .steps { margin-top: 34px; display: flex; flex-direction: column; gap: 4px; }
 .step { display: flex; gap: 22px; padding: 22px 0; border-bottom: 1px solid var(--line); }
@@ -88,15 +216,19 @@
     color: var(--bone);
 }
 
-.footer__eagle { display: block; height: 26px; width: auto; margin-bottom: 10px; }
+/* The lockup is a wide asset — roughly 4:1 — so it is sized by width and
+   left to find its own height. width/height on the <img> tag match the
+   file's real pixel dimensions so the browser reserves the right box before
+   the image loads; without them the whole footer reflows on arrival.
 
-.footer__company {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: .06em;
-    color: var(--bone-dim);
-    margin: 0 0 14px;
+   max-width keeps it inside the brand column at every breakpoint, including
+   the 2-up layout below 760px where that column is roughly half the screen. */
+.footer__lockup {
+    display: block;
+    width: 100%;
+    max-width: 240px;
+    height: auto;
+    margin: 0 0 16px;
 }
 
 .footer__line {
@@ -106,13 +238,41 @@
     margin: 0 0 18px;
 }
 
+/* Address and WhatsApp number as one block: together they are "here is how
+   you reach us". Stacked with a small gap rather than run together, because
+   an email and a phone number on one line are read as one string. */
+.footer__reach {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
 .footer__email {
     font-family: var(--mono);
     font-size: 12px;
     color: var(--lime);
     text-decoration: none;
 }
-.footer__email:hover { text-decoration: underline; }
+.footer__email:hover,
+.footer__email:focus-visible { text-decoration: underline; }
+
+/* WhatsApp brand green, the one colour on this site that is not a token —
+   it belongs to WhatsApp, and a lime WhatsApp mark is not recognised as one.
+   Same reasoning as .float__wa. */
+.footer__wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #25D366;
+    text-decoration: none;
+}
+.footer__wa:hover,
+.footer__wa:focus-visible { text-decoration: underline; }
+
+.footer__waicon { flex-shrink: 0; }
 
 .footer__addr {
     font-family: var(--mono);
