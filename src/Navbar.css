@@ -277,24 +277,40 @@
     border-radius: 2px;
 }
 
+/* ── mobile ──────────────────────────────────────────────────────────────
+   The drawer is IN FLOW rather than absolutely positioned, so the CTA — now
+   a sibling of the links rather than a child — can sit underneath them
+   inside it. Both wrap onto their own full-width row; an absolute drawer
+   plus a separate button would have the button floating over the page. */
 @media (max-width: 980px) {
     .nav__tag { display: none; }
-    .nav__burger { display: flex; }
+    .nav__inner { flex-wrap: wrap; height: auto; min-height: 70px; }
+    .nav__burger { display: flex; margin-left: auto; }
+
     .nav__links {
-        position: absolute;
-        top: 70px; left: 0; right: 0;
+        order: 3;
+        flex-basis: 100%;
         flex-direction: column;
         align-items: stretch;
         gap: 0;
         margin-left: 0;
-        background: var(--void-2);
-        border-bottom: 1px solid var(--edge);
-        padding: 8px 24px 20px;
+        border-top: 1px solid var(--edge);
+        padding: 8px 0 4px;
         display: none;
     }
     .nav__links.is-open { display: flex; }
     .nav__link { text-align: left; padding: 14px 0; border-bottom: 1px solid var(--edge); }
-    .nav__cta { margin: 16px 0 0; text-align: center; }
+
+    /* Hidden until the burger opens, then full width at the bottom of the
+       drawer. margin-left:auto is a desktop-only instruction. */
+    .nav__cta { display: none; }
+    .nav__cta.is-open {
+        display: block;
+        order: 4;
+        flex-basis: 100%;
+        margin: 12px 0 18px;
+        text-align: center;
+    }
 
     /* In the drawer the panel is part of the flow, not an overlay — a
        640px absolutely-positioned box would hang off the screen. */

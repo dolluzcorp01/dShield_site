@@ -17,6 +17,14 @@ const express = require("express");
 const crypto = require("crypto");
 const getDBConnection = require("../../config/db");
 const { runScan } = require("../utils/scan_engine");
+const { ALL_CHECKS } = require("../utils/checks");
+
+/* checkId -> the risk area it belongs to, so a progress event can name the
+   tile to light. Derived from the catalogue rather than written out again:
+   a second hand-kept list of check ids is a second thing to forget when a
+   check is added, and it would fail silently — the tile simply never
+   lights and nobody notices. */
+const DOMAIN_OF = Object.fromEntries(ALL_CHECKS.map((c) => [c.id, c.domain]));
 const { isSuppressed } = require("../utils/suppression");
 const { queueMail } = require("../utils/mail");
 
@@ -79,41 +87,92 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 router.post("/", async (req, res) => {
     const { domain, email, name, company } = req.body || {};
 
+    /* ── progress streaming ──────────────────────────────────────────────
+     *
+     * The engine has always reported per-check progress through onProgress;
+     * nothing consumed it, so the scanning screen sat still for the twenty
+     * to sixty seconds a scan takes.
+     *
+     * A caller that sends Accept: text/event-stream gets the checks as they
+     * finish and the finished scan as a finalevent. Any other caller gets
+     * exactly the JSON it got before — same shape, same status codes. The
+     * two share one route deliberately: the rate limiting, the scans row,
+     * the suppression check, the lead and the result email are all here,
+     * and a second streaming endpoint would be a second copy of all of it
+     * that drifts.
+     *
+     * ⚠️  BEHIND NGINX THIS NEEDS `proxy_buffering off;` ON THE /api/
+     *     LOCATION. Without it the proxy holds the events and releases them
+     *     together at the end. That degrades to the old behaviour — the
+     *     grid fills on arrival instead of during — rather than breaking,
+     *     which is why this is safe to ship before the nginx change.
+     */
+    const wantsStream = String(req.headers.accept || "").includes("text/event-stream");
+
+    if (wantsStream) {
+        res.writeHead(200, {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache, no-transform",
+            Connection: "keep-alive",
+            // Nginx honours this per-response even without proxy_buffering off.
+            "X-Accel-Buffering": "no",
+        });
+        res.flushHeaders?.();
+    }
+
+    /* One refusal path for both protocols. A streamed response has already
+       sent 200 and its headers, so an error after that point can only be an
+       event — the status code is long gone. */
+    const fail = (status, message, extra = {}) => {
+        if (!wantsStream) return res.status(status).json({ success: false, message, ...extra });
+        res.write(`data: ${JSON.stringify({ type: "error", message, ...extra })}\n\n`);
+        return res.end();
+    };
+
+    /* The blank line is what ends an SSE frame — written as \n\n rather than
+       two real newlines in the template so a reformat or a trailing-space
+       trim cannot silently merge two events into one unparseable frame. */
+    const emit = (payload) => {
+        if (wantsStream) res.write(`data: ${JSON.stringify(payload)}\n\n`);
+    };
+
     if (!domain || typeof domain !== "string") {
-        return res.status(400).json({ success: false, message: "Enter a domain to scan." });
+        return fail(400, "Enter a domain to scan.");
     }
 
     const ip = ipKey(req);
     let wait = tooMany(`ip:${ip}`, RATE.perIpPerHour);
     if (wait) {
-        return res.status(429).json({
-            success: false,
-            message: `That is a lot of scans from one place. Try again in about ${wait} minute(s).`,
-        });
+        return fail(429, `That is a lot of scans from one place. Try again in about ${wait} minute(s).`);
     }
 
     const cleanDomain = String(domain).trim().toLowerCase()
         .replace(/^https?:\/\//, "").replace(/\/.*$/, "").replace(/^www\./, "");
     wait = tooMany(`domain:${cleanDomain}`, RATE.perDomainPerHour);
     if (wait) {
-        return res.status(429).json({
-            success: false,
-            message: `${cleanDomain} was scanned recently. Try again in about ${wait} minute(s).`,
-        });
+        return fail(429, `${cleanDomain} was scanned recently. Try again in about ${wait} minute(s).`);
     }
 
     let result;
     try {
-        result = await runScan(cleanDomain);
+        /* Only the "done" phase is forwarded. A batch of checks all START
+           together under Promise.all, so the start events arrive in one
+           burst and say nothing about progress; they FINISH as their network
+           calls return, which is the staggering worth showing. */
+        result = await runScan(cleanDomain, {
+            onProgress: ({ phase, index, total, checkId, title }) => {
+                if (phase !== "done") return;
+                emit({ type: "progress", index, total, checkId, title,
+                       domain: DOMAIN_OF[checkId] ?? null });
+            },
+        });
     } catch (err) {
         // A refused or unresolvable domain is the visitor's problem to fix, not
         // an error to apologise for. Give them the reason in plain words.
         const known = ["INVALID_DOMAIN", "UNRESOLVABLE", "PRIVATE_ADDRESS"].includes(err.code);
         if (!known) console.error("❌ Scan failed:", cleanDomain, err.message);
-        return res.status(known ? 400 : 500).json({
-            success: false,
-            message: known ? err.message : "The scan could not be completed. Please try again.",
-        });
+        return fail(known ? 400 : 500,
+            known ? err.message : "The scan could not be completed. Please try again.");
     }
 
     const scanId = crypto.randomUUID();
@@ -183,7 +242,14 @@ router.post("/", async (req, res) => {
         });
     }
 
-    res.json({ success: true, scanId, result });
+    if (wantsStream) {
+        /* The whole result, in the same shape the JSON caller receives, so
+           the client has one parser and one object either way. */
+        emit({ type: "done", success: true, scanId, result });
+        res.end();
+    } else {
+        res.json({ success: true, scanId, result });
+    }
 
     /* Queue the result email AFTER responding. The scan is what they came
        for and must never wait on the mail table.

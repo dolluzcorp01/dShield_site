@@ -1,26 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { apiPost } from "./utils/api";
+import { apiStream } from "./utils/api";
 import "./Home.css";
 import { useDocumentMeta } from "./utils/meta";
 import Bolt, { Type } from "./Bolt";
 import TwentyThree from "./TwentyThree";
 import { Connect, WhatWeDo, SmartChecks, ServicesBlock, Compliance, Faq } from "./Sections";
+import { SEEN_DOMAINS, DOMAIN_LABELS } from "./data/site-content";
 import Tiers from "./Tiers";
 import { ContactSection } from "./Pages";
 
-/* The five things a free scan actually looks at.
-   These must stay in step with the eight checks in scan_engine.js. A site
-   that promises five areas while the engine covers two is the defect that
-   journey testing caught in the main product — three tiles dark, nothing
-   explaining why, under a headline promising five. */
-const PROMISED = [
-    { key: "surface", title: "Your website from outside", line: "Files and folders that should never have been published." },
-    { key: "certs", title: "Your certificates", line: "Whether encryption is valid, current, and about to lapse." },
-    { key: "email", title: "Your email", line: "Whether anyone can send mail that appears to come from you." },
-    { key: "exposure", title: "What is already public", line: "Internal hostnames leaking through public certificate logs." },
-    { key: "brand", title: "Fake versions of you", line: "Misspellings of your domain that can send invoices today." },
-];
+/* The rotating PROMISED list and the interval that drove it are gone. They
+   paced the scanning screen from a timer because there was no per-area
+   progress to show; there is now — Scan_server streams the engine's own
+   onProgress events and `measuring` below is built from them. */
 
 function Home() {
     useDocumentMeta({
@@ -32,28 +25,13 @@ function Home() {
     const [domain, setDomain] = useState("");
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState("");
-    const [phase, setPhase] = useState(0);
     const navigate = useNavigate();
-    const timer = useRef(null);
 
     /* Bolt's pointer tracking is the ONLY state he adds. His mood is derived
        from the state this component already had. */
     const [look, setLook] = useState({ x: 0, y: 0 });
     const heroRef = useRef(null);
     const boltRef = useRef(null);
-
-    /* Progress is theatre, and deliberately so. The scan takes twenty to
-       sixty seconds depending on how quickly the other end answers, and a
-       blank screen for that long reads as broken however well it works. */
-    useEffect(() => {
-        if (busy) {
-            setPhase(0);
-            timer.current = setInterval(() => setPhase((p) => (p + 1) % PROMISED.length), 2600);
-        } else if (timer.current) {
-            clearInterval(timer.current);
-        }
-        return () => timer.current && clearInterval(timer.current);
-    }, [busy]);
 
     /* Pupils follow the cursor.
 
@@ -98,14 +76,26 @@ function Home() {
         };
     }, []);
 
+    /* Areas the engine has started work on, in the order it reached them.
+       Driven by real progress events from the engine, not a timer — see
+       apiStream in utils/api.js and the streaming block in Scan_server.js. */
+    const [measuring, setMeasuring] = useState([]);
+
     const submit = async (e) => {
         e.preventDefault();
         setError("");
         if (!domain.trim()) return setError("Enter a domain to scan.");
 
         setBusy(true);
-        const res = await apiPost("/api/scan", { domain: domain.trim() });
+        setMeasuring([]);
+
+        const res = await apiStream("/api/scan", { domain: domain.trim() }, (ev) => {
+            if (ev.type !== "progress" || ev.domain == null) return;
+            setMeasuring((m) => (m.includes(ev.domain) ? m : [...m, ev.domain]));
+        });
+
         setBusy(false);
+        setMeasuring([]);
 
         if (!res.success) return setError(res.message || "The scan could not be completed.");
         navigate(`/result/${res.scanId}`, { state: { result: res.result } });
@@ -123,16 +113,13 @@ function Home() {
         : domain.trim().length > 0 ? "typing"
             : "greet";
 
-    /* His scanning line does NOT count areas.
+    /* His scanning line still does NOT count areas.
 
-       The prototype said "n/5 AREAS IN" because it drove that number from a
-       simulated counter. The real scan returns everything at once — there is
-       no per-area progress from the server — and `phase` below is a rotating
-       index for the "Checking your email…" theatre, so it wraps back to 1
-       partway through. A counter driven from it would run backwards, and a
-       counter driven from nothing would be a fabricated progress figure on a
-       product whose whole argument is that it tells you what it actually
-       measured. "HOLD ON" is the frozen file's own screenplay line. */
+       The prototype said "n/5 AREAS IN" from a simulated counter. We now
+       have real per-area progress and could show a true count — but the
+       tiles and the level meter already say which areas are done, and a
+       third counter saying the same thing in a speech bubble is noise.
+       "HOLD ON" is the frozen file's own line. */
     const boltLine = {
         greet: "← PSST. DROP YOUR SITE IN HERE",
         typing: "← OOH. KEEP GOING…",
@@ -198,21 +185,22 @@ function Home() {
 
                         {error && <div className="ds-error">{error}</div>}
 
-                        {/* The level meter — five bars, one per area a free
-                            check reaches. It fills from the same rotating
-                            index that drives the theatre, so it is pace, not a
-                            measurement: the server returns everything at once
-                            and there is no per-area progress to report. */}
+                        {/* The level meter — one bar per area a free check
+                            reaches, filling from REAL progress events now
+                            rather than a rotating timer. A bar lights when
+                            the engine actually starts that area. */}
                         {busy && (
                             <div className="scanbox__meter" aria-hidden="true">
-                                {PROMISED.map((c, i) => (
-                                    <span key={c.key} className={i <= phase ? "is-lit" : ""} />
+                                {SEEN_DOMAINS.map((d, i) => (
+                                    <span key={d.n} className={i < measuring.length ? "is-lit" : ""} />
                                 ))}
                             </div>
                         )}
                         {busy && (
                             <p className="scanbox__progress" role="status">
-                                Checking {PROMISED[phase].title.toLowerCase()}…
+                                {measuring.length
+                                    ? `Checking ${DOMAIN_LABELS[measuring[measuring.length - 1]].toLowerCase()}…`
+                                    : "Starting the check…"}
                             </p>
                         )}
                     </form>
@@ -245,8 +233,7 @@ function Home() {
             {/* The five-card "Five ways in from the street" block that used to
                 sit here is gone. It repeated the hero headline word for word,
                 two screens apart, and listed five of the areas the grid below
-                already names all twenty-three of. PROMISED survives as the
-                source of the scanning theatre and the level meter. */}
+                already names all twenty-three of. */}
 
             {/* THE 23, in its idle state. The frozen prototype puts the full
                 grid on the home page before anything has been scanned — every
@@ -257,7 +244,7 @@ function Home() {
                 It takes result={null} here. The same component renders the
                 real thing on /result, so the two can never drift into showing
                 different numbers of areas. */}
-            <TwentyThree result={null} />
+            <TwentyThree result={null} measuring={measuring} />
 
             <section className="ds-section ds-section--tight">
                 <div className="ds-wrap">

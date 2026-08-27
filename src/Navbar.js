@@ -215,24 +215,37 @@ function Navbar() {
                         <button className="nav__link" onClick={() => goSection("smart-checks")}>
                             {SECTIONS["smart-checks"]}
                         </button>
-
-                        {/* Scrolls to the section on the home page, routes to
-                            /contact from anywhere else. It stays an <a> with a
-                            real href either way, so it is still a link a
-                            middle-click or a screen reader can use — a button
-                            that navigates is neither. */}
-                        <Link
-                            to="/contact"
-                            className="nav__cta"
-                            onClick={(e) => {
-                                if (location.pathname !== "/") { setOpen(false); setMenu(null); return; }
-                                e.preventDefault();
-                                goSection("contact");
-                            }}
-                        >
-                            Talk to experts
-                        </Link>
                     </nav>
+
+                    {/* A SIBLING OF .nav__links, NOT A CHILD OF IT.
+
+                        margin-left:auto only pushes when there is free space
+                        to consume. Inside .nav__links — a flex row sized to
+                        its own content — there is none, so the button sat
+                        against the last link with the whole right half of the
+                        header empty. As a third child of .nav__inner the auto
+                        margin has the row's spare width to eat, and the brand
+                        and the button anchor opposite edges at every width.
+
+                        A fixed margin would land correctly at one viewport and
+                        nowhere else.
+
+                        Scrolls to the section on the home page, routes to
+                        /contact from anywhere else. It stays an <a> with a
+                        real href either way, so it is still a link a
+                        middle-click or a screen reader can use — a button
+                        that navigates is neither. */}
+                    <Link
+                        to="/contact"
+                        className={`nav__cta${open ? " is-open" : ""}`}
+                        onClick={(e) => {
+                            if (location.pathname !== "/") { setOpen(false); setMenu(null); return; }
+                            e.preventDefault();
+                            goSection("contact");
+                        }}
+                    >
+                        Talk to experts
+                    </Link>
 
                     <button
                         className="nav__burger"

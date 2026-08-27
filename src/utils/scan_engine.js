@@ -305,7 +305,8 @@ async function runScan(domainInput, opts = {}) {
 
         await Promise.all(batch.map(async (check) => {
             if (typeof onProgress === "function") {
-                onProgress({ index: completed, total: checks.length, checkId: check.id, title: check.title });
+                onProgress({ phase: "start", index: completed, total: checks.length,
+                    checkId: check.id, title: check.title });
             }
             try {
                 /* A SHORT, GENERIC LABEL — not check.title.
@@ -326,6 +327,22 @@ async function runScan(domainInput, opts = {}) {
                 inconclusive.push({ checkId: check.id, domain: check.domain, title: check.title, reason: err.message });
             } finally {
                 completed += 1;
+
+                /* A SECOND EVENT, WHEN THE CHECK ACTUALLY FINISHES.
+                   The start event above fires for every check in a batch at
+                   the same instant, because a batch runs concurrently under
+                   Promise.all — so eight "starting" events arrive together
+                   with the same index and tell a caller nothing about
+                   progress. Checks finish as their network calls return,
+                   which is genuinely staggered, so this is the event worth
+                   drawing from.
+
+                   Additive only: `phase` distinguishes the two, nothing is
+                   removed, and no scoring path is touched. */
+                if (typeof onProgress === "function") {
+                    onProgress({ phase: "done", index: completed, total: checks.length,
+                        checkId: check.id, title: check.title });
+                }
             }
         }));
     }

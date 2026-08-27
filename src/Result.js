@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
-import { apiGet, apiPost } from "./utils/api";
+import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
+import { apiGet, apiPost, apiStream } from "./utils/api";
 import "./Result.css";
 import { useDocumentMeta } from "./utils/meta";
 import TwentyThree from "./TwentyThree";
@@ -117,6 +117,57 @@ function ScanLeadCapture({ domain, scanId }) {
                 </button>
             </form>
         </section>
+    );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   A compact scan box, so a second domain does not mean going home first.
+
+   The prototype keeps its input on screen after a scan because its result
+   appears on the same page. Ours is its own route — /result/:id is
+   shareable, is what the result emails link to, and carries its own
+   noindex — so the page stays a page and only the box comes across.
+
+   It streams like the home page's does, but shows no per-area progress:
+   there is no grid above it to fill, and a second progress display arguing
+   with the one already on the page is worse than none. Just a disabled
+   button that says what is happening.
+   ───────────────────────────────────────────────────────────────────────── */
+function RescanBox() {
+    const [domain, setDomain] = useState("");
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+
+    const submit = async (e) => {
+        e.preventDefault();
+        setError("");
+        if (!domain.trim()) return setError("Enter a domain to scan.");
+        setBusy(true);
+        const res = await apiStream("/api/scan", { domain: domain.trim() });
+        setBusy(false);
+        if (!res.success) return setError(res.message || "The scan could not be completed.");
+        setDomain("");
+        navigate(`/result/${res.scanId}`, { state: { result: res.result } });
+    };
+
+    return (
+        <form className="rescan" onSubmit={submit}>
+            <input
+                className="ds-input rescan__domain"
+                placeholder="Scan another domain"
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
+                disabled={busy}
+                autoComplete="off"
+                spellCheck="false"
+                aria-label="Scan another domain"
+            />
+            <button className="ds-btn rescan__go" disabled={busy}>
+                {busy ? "Scanning" : "Go"}
+            </button>
+            {error && <p className="ds-error rescan__error">{error}</p>}
+        </form>
     );
 }
 
@@ -273,6 +324,7 @@ function Result() {
     return (
         <div className="result">
             <section className="ds-wrap result__head">
+                <RescanBox />
                 <p className="ds-eyebrow">Free scan · {new Date(result.scannedAt).toLocaleDateString()}</p>
                 <h1 className="result__domain">{result.domain}</h1>
 

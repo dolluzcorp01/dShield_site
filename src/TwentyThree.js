@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { DOMAINS } from "./data/site-content";
+import { DOMAINS, SEEN_DOMAINS } from "./data/site-content";
 import { Count } from "./Motion";
 import "./TwentyThree.css";
+
+/* How many areas a free check reaches. Derived, so the counter in the
+   headline cannot disagree with the grid. */
+const SEEN_COUNT = SEEN_DOMAINS.length;
 
 /* ─────────────────────────────────────────────────────────────────────────
    THE 23 — the tile grid, ported from the frozen prototype's section of the
@@ -42,8 +46,14 @@ import "./TwentyThree.css";
    `scanned` comes from coverageMap — the engine's own list of what this tier
    attempts. A domain it attempted but produced no score for was attempted
    and failed, and that is the distinction the third state carries. */
-function tileState(d, result) {
-    if (!result) return "idle";
+function tileState(d, result, measuring) {
+    /* Mid-scan. The engine has reached this area and has not finished it —
+       a real state from a real progress event, not a timer.
+
+       IT SHOWS NO NUMBER. We do not have one yet, and a placeholder score
+       that changed when the scan landed would be exactly the invented
+       figure this grid exists to avoid. */
+    if (!result) return measuring?.includes(d.n) ? "measuring" : "idle";
 
     const attempted = (result.coverageMap || []).some((c) => c.no === d.n && c.scanned);
     if (!attempted) return "unseen";
@@ -72,6 +82,7 @@ function Tile({ d, state, open, onToggle, result }) {
        "?" to be guessed at. */
     const aria = {
         idle: `${d.name}, not checked yet`,
+        measuring: `${d.name}, checking now`,
         lit: `${d.name}, scored ${scored?.score} out of 100`,
         unreachable: `${d.name}, could not be checked`,
         unseen: `${d.name}, not covered by a free scan`,
@@ -93,6 +104,9 @@ function Tile({ d, state, open, onToggle, result }) {
                 )}
                 {state === "unreachable" && (
                     <span className="t23__mark t23__mark--warn" aria-hidden="true">!</span>
+                )}
+                {state === "measuring" && (
+                    <span className="t23__mark t23__mark--live" aria-hidden="true">•••</span>
                 )}
                 {(state === "unseen" || state === "idle") && (
                     <span className="t23__mark" aria-hidden="true">?</span>
@@ -185,10 +199,11 @@ function Detail({ d, state, result }) {
  *                dim with a "?", which is what the home page shows before
  *                anybody has typed a domain.
  */
-function TwentyThree({ result }) {
+function TwentyThree({ result, measuring }) {
     const [open, setOpen] = useState(null);
 
-    const states = Object.fromEntries(DOMAINS.map((d) => [d.n, tileState(d, result)]));
+    const states = Object.fromEntries(DOMAINS.map((d) => [d.n, tileState(d, result, measuring)]));
+    const live = DOMAINS.filter((d) => states[d.n] === "measuring").length;
     const lit = DOMAINS.filter((d) => states[d.n] === "lit").length;
     const unreachable = DOMAINS.filter((d) => states[d.n] === "unreachable").length;
 
@@ -196,7 +211,9 @@ function TwentyThree({ result }) {
        promised: five checked reads as a success when one of the five in fact
        failed to run, and that gap is the thing this product exists to close. */
     const headline = !result
-        ? "23 areas · none checked yet"
+        ? (live || measuring?.length
+            ? `checking… ${measuring.length} of ${SEEN_COUNT} areas started`
+            : "23 areas · none checked yet")
         : unreachable > 0
             ? `${lit} scored · ${unreachable} could not be checked · ${23 - lit - unreachable} need a look inside`
             : `${lit} scored / ${23 - lit} need a look inside`;
