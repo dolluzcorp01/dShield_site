@@ -157,7 +157,7 @@
 
 /* Hover AND focus. The prototype decorates hover only, through JS handlers
    that a keyboard never triggers. */
-.smart__card:hover,
+.smart__card:not(.smart__card--soon):hover,
 .smart__card:focus-visible {
     transform: translateY(-6px) rotate(-1.2deg);
     border-color: var(--lime);
@@ -181,9 +181,17 @@
     padding-top: 3px;
 }
 
-.smart__soon {
-    margin-top: 18px;
-    font-size: .85rem;
+/* The two with no engine behind them. Present in the grid, and
+   unmistakably not a door: dimmed, flat on hover, default cursor. It is a
+   div, so there is no focus state to suppress and no tabindex needed to keep
+   it out of the tab order. */
+.smart__card--soon {
+    opacity: .45;
+    cursor: default;
+}
+
+.smart__card--soon .smart__price {
+    color: var(--bone-faint);
 }
 
 /* ── the two-up blocks, services and compliance ───────────────────────────

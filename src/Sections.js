@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Reveal } from "./Motion";
 import {
-    PROOF, CONNECT_DOMAINS, SMART, SMART_BUILT,
+    PROOF, CONNECT_DOMAINS, SMART,
     SERVICES_LEFT, SERVICES_RIGHT, COMPLY_LEFT, COMPLY_RIGHT, FAQ,
 } from "./data/site-content";
 import "./Sections.css";
@@ -114,17 +114,22 @@ export function Connect() {
    with a hover effect and no handler — including the two paid ones, which
    have no engine behind them anywhere in this repository.
 
-   Here the five built tools link to their pages. The two unbuilt ones are
-   rendered as plainly unavailable rather than as buttons that do nothing:
-   a card that looks clickable and is not reads as a broken site, and a card
+   All seven are cards here too, so the grid matches the prototype. What
+   differs is what a card IS. The five built tools are links to their tool
+   pages. The two unbuilt ones are plain divs: dimmed, no hover lift, no
+   pointer, and outside the tab order because a div with no handler and no
+   tabindex simply is — nothing to click, nothing to tab to, nothing to buy.
+   Their badge carries "SOON" and the price is not rendered at all, so no
+   figure on those two cards reads as a thing you can pay for today.
+
+   A card that looks clickable and is not reads as a broken site, and a card
    that takes money for a check nothing performs is the fifty-connectors
    defect in miniature.
 
-   SMART_BUILT is derived in site-content.js, so a tool cannot reach a
-   customer by being forgotten in a list. */
+   Which of the two a tool gets is derived from `built` in
+   data/site-content.js, never written out here, so a tool cannot reach a
+   customer as a buyable card by being forgotten in a list. */
 export function SmartChecks() {
-    const unbuilt = SMART.filter((t) => !t.built);
-
     return (
         <section id="smart-checks" className="ds-section ds-wrap sec">
             <Reveal>
@@ -133,23 +138,27 @@ export function SmartChecks() {
             </Reveal>
 
             <div className="smart">
-                {SMART_BUILT.map((s, i) => (
+                {SMART.map((s, i) => (
                     <Reveal key={s.slug} delay={i * 50}>
-                        <Link className="smart__card" to={`/tools/${s.slug}`}>
-                            <span className="smart__name">{s.name}</span>
-                            <span className="smart__price">{s.price}</span>
-                        </Link>
+                        {s.built ? (
+                            <Link className="smart__card" to={`/tools/${s.slug}`}>
+                                <span className="smart__name">{s.name}</span>
+                                <span className="smart__price">{s.price}</span>
+                            </Link>
+                        ) : (
+                            /* No aria-disabled: it is not a control, and on a
+                               generic div assistive tech drops it. "SOON" in
+                               the badge is read out with the name, which is
+                               the same sentence the dimming tells everyone
+                               else. */
+                            <div className="smart__card smart__card--soon">
+                                <span className="smart__name">{s.name}</span>
+                                <span className="smart__price">SOON</span>
+                            </div>
+                        )}
                     </Reveal>
                 ))}
             </div>
-
-            {unbuilt.length > 0 && (
-                <p className="ds-faint smart__soon">
-                    {unbuilt.map((t) => t.name).join(" · ")} — {unbuilt.length === 1 ? "is" : "are"}{" "}
-                    not built yet. When {unbuilt.length === 1 ? "it is" : "they are"}, {unbuilt.length === 1 ? "it" : "they"}{" "}
-                    will appear here and not before.
-                </p>
-            )}
         </section>
     );
 }
