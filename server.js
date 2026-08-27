@@ -166,4 +166,19 @@ if (String(process.env.MAIL_WORKER_ENABLED || "").toLowerCase() === "true") {
 
 app.listen(port, () => {
     console.log(`🚀 Server running at http://localhost:${port}`);
+
+    /* LAST THING IN THE LOG, ON PURPOSE.
+     *
+     * Printed after the port line so it cannot be scrolled past by whatever
+     * boots next, and inside the listen callback so it appears only once the
+     * server is actually up — a warning about a webhook secret is noise if
+     * the port was already taken.
+     *
+     * It exits only for a signing secret left at a placeholder, and this app
+     * has none. Everything else warns: refusing to boot over a missing
+     * webhook secret would turn a broken checkout into a broken site, and
+     * the free scan needs none of it. See src/utils/config_check.js. */
+    const { checkConfig } = require("./src/utils/config_check");
+    const { fatal } = checkConfig();
+    if (fatal.length) process.exit(1);
 });
