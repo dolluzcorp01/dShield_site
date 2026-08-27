@@ -470,7 +470,7 @@ export function Footer() {
                             className="footer__lockup"
                             src={lockup}
                             alt="Dolluz Corp — One Place. One Start. One Team."
-                            width="3945"
+                            width="3950"
                             height="994"
                         />
 
