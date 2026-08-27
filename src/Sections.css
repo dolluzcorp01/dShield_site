@@ -7,6 +7,21 @@
    to tab focus. :hover and :focus-visible share a rule below instead.
    ───────────────────────────────────────────────────────────────────────── */
 
+/* The frozen file gives every one of these sections `paddingTop:86`
+   (`70` for Connect) and never a paddingBottom — the gap you see is that
+   section's own top padding, not two paddings stacked. `.ds-section`
+   (72px top *and* bottom) is shared by pages that don't have a frozen
+   reference, so it stays as-is there; `.sec` overrides it here to match
+   the frozen rhythm instead of nearly doubling every gap on this page. */
+.sec {
+    padding-top: 86px;
+    padding-bottom: 0;
+}
+
+#connect-more.sec {
+    padding-top: 70px;
+}
+
 .sec__h2 {
     margin-bottom: 14px;
 }
@@ -75,8 +90,8 @@
 
 .conn__card {
     height: 100%;
-    padding: 20px 22px;
-    border-radius: var(--radius);
+    padding: 18px 20px;
+    border-radius: var(--radius-lg);
     background: var(--ink-3);
     border: 1px solid var(--edge);
     border-left: 3px solid var(--magenta);
@@ -86,12 +101,14 @@
     font-family: var(--mono);
     font-size: 10px;
     letter-spacing: .14em;
+    line-height: 1.2;
     color: var(--magenta);
     margin: 0 0 9px;
 }
 
 .conn__name {
     font-size: 1rem;
+    line-height: 1.2;
     margin: 0 0 8px;
 }
 
@@ -129,7 +146,7 @@
     gap: 10px;
     height: 100%;
     padding: 20px;
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     background: var(--ink-3);
     border: 1px solid var(--edge);
     text-decoration: none;
@@ -203,6 +220,7 @@
 
 .two__name {
     font-size: .98rem;
+    line-height: 1.2;
     margin: 0 0 4px;
 }
 
@@ -220,24 +238,29 @@
 
 .faq {
     display: grid;
-    gap: 10px;
-    max-width: 780px;
+    gap: 9px;
+    max-width: 840px;
 }
 
 .faq__item {
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     background: var(--ink-3);
     border: 1px solid var(--edge);
     padding: 0 20px;
 }
 
+/* `body`'s line-height (1.6) is meant for prose. Left uninherited-from
+   here, it was inflating this single-line row well past the frozen
+   file's 18px-top/18px-bottom button padding, which is what made every
+   card in this list read as roughly twice as tall as the reference. */
 .faq__q {
     cursor: pointer;
     list-style: none;
     padding: 18px 0;
     font-family: var(--display);
     font-weight: 700;
-    font-size: .95rem;
+    font-size: .97rem;
+    line-height: 1.2;
     text-transform: uppercase;
     letter-spacing: -.01em;
     display: flex;
@@ -261,8 +284,10 @@
 .faq__item[open] .faq__q::after { content: "−"; }
 
 .faq__a {
-    margin: 0;
+    margin: 14px 0 0;
     padding: 0 0 20px;
+    font-size: .91rem;
+    line-height: 1.65;
     max-width: 70ch;
 }
 

@@ -213,9 +213,9 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
 
 .ds-wrap {
     width: 100%;
-    max-width: 1140px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 26px;
 }
 
 .ds-section { padding: 72px 0; }
@@ -390,6 +390,7 @@ textarea.ds-input { resize: vertical; min-height: 110px; }
 
 @media (max-width: 640px) {
     .ds-section { padding: 48px 0; }
+    .sec { padding-top: 48px; }
     .ds-wrap { padding: 0 18px; }
     .ds-card { padding: 20px; }
 }

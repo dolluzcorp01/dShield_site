@@ -249,10 +249,10 @@ function Pricing() {
                 )}
             </div>
 
-            <div className="faq">
+            <div className="pricing-faq">
                 <h2 className="ds-shout">Questions people ask</h2>
 
-                <div className="faq__item">
+                <div className="pricing-faq__item">
                     <h3>Why is the scan free?</h3>
                     <p className="ds-muted">
                         Because it costs us almost nothing to run. It reads what your servers already
@@ -261,7 +261,7 @@ function Pricing() {
                     </p>
                 </div>
 
-                <div className="faq__item">
+                <div className="pricing-faq__item">
                     <h3>What do I get for $49 that I do not get free?</h3>
                     <p className="ds-muted">
                         Every problem named, with the exact host, file or record, how serious it is, and
@@ -270,7 +270,7 @@ function Pricing() {
                     </p>
                 </div>
 
-                <div className="faq__item">
+                <div className="pricing-faq__item">
                     <h3>Why $199 rather than $99?</h3>
                     <p className="ds-muted">
                         Because at $199 we stop guessing. You connect your Microsoft 365 or your AWS,
@@ -280,7 +280,7 @@ function Pricing() {
                     </p>
                 </div>
 
-                <div className="faq__item">
+                <div className="pricing-faq__item">
                     <h3>Is a scan safe? Will it break anything?</h3>
                     <p className="ds-muted">
                         No. dShield is entirely passive. We make ordinary requests of the kind any
