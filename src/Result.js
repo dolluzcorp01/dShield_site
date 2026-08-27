@@ -4,6 +4,10 @@ import { apiGet, apiPost, apiStream } from "./utils/api";
 import "./Result.css";
 import { useDocumentMeta } from "./utils/meta";
 import TwentyThree from "./TwentyThree";
+import { OPT_IN_TEXT } from "./data/site-content";
+import { Connect, WhatWeDo, SmartChecks, ServicesBlock, Compliance, Faq } from "./Sections";
+import { ContactSection } from "./Pages";
+import Tiers from "./Tiers";
 
 const GRADE_WORD = {
     A: "Strong", B: "Good", C: "Mixed", D: "Weak", E: "Poor",
@@ -46,6 +50,15 @@ function ScanLeadCapture({ domain, scanId }) {
     const [busy, setBusy] = useState(false);
     const [sent, setSent] = useState(false);
 
+    /* UNTICKED ON LOAD — a literal false, not a prop a caller could set.
+       A pre-ticked box is not consent under DPDP or GDPR, and a form that
+       ships one has poisoned every contact captured before anybody noticed.
+
+       Deliberately NOT required: the button below gates on the email alone.
+       Somebody asking for a copy of their own scan result should not have to
+       accept marketing to receive it. */
+    const [optIn, setOptIn] = useState(false);
+
     const valid = LEAD_EMAIL_RE.test(email.trim());
 
     const send = async (e) => {
@@ -59,6 +72,13 @@ function ScanLeadCapture({ domain, scanId }) {
                 domain,
                 scanId,
                 source: "free_scan",
+                marketingOptIn: optIn,
+                /* The exact wording they read, sent with the tick, so the
+                   record shows what was on screen rather than what we believe
+                   the form said that day. Nothing is sent when the box is
+                   clear — a consent record carrying wording but no tick reads
+                   as consent to whoever audits it later. */
+                consentText: optIn ? OPT_IN_TEXT : undefined,
             });
         } catch (err) {
             console.error("⚠️  Scan lead could not be sent:", err.message);
@@ -111,6 +131,20 @@ function ScanLeadCapture({ domain, scanId }) {
                         disabled={busy}
                     />
                 </div>
+
+                <label className={`leadcap__optin${optIn ? " is-on" : ""}`} htmlFor="leadoptin">
+                    <span className="leadcap__box">
+                        <input
+                            id="leadoptin"
+                            type="checkbox"
+                            checked={optIn}
+                            onChange={(ev) => setOptIn(ev.target.checked)}
+                            disabled={busy}
+                        />
+                        {optIn && <span className="leadcap__tick" aria-hidden="true">✓</span>}
+                    </span>
+                    <span className="leadcap__consent">{OPT_IN_TEXT}</span>
+                </label>
 
                 <button className="ds-btn leadcap__go" disabled={!valid || busy}>
                     {busy ? "Sending…" : "Send me the result"}
@@ -488,6 +522,27 @@ function Result() {
                     </div>
                 </div>
             </section>
+
+            {/* THE PAGE CONTINUES BELOW THE RESULT.
+
+                It used to stop here and drop straight into the footer, so
+                somebody who had just been shown eighteen dark tiles scrolled
+                down and found nothing — the moment they are most likely to
+                want to know what is in those tiles.
+
+                The prototype does not end after a result either: CONNECT and
+                TIERS appear only once a scan has run (its `phase === "done"`
+                gate), and the rest of the page follows. This route is the
+                equivalent of that state, so it carries the same run of
+                sections, from the same components the home page uses. */}
+            <Connect />
+            <Tiers />
+            <WhatWeDo />
+            <SmartChecks />
+            <ServicesBlock />
+            <Compliance />
+            <Faq />
+            <ContactSection />
         </div>
     );
 }

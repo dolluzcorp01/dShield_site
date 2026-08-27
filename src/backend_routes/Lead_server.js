@@ -148,6 +148,20 @@ router.post("/notify", (req, res) => {
 
     const source = LEAD_SOURCES.includes(req.body?.source) ? req.body.source : "notify_me";
 
+    /* THE MARKETING TICK, AND WHAT IT ACTUALLY CONTROLS.
+       A scan-result request is transactional: they typed an address into a box
+       offering to send them their own result. The marketing confirmation is a
+       separate thing, and it is sent only when the box was ticked.
+
+       A tick-box that changes nothing is worse than no tick-box: it collects a
+       decision, ignores it, and leaves the person believing they opted out.
+
+       "notify_me" has no box — that form IS the marketing signup — so it stays
+       opted in by default, exactly as before. */
+    const marketingOptIn = source === "free_scan"
+        ? req.body?.marketingOptIn === true
+        : true;
+
     /* What we say back. Somebody who asked for a copy of their scan is not
        joining a waiting list, and telling them "we will write when reports
        open" reads as though we ignored what they clicked. */
@@ -208,6 +222,18 @@ router.post("/notify", (req, res) => {
                 /* Answer the visitor first. Everything below is bookkeeping
                    and must not delay or endanger the response. */
                 res.json({ success: true, message: done });
+
+                /* No tick, no marketing mail. The lead row above still exists
+                   — they asked for their result and we have to be able to send
+                   it — but nothing in the marketing category goes out.
+
+                   ⚠️  THE TICK ITSELF IS NOT YET STORED. `leads` has no consent
+                   column, so what is recorded is the CONSEQUENCE of the answer
+                   (a confirmation sent, or not) rather than the answer and the
+                   wording they agreed to. That is enough to behave correctly
+                   and not enough to prove consent to an auditor. Adding
+                   consent_text and consent_at to db/schema.sql closes it. */
+                if (!marketingOptIn) return;
 
                 /* Read the token BACK rather than using the one generated
                    above. On the duplicate-key path COALESCE keeps whatever

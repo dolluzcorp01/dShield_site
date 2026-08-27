@@ -162,7 +162,93 @@
     margin-bottom: 14px;
 }
 
-.leadcap__go { min-width: 200px; }
+/* FULL WIDTH, like the prototype's. A short button beside a wide form reads
+   as a secondary action; this is the only action in the block. */
+.leadcap__go {
+    display: block;
+    width: 100%;
+    border-radius: 99px;
+    padding: 14px;
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 13.5px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    background: linear-gradient(120deg, var(--lime), var(--cyan));
+}
+.leadcap__go:hover:not(:disabled) {
+    background: linear-gradient(120deg, var(--lime), var(--cyan));
+}
+.leadcap__go:disabled {
+    background: var(--panel);
+    color: var(--bone-faint);
+    box-shadow: none;
+}
+
+/* ── the marketing opt-in ────────────────────────────────────────────────
+   A real checkbox, visually restyled — not a div pretending to be one. It
+   keeps the label association, the keyboard behaviour and the announcement
+   a screen reader expects. */
+.leadcap__optin {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    cursor: pointer;
+    padding: 13px 14px;
+    border-radius: 14px;
+    margin-bottom: 14px;
+    border: 1px solid var(--edge);
+    transition: border-color .3s ease, background .3s ease;
+}
+.leadcap__optin.is-on {
+    border-color: var(--lime);
+    background: rgba(198, 255, 61, .055);
+}
+
+.leadcap__box {
+    position: relative;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+}
+
+.leadcap__box input {
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid var(--edge);
+    background: transparent;
+    transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+.leadcap__optin.is-on .leadcap__box input {
+    background: var(--lime);
+    border-color: var(--lime);
+    box-shadow: 0 0 16px rgba(198, 255, 61, .4);
+}
+
+.leadcap__tick {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--void);
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.leadcap__consent {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--bone-faint);
+}
+.leadcap__optin.is-on .leadcap__consent { color: var(--bone-dim); }
 
 /* The confirmation arrives rather than replaces — prototype pop .4s. */
 .leadcap--done {
@@ -173,7 +259,6 @@
 
 @media (max-width: 620px) {
     .leadcap__row { grid-template-columns: 1fr; }
-    .leadcap__go { width: 100%; }
 }
 
 /* ── scan another domain ─────────────────────────────────────────────────
