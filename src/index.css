@@ -1,11 +1,11 @@
 /* ─────────────────────────────────────────────────────────────────────────
-   dShield global site — design tokens and base styles.
+   dShield global site - design tokens and base styles.
 
    THE ARCADE THEME. Purple-black and lime, ported from the frozen v5.9
    customer-website prototype, which Shoban has confirmed as the direction
    for all four dShield applications.
 
-   Note the background is #0B0316 — purple-black, not neutral black. The
+   Note the background is #0B0316 - purple-black, not neutral black. The
    violet cast is what the rest of the palette is built on; a neutral
    #0A0A0A kills the effect and makes the lime look radioactive.
 
@@ -37,7 +37,7 @@
     --bone:       #F4F0FF;   /* primary text */
     --bone-dim:   #B9AEDC;   /* secondary text */
     /* The frozen palette calls this faint and sets #6E6193, which measures
-       3.65:1 on void and 3.46:1 on void-2 — below the 4.5:1 needed for body
+       3.65:1 on void and 3.46:1 on void-2 - below the 4.5:1 needed for body
        text, and it carries metadata across the whole site. Lightened here
        to 5.46:1. */
     --bone-faint: #8B7CB8;
@@ -57,7 +57,7 @@
 
     --mono:    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --sans:    "Chakra Petch", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    /* Orbitron is a display face. Headings and short labels only — a
+    /* Orbitron is a display face. Headings and short labels only - a
        paragraph set in it is unreadable, and the frozen file never does it. */
     --display: "Orbitron", "Chakra Petch", system-ui, sans-serif;
 }
@@ -140,7 +140,7 @@ body::after {
    Ported from the prototype's CSS block. Every one of these is used; the
    reduced-motion rule at the foot of this file switches all of them off.
 
-   pop     things arriving — menus, panels, a score landing on a tile
+   pop     things arriving - menus, panels, a score landing on a tile
    wob     a slow idle tilt, for the mark and the unanswered tiles
    scan    the bar above
    glitch  a rare CRT stutter on the headline
@@ -201,13 +201,13 @@ h2 { font-size: clamp(1.4rem, 2.9vw, 2.05rem); }
 h3 { font-size: 1.2rem; }
 
 /* Opt-in arcade shout. Applied to marketing headings, never to one that has
-   to deliver bad news — SOMETHING WENT WRONG set in Orbitron 900 is
+   to deliver bad news - SOMETHING WENT WRONG set in Orbitron 900 is
    shouting at somebody who has just had a problem. */
 /* AND THE FROZEN FILE'S SIZE, not just its case.
 
    The prototype sets every marketing section heading to
    clamp(24px, 3.4vw, 42px). The global h2 here is
-   clamp(1.4rem, 2.9vw, 2.05rem) — 32.8px at 1440px against the prototype's
+   clamp(1.4rem, 2.9vw, 2.05rem) - 32.8px at 1440px against the prototype's
    42px, a quarter smaller, which is why "Six of the eighteen open in two
    minutes" read as a subheading rather than as the thing the section is
    about.
@@ -222,7 +222,7 @@ h3 { font-size: 1.2rem; }
     line-height: 1.02;
 }
 
-/* h1.ds-shout keeps the h1 scale — it is already the larger of the two, and
+/* h1.ds-shout keeps the h1 scale - it is already the larger of the two, and
    letting this rule shrink a page title would be a regression on /pricing. */
 h1.ds-shout { font-size: clamp(1.85rem, 4.6vw, 3.1rem); }
 
@@ -251,7 +251,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
     margin-bottom: 14px;
 }
 
-/* The frozen file recolours this label per section — magenta where it is
+/* The frozen file recolours this label per section - magenta where it is
    introducing the part of the product you cannot see, cyan over compliance.
    It is the only thing distinguishing one uppercase mono label from the next
    as you scroll past six of them. */
@@ -316,7 +316,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
    text while the form is incomplete.
 
    That disabled state is doing real work. It is the only thing telling
-   somebody the form is not ready yet — a bright button that silently
+   somebody the form is not ready yet - a bright button that silently
    refuses to submit reads as a broken page, and it is the state this button
    spends most of its life in.
 
@@ -373,7 +373,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
 
 .ds-field { margin-bottom: 16px; }
 
-/* MONO, CYAN, UPPERCASE — the frozen file's field label, not a sentence in
+/* MONO, CYAN, UPPERCASE - the frozen file's field label, not a sentence in
    grey. It is the same label treatment as .office__k across the gap and as
    every eyebrow on the page, which is what makes a form read as part of this
    interface rather than as a generic form dropped into it. */
@@ -444,9 +444,16 @@ textarea.ds-input { resize: vertical; min-height: 110px; }
 /* ── utility ────────────────────────────────────────────────────────── */
 
 .ds-grid { display: grid; gap: 20px; }
-.ds-grid--2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-.ds-grid--3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-.ds-grid--4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+/* min(..., 100%) on the track minimum.
+
+   A bare minmax(280px, 1fr) has a MINIMUM of 280px, so inside a 244px card
+   the grid still demands 280 and pushes the card itself to 324px wide. That
+   is what made the contact form and the office card hang off the right edge
+   of a 320px screen. min() lets the track collapse to the container when
+   the container is the smaller of the two, and changes nothing above it. */
+.ds-grid--2 { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
+.ds-grid--3 { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
+.ds-grid--4 { grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); }
 
 .ds-mono { font-family: var(--mono); }
 .ds-display { font-family: var(--display); }
@@ -466,11 +473,30 @@ textarea.ds-input { resize: vertical; min-height: 110px; }
     .sec { padding-top: 48px; }
     .ds-wrap { padding: 0 18px; }
     .ds-card { padding: 20px; }
+
+    /* nowrap is right on a desktop button and wrong on a phone: the label
+       "Full pricing, and what is on sale today" is 363px on one line, which
+       is wider than the screen, and a button cannot shrink below its own
+       text. Wrapping costs a second line and removes the sideways scroll. */
+    .ds-btn { white-space: normal; max-width: 100%; }
+
+    /* Form labels were 10px. They carry the field name, so they have to be
+       readable; the mono face, colour and casing are unchanged. The tracking
+       comes in slightly so a long label still fits on one line. */
+    .ds-label { font-size: 12.5px; letter-spacing: .1em; }
+
+    /* Back links ("<- All tools") sit alone on a line and were 18px high. */
+    a.ds-faint { display: inline-block; padding: 11px 0; }
+
+    /* Inputs are tap targets as much as buttons are, and were 39px. The
+       padding is left alone so the type does not move; only the floor
+       changes. */
+    .ds-input { min-height: 44px; }
 }
 
 /* ── Reveal ───────────────────────────────────────────────────────────────
    Blocks fade up as they scroll into view. The class is applied by
-   Motion.js, which does not attach an observer at all under reduced motion —
+   Motion.js, which does not attach an observer at all under reduced motion -
    so the rules below simply never get used in that case. */
 .reveal {
     opacity: 0;
@@ -489,7 +515,7 @@ textarea.ds-input { resize: vertical; min-height: 110px; }
    no indication of where you are, which makes the page unusable without a
    mouse and fails WCAG 2.4.7.
 
-   The fix is in the same zip — ARCHIVE/ui-explorations/dShield-arcade-v5.9.1
+   The fix is in the same zip - ARCHIVE/ui-explorations/dShield-arcade-v5.9.1
    is the frozen file plus exactly this, a skip link, and the contrast repair
    already applied to --bone-faint above. The package marked the version
    without them CURRENT and filed the accessible one under ARCHIVE.
@@ -498,7 +524,7 @@ textarea.ds-input { resize: vertical; min-height: 110px; }
    likely to run the check.
 
    :focus-visible rather than :focus, so a mouse click does not leave a ring
-   behind — the ring appears for keyboard users and nobody else. Lime because
+   behind - the ring appears for keyboard users and nobody else. Lime because
    it already means "this is the thing to act on" here, and the dark outer
    shadow keeps it readable over the lime and magenta buttons where a lime
    ring alone would disappear into its own background. */
@@ -517,7 +543,7 @@ summary:focus-visible,
     box-shadow: 0 0 0 5px var(--void), 0 0 20px rgba(198, 255, 61, .33);
 }
 
-/* The skip link — the first thing a keyboard user meets. Off-screen until
+/* The skip link - the first thing a keyboard user meets. Off-screen until
    focused, then it lands top-left like any other site.
 
    Without it, tabbing into the page means walking the entire nav before
@@ -544,7 +570,7 @@ summary:focus-visible,
 }
 
 /* Somebody who has asked their operating system to stop moving things gets a
-   still page — the ticker included, which is the one element here that would
+   still page - the ticker included, which is the one element here that would
    otherwise never stop.
 
    The focus ring is deliberately NOT covered by this. It is not decoration,

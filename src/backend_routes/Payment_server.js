@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  Payment_server — checkout, payment verification, fulfilment, delivery.
+//  Payment_server - checkout, payment verification, fulfilment, delivery.
 //
 //  ⚠️  THE ONE RULE: THERE IS NO POINT HERE WHERE MONEY CAN BE TAKEN AND
 //  NOTHING DELIVERED.
@@ -11,14 +11,14 @@
 //  sequence. A customer could pay $499 and receive nothing, and it went
 //  unnoticed for months.
 //
-//  So fulfilOrder() below is the whole chain in one function — scan, report,
-//  token, email — and anything that throws inside it lands the order as
+//  So fulfilOrder() below is the whole chain in one function - scan, report,
+//  token, email - and anything that throws inside it lands the order as
 //  `failed` with a reason and an internal alert. An order is never left at
 //  `running`, and silence is never an outcome.
 //
 //    POST /api/payments/checkout      create the order, before any money
 //    POST /api/payments/verify        browser callback, fast feedback only
-//    POST /api/payments/webhook       Razorpay's webhook — THE AUTHORITY
+//    POST /api/payments/webhook       Razorpay's webhook - THE AUTHORITY
 //    GET  /api/payments/order/:ref    status for the success page to poll
 //    GET  /api/reports/:token         the paid report itself
 // ─────────────────────────────────────────────────────────────────────────
@@ -47,7 +47,7 @@ const TTL_DAYS = () => Number(process.env.REPORT_LINK_TTL_DAYS || 30);
    Terms change, we still know which text they agreed to. */
 const TERMS_VERSION = 1;
 
-/** Razorpay's REST API over plain https — no SDK, no new dependency. */
+/** Razorpay's REST API over plain https - no SDK, no new dependency. */
 function razorpay(path, body) {
     return new Promise((resolve, reject) => {
         const payload = body ? JSON.stringify(body) : null;
@@ -81,7 +81,7 @@ function razorpay(path, body) {
     });
 }
 
-/** Constant-time comparison — a signature check that leaks timing is not one. */
+/** Constant-time comparison - a signature check that leaks timing is not one. */
 function safeEqual(a, b) {
     const x = Buffer.from(String(a) || "", "utf8");
     const y = Buffer.from(String(b) || "", "utf8");
@@ -95,7 +95,7 @@ const query = (sql, params = []) => new Promise((resolve, reject) =>
 /** Tell a human. A paid order that could not be fulfilled must not be quiet. */
 function alertInternal(subject, payload) {
     const to = String(process.env.ENQUIRY_ALERT_TO || "").trim();
-    if (!to) return console.error("⚠️  ENQUIRY_ALERT_TO is not set — nobody will be told:", subject);
+    if (!to) return console.error("⚠️  ENQUIRY_ALERT_TO is not set - nobody will be told:", subject);
     queueMail(db, {
         to, cc: process.env.ENQUIRY_ALERT_CC || "",
         template: "fulfilment_failed", category: "internal",
@@ -104,7 +104,7 @@ function alertInternal(subject, payload) {
 }
 
 /* ═════════════════════════════════════════════════════════════════════════
-   fulfilOrder — the chain.
+   fulfilOrder - the chain.
 
    IDEMPOTENT BY DATABASE GUARANTEE, not by a flag in memory. Step 1 claims
    the order with a conditional UPDATE and returns immediately if it affected
@@ -125,7 +125,7 @@ async function fulfilOrder(orderRef) {
         await query("UPDATE orders SET fulfilment_status='failed', fulfilment_error=? WHERE order_ref=?",
             [String(reason).slice(0, 500), orderRef]);
         console.error(`❌ Fulfilment failed for ${orderRef}: ${reason}`);
-        alertInternal(alertSubject || `Fulfilment failed — ${orderRef}`, {
+        alertInternal(alertSubject || `Fulfilment failed - ${orderRef}`, {
             orderRef, tier: order.tier, domain: order.domain, email: order.email,
             amountInr: order.amount_paise / 100, error: String(reason).slice(0, 300),
         });
@@ -138,7 +138,7 @@ async function fulfilOrder(orderRef) {
         if (Number(order.amount_paid_paise) !== Number(order.amount_paise)) {
             return await failOrder(
                 `Amount mismatch: asked ${order.amount_paise} paise, received ${order.amount_paid_paise}`,
-                `⚠️ Amount mismatch on a paid order — ${orderRef}`);
+                `⚠️ Amount mismatch on a paid order - ${orderRef}`);
         }
 
         // 3 · The scan they paid for, at the tier they paid for.
@@ -146,12 +146,12 @@ async function fulfilOrder(orderRef) {
 
         /* 4 · An inconclusive scan does NOT fail the order silently. They have
            paid. We tell them plainly that we could not complete it and that a
-           person will be in touch — a refund is a human decision, not an
+           person will be in touch - a refund is a human decision, not an
            automatic one, and silence is the single unacceptable outcome. */
         if (scan.status === "inconclusive") {
             await query("UPDATE orders SET fulfilment_status='failed', fulfilment_error=?, scan_id=? WHERE order_ref=?",
-                ["Scan was inconclusive — too few checks completed to publish a report", null, orderRef]);
-            alertInternal(`⚠️ Paid scan inconclusive — ${orderRef}`, {
+                ["Scan was inconclusive - too few checks completed to publish a report", null, orderRef]);
+            alertInternal(`⚠️ Paid scan inconclusive - ${orderRef}`, {
                 orderRef, tier: order.tier, domain: order.domain, email: order.email,
                 amountInr: order.amount_paise / 100,
                 error: `Only ${scan.checksCompleted} of ${scan.checksRun} checks completed. The customer has paid and needs a person.`,
@@ -193,7 +193,7 @@ async function fulfilOrder(orderRef) {
         console.log(`✅ Delivered ${order.tier} report for ${order.domain} (${orderRef})`);
 
         /* 9 · The PDF, LAST and deliberately so.
-           Chrome is the least reliable thing in this chain — it needs memory,
+           Chrome is the least reliable thing in this chain - it needs memory,
            a binary on disk and a few seconds. Generating it before the order
            is marked delivered would let a Chrome problem turn a completed
            purchase into a failed one. A missing PDF is an inconvenience; a
@@ -218,7 +218,7 @@ async function fulfilOrder(orderRef) {
 async function generatePdfFor(orderRef, report, order) {
     const avail = await isPdfAvailable();
     if (!avail.ok) {
-        // Not an error — PDF_ENABLED=false is a legitimate configuration and
+        // Not an error - PDF_ENABLED=false is a legitimate configuration and
         // must be silent rather than alarming.
         console.log(`ℹ️  PDF not generated for ${orderRef}: ${avail.reason}`);
         return;
@@ -231,15 +231,15 @@ async function generatePdfFor(orderRef, report, order) {
         await query(
             "UPDATE orders SET pdf_status='ready', pdf_path=?, pdf_sha256=?, pdf_bytes=?, pdf_error=NULL WHERE order_ref=?",
             [out.relPath, out.sha256, out.bytes, orderRef]);
-        console.log(`📄 PDF ready for ${orderRef} — ${out.bytes} bytes`);
+        console.log(`📄 PDF ready for ${orderRef} - ${out.bytes} bytes`);
     } catch (err) {
         await query("UPDATE orders SET pdf_status='failed', pdf_error=? WHERE order_ref=?",
             [String(err.message).slice(0, 500), orderRef]).catch(() => {});
         console.error(`⚠️  PDF failed for ${orderRef}: ${err.message}`);
-        alertInternal(`⚠️ PDF generation failed — ${orderRef}`, {
+        alertInternal(`⚠️ PDF generation failed - ${orderRef}`, {
             orderRef, tier: order.tier, domain: order.domain, email: order.email,
             amountInr: order.amount_paise / 100,
-            error: `${err.message} — the customer HAS their report page and email; only the PDF is missing.`,
+            error: `${err.message} - the customer HAS their report page and email; only the PDF is missing.`,
         });
     }
 }
@@ -269,7 +269,7 @@ router.post("/checkout", async (req, res) => {
 
     const email = clean(req.body?.email, 190);
     if (!email || !EMAIL_RE.test(email)) {
-        return res.status(400).json({ success: false, message: "Enter a valid email address — this is where the report is sent." });
+        return res.status(400).json({ success: false, message: "Enter a valid email address - this is where the report is sent." });
     }
 
     /* An assessment tier with no domain is refused HERE, before any money
@@ -325,7 +325,7 @@ router.post("/checkout", async (req, res) => {
 
 // ── POST /api/payments/verify ────────────────────────────────────────────
 //
-// The browser callback. Used ONLY to show the customer a result quickly —
+// The browser callback. Used ONLY to show the customer a result quickly -
 // the webhook is the authority. Anyone can post to this endpoint, so the
 // signature is checked before anything happens.
 router.post("/verify", async (req, res) => {
@@ -359,7 +359,7 @@ router.post("/verify", async (req, res) => {
  * Record a payment against an order.
  *
  * `payment_id` is UNIQUE, so a second call for the same payment updates
- * nothing and the caller sees affectedRows 0 — the point at which duplicate
+ * nothing and the caller sees affectedRows 0 - the point at which duplicate
  * fulfilment becomes impossible rather than merely unlikely.
  */
 async function markPaid(razorpayOrderId, paymentId, amountPaidPaise) {
@@ -377,7 +377,7 @@ async function markPaid(razorpayOrderId, paymentId, amountPaidPaise) {
              WHERE razorpay_order_id=? AND status='pending'`,
             [paymentId, amount, razorpayOrderId]);
     } catch (err) {
-        // Duplicate payment_id — this payment is already recorded. Not an error.
+        // Duplicate payment_id - this payment is already recorded. Not an error.
         if (err.code !== "ER_DUP_ENTRY") throw err;
     }
     return { orderRef: order.order_ref };
@@ -385,7 +385,7 @@ async function markPaid(razorpayOrderId, paymentId, amountPaidPaise) {
 
 // ── POST /api/payments/webhook ───────────────────────────────────────────
 //
-// THE AUTHORITY. Mounted with express.raw in server.js — see the note there.
+// THE AUTHORITY. Mounted with express.raw in server.js - see the note there.
 router.post("/webhook", async (req, res) => {
     const raw = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body || {}));
     const signature = req.get("x-razorpay-signature") || "";
@@ -396,7 +396,7 @@ router.post("/webhook", async (req, res) => {
         const expected = crypto.createHmac("sha256", secret).update(raw).digest("hex");
         valid = safeEqual(expected, signature);
     } else {
-        console.error("⚠️  RAZORPAY_WEBHOOK_SECRET is not set — webhook signatures cannot be verified.");
+        console.error("⚠️  RAZORPAY_WEBHOOK_SECRET is not set - webhook signatures cannot be verified.");
     }
 
     let body = {};
@@ -405,7 +405,7 @@ router.post("/webhook", async (req, res) => {
     const payment = body?.payload?.payment?.entity || {};
 
     /* Log FIRST, valid or not. When a customer says they paid and got
-       nothing, this table is the only thing that can settle it — and an
+       nothing, this table is the only thing that can settle it - and an
        invalid signature is exactly the row worth keeping. */
     await query(
         "INSERT INTO payment_events (event_type, razorpay_order_id, payment_id, signature_valid, raw_body) VALUES (?, ?, ?, ?, ?)",
@@ -506,7 +506,7 @@ reportsRouter.get("/:token.pdf", async (req, res) => {
         if (error === "expired") {
             return res.status(410).json({
                 success: false, expired: true,
-                message: "This report link has expired. Your report still exists — write to us and we will send you a fresh link.",
+                message: "This report link has expired. Your report still exists - write to us and we will send you a fresh link.",
             });
         }
 
@@ -570,7 +570,7 @@ reportsRouter.get("/:token.json", async (req, res) => {
 });
 
 /* ⚠️  THE PAGE ROUTE IS REGISTERED LAST, AND MUST STAY LAST.
-   Express matches in order and `:token` happily matches "abc.pdf" — so if
+   Express matches in order and `:token` happily matches "abc.pdf" - so if
    this came first, every download would be answered by the page route with
    a token it considered malformed. */
 reportsRouter.get("/:token", async (req, res) => {
@@ -592,7 +592,7 @@ reportsRouter.get("/:token", async (req, res) => {
         if (o.report_expires_at && new Date(o.report_expires_at) < new Date()) {
             return res.status(410).json({
                 success: false, expired: true,
-                message: "This report link has expired. Your report still exists — write to us and we will send you a fresh link.",
+                message: "This report link has expired. Your report still exists - write to us and we will send you a fresh link.",
                 domain: o.domain, expiredOn: o.report_expires_at,
             });
         }

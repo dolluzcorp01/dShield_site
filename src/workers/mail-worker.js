@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  mail-worker — drains mail_outbox.
+//  mail-worker - drains mail_outbox.
 //
 //  A setInterval poller, not a queue library. There is no Redis in this app
 //  and introducing one to send four emails a day would be absurd.
@@ -8,7 +8,7 @@
 //
 //  Under PM2 cluster mode, four processes would each poll this same table on
 //  the same schedule and every message would go out four times. Marking a row
-//  'sending' before work narrows the window but does not close it — two
+//  'sending' before work narrows the window but does not close it - two
 //  processes can still SELECT the same row before either UPDATEs it.
 //
 //  If this is ever scaled, the fix is a lock (SELECT ... FOR UPDATE SKIP
@@ -38,7 +38,7 @@ function claim(db, callback) {
 }
 
 function markFailed(db, row, err) {
-    // Back to 'queued', not 'failed' — the row is retried until attempts hits
+    // Back to 'queued', not 'failed' - the row is retried until attempts hits
     // the ceiling, at which point it simply stops being selected. It is never
     // deleted: a permanently undelivered email is something somebody needs to
     // be able to find and act on.
@@ -84,7 +84,7 @@ function processRow(db, row, done) {
 
     /* Suppression is checked HERE as well as at signup, and only for
        marketing. Someone can unsubscribe between a message being queued and
-       it being sent — the signup check prevents a subscription, this one
+       it being sent - the signup check prevents a subscription, this one
        prevents a delivery, and they are not the same guard.
 
        Transactional mail is deliberately exempt: a scan result is something
@@ -142,14 +142,14 @@ function tick(db) {
  * Start polling. Returns the interval handle so a caller could stop it.
  *
  * With no API key configured this still starts and still logs once, but
- * leaves rows 'queued' rather than failing them — so a developer running
+ * leaves rows 'queued' rather than failing them - so a developer running
  * locally can exercise the whole flow, see rows appear, and have them go out
  * the moment a key is added rather than having to re-create them.
  */
 function startMailWorker(db) {
     /* Recover rows stranded in 'sending'.
-       If the process died between claiming a batch and finishing it — a
-       restart, a deploy, a crash — those rows are 'sending' and the claim
+       If the process died between claiming a batch and finishing it - a
+       restart, a deploy, a crash - those rows are 'sending' and the claim
        query only ever looks at 'queued', so nothing would touch them again.
        They would sit there looking busy forever, which is precisely the
        silent mail loss this whole table exists to prevent.
@@ -167,7 +167,7 @@ function startMailWorker(db) {
     );
 
     if (!isConfigured()) {
-        console.log("✉️  Mail worker started, but SENDGRID_API_KEY is not configured — messages will queue and wait.");
+        console.log("✉️  Mail worker started, but SENDGRID_API_KEY is not configured - messages will queue and wait.");
         return null;
     }
     console.log(`✉️  Mail worker started, polling every ${TICK_MS / 1000}s.`);

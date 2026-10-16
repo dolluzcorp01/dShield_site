@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  meta — per-route <title>, description, canonical and robots.
+//  meta - per-route <title>, description, canonical and robots.
 //
 //  No SEO library. The usual React head-management packages are a
 //  dependency, a provider to wire and a maintenance surface, and what they
@@ -8,7 +8,7 @@
 //  WHAT THIS FIXES, AND WHAT IT DOES NOT.
 //
 //  Google executes JavaScript, so it sees these tags. Most social preview
-//  crawlers — WhatsApp, Slack, LinkedIn, Twitter — fetch the raw HTML and
+//  crawlers - WhatsApp, Slack, LinkedIn, Twitter - fetch the raw HTML and
 //  never run it. A link pasted into WhatsApp will show whatever is in
 //  public/index.html, NOT the tags set here.
 //
@@ -56,7 +56,7 @@ function upsertLink(rel, href) {
  *
  * @param title       full <title>, including the " | dShield" suffix
  * @param description meta description
- * @param canonical   absolute path, e.g. "/tools/ssl" — resolved against SITE_URL
+ * @param canonical   absolute path, e.g. "/tools/ssl" - resolved against SITE_URL
  * @param noindex     true to ask crawlers not to index this page
  *
  * Nothing is restored on unmount: every route sets its own on mount, so a

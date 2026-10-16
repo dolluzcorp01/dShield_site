@@ -1,10 +1,10 @@
-# Claude Code — dShield Site · Task 09
-## Bolt — the guide
+# Claude Code - dShield Site · Task 09
+## Bolt - the guide
 
 **Repo:** `dolluzcorp01/dShield_site` · branch `main`
 **Prerequisite:** Task 08 merged (the arcade theme)
 **Source:** the v6.3 package,
-`CURRENT/frontend/01-customer-website-v5.9-FROZEN.jsx`, lines 372–489
+`CURRENT/frontend/01-customer-website-v5.9-FROZEN.jsx`, lines 372-489
 
 **Do not touch:** `src/utils/checks/*` · `src/utils/scan_engine.js` ·
 `src/utils/tools_engine.js` · `src/utils/suppression.js` ·
@@ -24,7 +24,7 @@ result and wants him.
 
 He is worth having, and for a reason worth stating so it survives future edits:
 
-> Every line he says is doing a job — telling you what to do next. He is
+> Every line he says is doing a job - telling you what to do next. He is
 > navigation wearing a costume, not decoration.
 
 That is the design note in the frozen file, and it is the test for any change
@@ -36,7 +36,7 @@ to him later. A mascot that says *"Hi, I'm Bolt!"* has failed. One that says
 ## What Bolt is
 
 An inline SVG, 200×230, with **four moods** driven entirely by the state the
-hero already has. He is stateless — he takes props and renders.
+hero already has. He is stateless - he takes props and renders.
 
 | Mood | When | He says | He does |
 |---|---|---|---|
@@ -61,7 +61,7 @@ invisible when right and ridiculous when wrong:
 
 > Bolt stands to the RIGHT of the input box, so his LEFT arm is the one that
 > points at it. Pointing with the right arm aimed him at the WhatsApp button on
-> the far edge of the screen — the opposite of the instruction he is giving.
+> the far edge of the screen - the opposite of the instruction he is giving.
 
 Arm angles, for the **left** arm: greet `−18°`, typing `−6°`, scanning `42°`,
 done `−74°`.
@@ -74,23 +74,23 @@ worse than no mascot.
 
 ## What to build
 
-### 1 · `src/Bolt.js` — new file
+### 1 · `src/Bolt.js` - new file
 
-Port the SVG from the frozen file, lines 372–489. Two components:
+Port the SVG from the frozen file, lines 372-489. Two components:
 
-- `Bolt({ mood, look })` — the robot
-- `Type({ text, speed })` — the typewriter
+- `Bolt({ mood, look })` - the robot
+- `Type({ text, speed })` - the typewriter
 
 **Adapt the palette to CSS variables.** The source uses a local `A` object.
 This repo has variables in `index.css` after Task 08. Read them with
-`getComputedStyle` once, or accept them as props — do not hardcode a second
+`getComputedStyle` once, or accept them as props - do not hardcode a second
 copy of the palette. Two palettes drift.
 
 The gradient IDs in the SVG (`bodyG`, `visorG`, `glow`) are global to the
 document. If Bolt is ever rendered twice on one page they collide. **Prefix
-them uniquely** — a `useId()` suffix — even though today he appears once.
+them uniquely** - a `useId()` suffix - even though today he appears once.
 
-### 2 · `src/Bolt.css` — new file
+### 2 · `src/Bolt.css` - new file
 
 The eleven keyframes he needs: `boltFloat`, `boltShake`, `blink`, `armIdle`,
 `corePulse`, `blip`, `spark`, `thrust`, `sweep`, `chatter`, `caret`.
@@ -103,13 +103,13 @@ not a charming detail, it is a reason to leave the page. Under reduced motion
 he should render still, in his correct pose, with his line shown complete
 rather than typed.
 
-### 3 · `src/Home.js` — place him
+### 3 · `src/Home.js` - place him
 
 Task 08 left a comment marking where he goes. Two-column hero: copy and scan
 box on the left, Bolt on the right, with a speech bubble above him and
 `BOLT · YOUR GUIDE` beneath in mono.
 
-**Mood comes from state the component already has** — whether the input has
+**Mood comes from state the component already has** - whether the input has
 text, whether a scan is running, whether a result arrived. Do not add new
 state for Bolt beyond the pointer position.
 
@@ -118,7 +118,7 @@ window, throttled with `requestAnimationFrame`. Convert to −1..1 relative to
 Bolt's centre. Remove the listener on unmount.
 
 **The scanning line says `n/4 AREAS IN`, not `n/5`.** The frozen prototype was
-written when the free scan covered five domains. It covers **four** —
+written when the free scan covered five domains. It covers **four** -
 External Attack Surface, Encryption & Certificates, Email & Domain Security,
 Brand & Digital Risk. Verify this against `src/utils/checks/index.js` before
 writing the number, and use what the code says.
@@ -127,7 +127,7 @@ A mascot that miscounts the product is worse than no mascot.
 
 ### 4 · Mobile
 
-Below 860px, **hide Bolt entirely** — `display: none`, not a scaled-down
+Below 860px, **hide Bolt entirely** - `display: none`, not a scaled-down
 version. He is 200×230 plus a speech bubble; on a phone he pushes the scan box
 below the fold, and the scan box is the entire purpose of the page.
 
@@ -155,19 +155,19 @@ CSS.
 ## Verification
 
 ```bash
-# 1 — build
+# 1 - build
 npx react-scripts build
 
-# 2 — boot
+# 2 - boot
 node server.js &
 curl -s localhost:4008/api/health
 
-# 3 — NOTHING FUNCTIONAL CHANGED
+# 3 - NOTHING FUNCTIONAL CHANGED
 curl -s -X POST localhost:4008/api/scan \
      -H "Content-Type: application/json" \
      -d '{"domain":"github.com"}'
 
-# 4 — both verify scripts
+# 4 - both verify scripts
 node scripts/verify-checks.js
 node scripts/verify-remediation.js
 ```
@@ -185,7 +185,7 @@ Check each mood by driving the state:
 
 Then:
 
-- Move the cursor around the hero — **do the pupils follow?**
+- Move the cursor around the hero - **do the pupils follow?**
 - Does each line type out character by character with a caret?
 - At 1280px, 1024px and 900px, does he overlap anything?
 - At 800px and below, is he gone entirely and is the scan box at the top?

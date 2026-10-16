@@ -1,5 +1,5 @@
 -- ─────────────────────────────────────────────────────────────────────────
---  dShield Global Site — orders and payment events
+--  dShield Global Site - orders and payment events
 --
 --  RUN THIS AFTER schema.sql, schema-legal.sql AND schema-mail.sql.
 --
@@ -17,7 +17,7 @@ USE dshield;
 -- ── orders ───────────────────────────────────────────────────────────────
 --
 -- The order records WHAT WAS BOUGHT, before any money moves. v6.3 accepted a
--- domain at checkout, validated it, and discarded it — so even a correct
+-- domain at checkout, validated it, and discarded it - so even a correct
 -- webhook arrived with nothing to scan. The domain is stored here at
 -- creation and an assessment tier without one is refused before payment.
 --
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS orders (
 -- Every webhook received, exactly as it arrived, valid or not. NEVER DELETED.
 --
 -- When a customer says they paid and got nothing, this is the only place
--- that can settle it — and a webhook with a bad signature is precisely the
+-- that can settle it - and a webhook with a bad signature is precisely the
 -- one worth keeping, because it is either an integration fault or somebody
 -- probing the endpoint.
 CREATE TABLE IF NOT EXISTS payment_events (
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS payment_events (
 -- and this file must stay safe to re-run.
 --
 -- The report is stored as built. Re-opening a paid link must show the same
--- document a customer already read — a report that changes when you reload
+-- document a customer already read - a report that changes when you reload
 -- it is not something anyone can act on, and it is what they paid for.
 SET @col := (
   SELECT COUNT(*) FROM information_schema.COLUMNS

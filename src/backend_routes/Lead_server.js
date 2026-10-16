@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  Lead_server — enquiries, notify-me signups, and the pricing content.
+//  Lead_server - enquiries, notify-me signups, and the pricing content.
 //
 //  POST /api/leads/enquiry     someone wants to talk to a person
 //  POST /api/leads/notify      "tell me when paid tiers open"
@@ -21,7 +21,7 @@ const { getPlans, paymentsConfigured } = require("../data/plans");
 
 /* Service slugs, mirrored from SERVICE_LABELS in src/Pages.js. Kept here so
    an enquiry alert reads "Penetration Testing" rather than
-   "penetration-testing" — whoever picks it up should not have to decode a
+   "penetration-testing" - whoever picks it up should not have to decode a
    URL slug. */
 const TOPIC_LABELS = {
     "technical-assurance": "Technical Assurance",
@@ -55,7 +55,7 @@ router.post("/enquiry", (req, res) => {
         domain: clean(req.body?.domain, 253),
         /* An enquiry can now arrive from a service card with a slug in
            `topic`, or from the tier selector with `tier`. Both are the same
-           kind of thing — a free-text marker for what the person is after —
+           kind of thing - a free-text marker for what the person is after -
            so both land in tier_interest rather than earning a column. A
            migration for one string is not worth the schema drift.
 
@@ -64,7 +64,7 @@ router.post("/enquiry", (req, res) => {
 
            Clamped to 40, not 60. enquiries.tier_interest is VARCHAR(40) and
            this server runs under STRICT_TRANS_TABLES, so a 60-character topic
-           would not truncate — it would raise "Data too long for column" and
+           would not truncate - it would raise "Data too long for column" and
            lose the whole enquiry to a 500. Every slug we emit is well under
            40; the cap is here for anything hand-crafted in a URL. */
         tier_interest: clean(req.body?.topic, 40) || clean(req.body?.tier, 40),
@@ -83,7 +83,7 @@ router.post("/enquiry", (req, res) => {
            provider outage cannot lose them.
 
            Neither is allowed to affect the response. The enquiry is stored,
-           which is the part that matters to the visitor — if queueing fails
+           which is the part that matters to the visitor - if queueing fails
            we log it and still say thank you. */
         const payload = {
             name: row.name, email: row.email, company: row.company, phone: row.phone,
@@ -95,7 +95,7 @@ router.post("/enquiry", (req, res) => {
 
         queueMail(db, {
             to: row.email, template: "enquiry_ack", category: "transactional",
-            subject: "We have your message — Dolluz Corp", payload,
+            subject: "We have your message - Dolluz Corp", payload,
         }, (qErr) => { if (qErr) console.error("⚠️  Could not queue enquiry acknowledgement:", qErr.message); });
 
         const alertTo = String(process.env.ENQUIRY_ALERT_TO || "").trim();
@@ -103,19 +103,19 @@ router.post("/enquiry", (req, res) => {
             /* Copy the rest of the team. An alert that reaches one inbox
                nobody happens to be watching is the same failure as no alert
                at all. Addresses live in ENQUIRY_ALERT_CC rather than in this
-               file — who should see an enquiry is configuration, and changing
+               file - who should see an enquiry is configuration, and changing
                it should not need a deploy. */
             queueMail(db, {
                 to: alertTo, cc: process.env.ENQUIRY_ALERT_CC || "",
                 template: "enquiry_alert", category: "internal",
-                subject: `Enquiry from ${payload.name || payload.email} — ${payload.topicLabel || payload.tier || "general"}`,
+                subject: `Enquiry from ${payload.name || payload.email} - ${payload.topicLabel || payload.tier || "general"}`,
                 payload,
             }, (qErr) => { if (qErr) console.error("⚠️  Could not queue enquiry alert:", qErr.message); });
         } else {
             // Louder than a shrug: with no address set, nobody is told an
             // enquiry arrived, which is the exact failure this task exists
             // to fix.
-            console.error("⚠️  ENQUIRY_ALERT_TO is not set — nobody will be notified of this enquiry.");
+            console.error("⚠️  ENQUIRY_ALERT_TO is not set - nobody will be notified of this enquiry.");
         }
 
         res.json({
@@ -156,7 +156,7 @@ router.post("/notify", (req, res) => {
        A tick-box that changes nothing is worse than no tick-box: it collects a
        decision, ignores it, and leaves the person believing they opted out.
 
-       "notify_me" has no box — that form IS the marketing signup — so it stays
+       "notify_me" has no box - that form IS the marketing signup - so it stays
        opted in by default, exactly as before. */
     const marketingOptIn = source === "free_scan"
         ? req.body?.marketingOptIn === true
@@ -179,7 +179,7 @@ router.post("/notify", (req, res) => {
     /* Check the suppression list BEFORE writing anything.
        Somebody who has unsubscribed and later fills in a form must not be
        quietly re-subscribed by it. They are also not told they are on a
-       suppression list — that would let anyone test whether a given address
+       suppression list - that would let anyone test whether a given address
        had ever unsubscribed, which is nobody's business but theirs. The
        response is the ordinary one, and no row is written. */
     isSuppressed(db, address, (supErr, suppressed) => {
@@ -224,8 +224,8 @@ router.post("/notify", (req, res) => {
                 res.json({ success: true, message: done });
 
                 /* No tick, no marketing mail. The lead row above still exists
-                   — they asked for their result and we have to be able to send
-                   it — but nothing in the marketing category goes out.
+                   - they asked for their result and we have to be able to send
+                   it - but nothing in the marketing category goes out.
 
                    ⚠️  THE TICK ITSELF IS NOT YET STORED. `leads` has no consent
                    column, so what is recorded is the CONSEQUENCE of the answer
@@ -238,7 +238,7 @@ router.post("/notify", (req, res) => {
                 /* Read the token BACK rather than using the one generated
                    above. On the duplicate-key path COALESCE keeps whatever
                    token the row already had, so the value we just generated
-                   may not be the one stored — and an unsubscribe link built
+                   may not be the one stored - and an unsubscribe link built
                    from a token that is not in the database is a link that
                    cannot work. */
                 db.query(
@@ -253,7 +253,7 @@ router.post("/notify", (req, res) => {
                             to: address,
                             template: "notify_confirm",
                             category: "marketing",
-                            subject: "You are on the list — dShield",
+                            subject: "You are on the list - dShield",
                             payload: { unsubscribeToken: rows[0].unsubscribe_token },
                         }, (qErr) => { if (qErr) console.error("⚠️  Could not queue notify confirmation:", qErr.message); });
                     }
@@ -268,7 +268,7 @@ router.post("/notify", (req, res) => {
 // Served from the API rather than hardcoded in the React bundle so a price
 // change is a data change, not a rebuild and redeploy.
 //
-// The list itself now lives in src/data/plans.js, shared with checkout —
+// The list itself now lives in src/data/plans.js, shared with checkout -
 // the pricing page and the till disagreeing about what something costs is
 // the kind of problem you hear about from a customer.
 router.get("/pricing", (req, res) => {

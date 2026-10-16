@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // ─────────────────────────────────────────────────────────────────────────
-//  verify-site-content — assert the words agree with the engine.
+//  verify-site-content - assert the words agree with the engine.
 //
 //      node scripts/verify-site-content.mjs
 //
@@ -16,7 +16,7 @@
 //  terms. The site listed five, the engine ran its checks, and nothing
 //  compared the two lists.
 //
-//  This script is that comparison. It enumerates BOTH directions — every
+//  This script is that comparison. It enumerates BOTH directions - every
 //  area the site promises must be an area the engine reaches, and every
 //  domain the engine scans must be an area the site names. Sampling finds
 //  the instance; enumeration finds the class.
@@ -50,7 +50,7 @@ const siteNumbers = C.DOMAINS.map((d) => d.n).sort((a, b) => a - b);
 const engineNumbers = ALL_DOMAINS.map((d) => d.no).sort((a, b) => a - b);
 String(siteNumbers) === String(engineNumbers)
     ? pass("area numbers line up exactly")
-    : fail(`area numbers differ — site ${siteNumbers} vs engine ${engineNumbers}`);
+    : fail(`area numbers differ - site ${siteNumbers} vs engine ${engineNumbers}`);
 
 // ── 2 · the promise, in both directions ──────────────────────────────────
 //  This is the v6.3 defect. Do not relax either half.
@@ -59,12 +59,12 @@ const scanned = ALL_DOMAINS.filter((d) => d.scanned).map((d) => d.no).sort((a, b
 const reached = [...new Set(checksForTier("snapshot").map((c) => c.domain))].sort((a, b) => a - b);
 
 String(promised) === String(scanned)
-    ? pass(`site promises areas ${promised.join(", ")} — engine marks the same five scanned`)
+    ? pass(`site promises areas ${promised.join(", ")} - engine marks the same five scanned`)
     : fail(`site promises ${promised.join(", ")}, engine marks ${scanned.join(", ")} as scanned`);
 
 String(promised) === String(reached)
     ? pass(`free scan actually reaches all ${reached.length} promised areas`)
-    : fail(`PROMISE BROKEN — site lights ${promised.join(", ")}, snapshot checks only reach ${reached.join(", ")}`);
+    : fail(`PROMISE BROKEN - site lights ${promised.join(", ")}, snapshot checks only reach ${reached.join(", ")}`);
 
 const unreached = promised.filter((n) => !reached.includes(n));
 unreached.length
@@ -83,7 +83,7 @@ unpromised.length
 //  their own domain.
 const fabricated = C.DOMAINS.filter((d) => d.score !== undefined || d.found !== undefined);
 fabricated.length
-    ? fail(`fabricated scan data in DOMAINS: ${fabricated.map((d) => d.n).join(", ")} — real numbers come from the scan response`)
+    ? fail(`fabricated scan data in DOMAINS: ${fabricated.map((d) => d.n).join(", ")} - real numbers come from the scan response`)
     : pass("no hardcoded scores or findings in the area table");
 
 // ── 4 · the unscanned eighteen each explain themselves ───────────────────
@@ -149,4 +149,4 @@ if (failures) {
     console.log(`❌ ${failures} disagreement(s) between the site and the engine\n`);
     process.exit(1);
 }
-console.log(`✅ site and engine agree — ${C.DOMAINS.length} areas named, ${promised.length} promised, ${promised.length} reached\n`);
+console.log(`✅ site and engine agree - ${C.DOMAINS.length} areas named, ${promised.length} promised, ${promised.length} reached\n`);

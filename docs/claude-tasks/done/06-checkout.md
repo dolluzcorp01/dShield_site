@@ -1,5 +1,5 @@
-# Claude Code — dShield Site · Task 06
-## Checkout, payment, and delivery — the whole chain
+# Claude Code - dShield Site · Task 06
+## Checkout, payment, and delivery - the whole chain
 
 **Repo:** `dolluzcorp01/dShield_site` · branch `main`
 **Prerequisite:** Task 05c merged (`f2c2378`)
@@ -36,7 +36,7 @@ nothing and say why.
 
 ---
 
-## Design decisions — follow these, do not substitute
+## Design decisions - follow these, do not substitute
 
 ### HTML report now, PDF later
 
@@ -58,16 +58,16 @@ of that callback.** Anyone can post whatever they like to your endpoint.
 
 Two independent paths, and fulfilment happens on whichever arrives first:
 
-1. **Webhook** — `POST /api/payments/webhook`, signature verified with
+1. **Webhook** - `POST /api/payments/webhook`, signature verified with
    `RAZORPAY_WEBHOOK_SECRET` against the **raw request body**. This is the
    authority.
-2. **Browser callback** — `POST /api/payments/verify`, HMAC-SHA256 of
+2. **Browser callback** - `POST /api/payments/verify`, HMAC-SHA256 of
    `order_id|payment_id` with the key secret. Used only to show the customer a
    result quickly.
 
 Both call the same `fulfilOrder(orderId)`, which must be **idempotent**. A
 webhook that arrives twice, or a webhook racing the browser callback, must
-produce one scan, one report and one email — never two.
+produce one scan, one report and one email - never two.
 
 Make it idempotent with a database guarantee, not a flag in memory: a unique
 constraint on `orders.payment_id`, and a status transition that only proceeds
@@ -76,7 +76,7 @@ constraint on `orders.payment_id`, and a status transition that only proceeds
 ### Raw body for the webhook signature
 
 `server.js` mounts `express.json()` globally. Signature verification needs the
-**exact bytes** Razorpay sent — a parsed and re-stringified body will not
+**exact bytes** Razorpay sent - a parsed and re-stringified body will not
 match, and the failure looks like a wrong secret.
 
 Mount `express.raw({ type: 'application/json' })` on the webhook path only,
@@ -86,7 +86,7 @@ like a mistake to anyone who does not know.
 ### The order records what was bought, before payment
 
 `orders` carries the **domain** at creation. In v6.3 the checkout accepted a
-domain, validated it, and discarded it — so even a correct webhook had nothing
+domain, validated it, and discarded it - so even a correct webhook had nothing
 to scan.
 
 Reject an assessment tier with no domain at checkout, **before money moves**,
@@ -98,7 +98,7 @@ The browser sends a tier key. It never sends an amount. Read the price from
 `PLANS`, and store `amount_paise` on the order at creation.
 
 At fulfilment, compare the amount Razorpay reports against the stored amount.
-If they differ, do not fulfil — record it and alert. That is either a bug or
+If they differ, do not fulfil - record it and alert. That is either a bug or
 someone tampering, and both need a human.
 
 ### One price list, not two
@@ -108,14 +108,14 @@ someone tampering, and both need a human.
 page disagreeing about what something costs is a problem you find out about
 from a customer.
 
-Add `amountPaise` per plan. Razorpay works in the smallest currency unit —
+Add `amountPaise` per plan. Razorpay works in the smallest currency unit -
 ₹4,312 is `431200`. Getting this wrong by a factor of a hundred is the classic
 first-integration bug, in both directions.
 
 ### Failure states are visible, not silent
 
 Every order carries a `fulfilment_status`. When a paid order cannot be
-fulfilled — scan failed, report failed, mail failed — it lands as `failed`
+fulfilled - scan failed, report failed, mail failed - it lands as `failed`
 with the reason, and an internal alert goes to `ENQUIRY_ALERT_TO`.
 
 A paid order with no report must be something a person can find in one query,
@@ -125,7 +125,7 @@ not something a customer has to tell you about.
 
 ## What to build
 
-### 1 · `db/schema-orders.sql` — new file
+### 1 · `db/schema-orders.sql` - new file
 
 Applied after the existing three. Add it to the README setup steps.
 
@@ -146,7 +146,7 @@ Applied after the existing three. Add it to the README setup steps.
 | `fulfilment_status` | ENUM('none','running','delivered','failed') NOT NULL DEFAULT 'none' | |
 | `fulfilment_error` | VARCHAR(500) NULL | |
 | `razorpay_order_id` | VARCHAR(60) NULL | |
-| `payment_id` | VARCHAR(60) NULL | **UNIQUE** — the idempotency guarantee |
+| `payment_id` | VARCHAR(60) NULL | **UNIQUE** - the idempotency guarantee |
 | `amount_paid_paise` | INT UNSIGNED NULL | what actually arrived |
 | `terms_version` | SMALLINT UNSIGNED NULL | which Terms they accepted |
 | `scan_id` | CHAR(36) NULL | the scan this order paid for |
@@ -160,7 +160,7 @@ Indexes on `status`, `fulfilment_status`, `email`, `razorpay_order_id`.
 webhook for the same payment fails the insert and is caught, rather than
 producing a second report.
 
-**Table `payment_events`** — every webhook received, raw. `id`, `event_type`,
+**Table `payment_events`** - every webhook received, raw. `id`, `event_type`,
 `razorpay_order_id`, `payment_id`, `signature_valid` BOOLEAN, `raw_body` JSON,
 `received_at`. Never deleted.
 
@@ -176,7 +176,7 @@ RAZORPAY_WEBHOOK_SECRET=
 REPORT_LINK_TTL_DAYS=30
 ```
 
-### 2 · `src/data/plans.js` — move and extend
+### 2 · `src/data/plans.js` - move and extend
 
 Move `PLANS` out of `Lead_server.js`. Add `amountPaise` and `available` per
 plan. `Lead_server.js` imports it for `/api/leads/pricing`.
@@ -185,20 +185,20 @@ Set `available: true` for `basic`, `advanced` and `full_protection` **only
 when `RAZORPAY_KEY_ID` is configured**. With no key the pricing page keeps
 showing "Notify me" rather than a checkout button that cannot work.
 
-### 3 · `src/backend_routes/Payment_server.js` — new file
+### 3 · `src/backend_routes/Payment_server.js` - new file
 
 | Route | Behaviour |
 |---|---|
 | `POST /api/payments/checkout` | Body: `tier`, `domain`, `email`, optional `name`/`company`, `termsAccepted`. Validate the domain with the existing `normaliseDomain`. Reject if `termsAccepted` is not true. Create the local order, create a Razorpay order, return `order_ref`, `razorpay_order_id`, `amount`, `key_id`. **Never return the key secret.** |
 | `POST /api/payments/verify` | Browser callback. Verify the HMAC. On success call `fulfilOrder`. Return the order status. |
-| `POST /api/payments/webhook` | Raw body. Verify the signature. Log to `payment_events` **before** anything else, valid or not. On `payment.captured` call `fulfilOrder`. **Always return 200** once logged — a non-200 makes Razorpay retry, and retrying a payment that succeeded is worse than a missed event we can replay from the table. |
+| `POST /api/payments/webhook` | Raw body. Verify the signature. Log to `payment_events` **before** anything else, valid or not. On `payment.captured` call `fulfilOrder`. **Always return 200** once logged - a non-200 makes Razorpay retry, and retrying a payment that succeeded is worse than a missed event we can replay from the table. |
 | `GET /api/payments/order/:ref` | Status for the success page to poll. Returns status, fulfilment status and, when ready, the report URL. No payment details. |
 
-**`fulfilOrder(orderRef)` — the chain, in one function:**
+**`fulfilOrder(orderRef)` - the chain, in one function:**
 
-1. `UPDATE orders SET fulfilment_status='running' WHERE order_ref=? AND fulfilment_status='none'`. **If zero rows affected, return** — another path already has it.
+1. `UPDATE orders SET fulfilment_status='running' WHERE order_ref=? AND fulfilment_status='none'`. **If zero rows affected, return** - another path already has it.
 2. Verify `amount_paid_paise === amount_paise`. Mismatch → `failed`, alert, stop.
-3. Run the scan at the order's tier — `runScan(domain, { tier })`.
+3. Run the scan at the order's tier - `runScan(domain, { tier })`.
 4. If the scan is inconclusive, **do not fail the order**. Mark
    `fulfilment_status='failed'` with the reason, alert internally, and email the
    customer to say we could not complete it and someone will be in touch. They
@@ -206,34 +206,34 @@ showing "Notify me" rather than a checkout button that cannot work.
    decision, not an automatic one.
 5. Build the report with `buildReport(scan, tier)`. Store the scan and the
    report JSON.
-6. Generate `report_token` — 32 random bytes hex — and set
+6. Generate `report_token` - 32 random bytes hex - and set
    `report_expires_at`.
 7. Queue the `paid_report` email, **transactional**.
 8. `fulfilment_status='delivered'`, `delivered_at=NOW()`.
 
-Wrap 3–7 so any throw lands as `failed` with the message, plus an internal
+Wrap 3-7 so any throw lands as `failed` with the message, plus an internal
 alert. Never leave an order stuck at `running`.
 
 ### 4 · Report delivery
 
-**`GET /api/reports/:token`** — returns the stored report JSON if the token
+**`GET /api/reports/:token`** - returns the stored report JSON if the token
 matches and has not expired. Expired → a clear message and a contact link, not
 a 404. Someone with an expired link is a paying customer, not an intruder.
 
-**`src/Report.js` + `.css`** — the page at `/report/:token`. Renders what the
+**`src/Report.js` + `.css`** - the page at `/report/:token`. Renders what the
 tier bought: grade and counts for all, plus findings with evidence for basic,
 plus impact, remediation steps, verification and the roadmap for advanced.
 
 Reuse existing tokens and classes. Add a print stylesheet so
-**Ctrl+P produces something presentable** — it is the interim answer for
+**Ctrl+P produces something presentable** - it is the interim answer for
 customers who want a file, until Task 07.
 
 **Two new email templates** in `mail-templates.js`:
 
-- `paid_report` — transactional, to the customer. Grade, counts, the link, the
-  expiry date. **No finding titles and no evidence** — an email is forwarded
+- `paid_report` - transactional, to the customer. Grade, counts, the link, the
+  expiry date. **No finding titles and no evidence** - an email is forwarded
   far more often than a page, and the paywall applies to both.
-- `fulfilment_failed` — internal, to `ENQUIRY_ALERT_TO`. Order ref, tier,
+- `fulfilment_failed` - internal, to `ENQUIRY_ALERT_TO`. Order ref, tier,
   domain, error, and the amount at stake.
 
 ### 5 · Frontend
@@ -246,39 +246,39 @@ checkbox with links to `/legal/terms` and `/legal/privacy`. Record the terms
 version on the order.
 
 Loads Razorpay's checkout script from `https://checkout.razorpay.com/v1/checkout.js`
-on demand — not in `index.html`, where it would load on every page including
+on demand - not in `index.html`, where it would load on every page including
 the free scan.
 
-**`src/Result.js`** — the existing buy path currently goes to `/pricing`. When
+**`src/Result.js`** - the existing buy path currently goes to `/pricing`. When
 a plan is available, link to `/checkout?tier=X&domain=Y` carrying the scanned
 domain, so the customer does not retype it.
 
-**`src/OrderStatus.js`** at `/order/:ref` — the post-payment page. Polls
+**`src/OrderStatus.js`** at `/order/:ref` - the post-payment page. Polls
 `GET /api/payments/order/:ref` every 3 seconds for up to 3 minutes. Shows the
 scan running, then the report link. On failure, shows a calm message saying we
 have their payment, something went wrong, and a person has been alerted.
 
-**`src/Pricing.js`** — where `available` is true, the button becomes
+**`src/Pricing.js`** - where `available` is true, the button becomes
 **Buy report** linking to `/checkout?tier=X`. Where false, "Notify me" stays.
 
 ---
 
-## Verification — the part that matters
+## Verification - the part that matters
 
 Razorpay test keys are in `.env`. Use test card **4111 1111 1111 1111**, any
 future expiry, any CVV.
 
 ```bash
-# 1 — schema applies twice
+# 1 - schema applies twice
 mysql -u root -p dshield < db/schema-orders.sql
 mysql -u root -p dshield < db/schema-orders.sql
 
-# 2 — build and boot
+# 2 - build and boot
 npx react-scripts build
 node server.js &
 curl -s localhost:4008/api/health
 
-# 3 — FREE SCAN UNCHANGED
+# 3 - FREE SCAN UNCHANGED
 curl -s -X POST localhost:4008/api/scan \
      -H "Content-Type: application/json" \
      -d '{"domain":"github.com"}'
@@ -291,7 +291,7 @@ exists for and it cannot be replaced by unit tests:
 2. Complete checkout with the test card
 3. Land on `/order/:ref` and watch it move to delivered
 4. Open the report link
-5. **Confirm the report contains remediation steps** — the thing $199 buys
+5. **Confirm the report contains remediation steps** - the thing $199 buys
 6. **Check the inbox** and confirm the email arrived with the link and **no
    finding titles**
 7. `SELECT order_ref, status, fulfilment_status, amount_paise, amount_paid_paise, delivered_at FROM orders;`
@@ -306,7 +306,7 @@ exists for and it cannot be replaced by unit tests:
 | Checkout with `termsAccepted` false | 400 |
 | Basic-tier report | Findings present, **no remediation** |
 | Expired report token | Clear message, not a 404 |
-| Tampered amount — set `amount_paid_paise` below `amount_paise` and fulfil | `failed`, internal alert, no report |
+| Tampered amount - set `amount_paid_paise` below `amount_paise` and fulfil | `failed`, internal alert, no report |
 
 Report the actual result of every row.
 
@@ -314,7 +314,7 @@ Also confirm:
 - `git diff package.json` shows `razorpay` and nothing else, if you used the SDK
 - The key **secret** appears nowhere in the built frontend:
   `grep -r "$RAZORPAY_KEY_SECRET" build/` finds nothing
-- A snapshot report still leaks no titles — re-run
+- A snapshot report still leaks no titles - re-run
   `node scripts/verify-remediation.js`
 
 ---
@@ -326,7 +326,7 @@ Also confirm:
 3. Whether you completed a real test payment end to end, and what the customer
    received at each step
 4. The contents of `orders` and `mail_outbox` after the run
-5. Anything wrong or conflicting in these instructions — Tasks 01, 02, 05a and
+5. Anything wrong or conflicting in these instructions - Tasks 01, 02, 05a and
    05c each found genuine errors in theirs, and 05c's would have destroyed the
    paywall had it been followed literally
 

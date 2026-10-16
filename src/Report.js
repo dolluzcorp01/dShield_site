@@ -9,7 +9,7 @@ import TwentyThree from "./TwentyThree";
    The paid report.
 
    Renders whatever the server put in the report object and nothing more.
-   THE PAYWALL IS NOT DECIDED HERE — report_builder.js decides it, and this
+   THE PAYWALL IS NOT DECIDED HERE - report_builder.js decides it, and this
    page simply shows what arrived. A tier that did not pay for remediation
    does not receive it in the response, so there is nothing here to hide.
 
@@ -130,7 +130,7 @@ function Report() {
                                     <li key={i.checkId}>
                                         <span className={`sev sev--${i.severity}`}>{i.severity}</span>
                                         <a href={`#${i.checkId}`}>{i.title}</a>
-                                        <span className="ds-faint"> — {i.effortHours}h · {i.skill}</span>
+                                        <span className="ds-faint"> - {i.effortHours}h · {i.skill}</span>
                                     </li>
                                 ))}
                             </ol>
@@ -184,7 +184,7 @@ function Report() {
                                     </p>
                                     <p className="ds-faint finding__effort">
                                         About {f.effortHours} hours · {f.skill}
-                                        {f.effortNote ? ` — ${f.effortNote}` : ""}
+                                        {f.effortNote ? ` - ${f.effortNote}` : ""}
                                     </p>
                                 </div>
                             )}
@@ -214,14 +214,14 @@ function Report() {
                     <h2>What we could not measure</h2>
                     <p className="ds-lead">
                         These checks did not complete. They are excluded from your score entirely rather than
-                        counted as passes — a number built on checks that never ran would tell you that you are
+                        counted as passes - a number built on checks that never ran would tell you that you are
                         safe when what actually happened is that we could not look.
                     </p>
                     <ul className="incon__list">
                         {r.inconclusive.map((i) => (
                             <li key={i.checkId}>
                                 <strong>{i.title}</strong>
-                                <span className="ds-faint"> — {i.reason}</span>
+                                <span className="ds-faint"> - {i.reason}</span>
                             </li>
                         ))}
                     </ul>
@@ -238,7 +238,7 @@ function Report() {
                         never changes; domainScores says which ones produced a
                         number. When a check cannot run the two disagree, and
                         the old line here reported the attempt as a
-                        measurement — the same defect that was in Result.js.
+                        measurement - the same defect that was in Result.js.
                         This is a report somebody paid for, so it is the last
                         place a count should flatter itself. */}
                     <p className="ds-lead">

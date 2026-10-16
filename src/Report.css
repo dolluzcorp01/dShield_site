@@ -70,7 +70,7 @@
 .incon__list li { line-height: 1.55; }
 
 /* ═════════════════════════════════════════════════════════════════════
-   PRINT — white page, dark text, no exceptions.
+   PRINT - white page, dark text, no exceptions.
 
    The token overrides below must cover EVERY colour token, including the
    arcade names added in Task 08. A token left un-overridden prints as
@@ -95,7 +95,7 @@
         --bone: #111; --bone-dim: #333; --bone-faint: #555;
         --line: #ccc; --line-2: #bbb;
         --gold: #657300; --gold-dim: #657300; --gold-glow: #f4f7e6;
-        /* severities keep their meaning on paper — a critical finding that
+        /* severities keep their meaning on paper - a critical finding that
            prints the same black as a low one has lost the only thing the
            pill was there to say */
         --critical: #b3005e; --high: #8a5a00; --medium: #0a6b7a;

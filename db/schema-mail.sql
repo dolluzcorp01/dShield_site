@@ -1,5 +1,5 @@
 -- ─────────────────────────────────────────────────────────────────────────
---  dShield Global Site — mail outbox
+--  dShield Global Site - mail outbox
 --
 --  RUN THIS AFTER db/schema.sql AND db/schema-legal.sql.
 --
@@ -16,7 +16,7 @@
 --
 --  A Dolluz SendGrid account was frozen once. Every message attempted during
 --  that window was dropped and gone, with nothing recording it had ever been
---  attempted — so nobody could say who had not been written to. A row
+--  attempted - so nobody could say who had not been written to. A row
 --  survives an outage, a restart and a bad deploy.
 --
 --  It also keeps the visitor off the critical path: an enquiry form confirms
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS mail_outbox (
   subject     VARCHAR(255) NOT NULL,
 
   -- Everything the template needs. The BODY IS RENDERED AT SEND TIME from
-  -- this, never stored pre-rendered — otherwise fixing a typo in a template
+  -- this, never stored pre-rendered - otherwise fixing a typo in a template
   -- means re-queueing every row that has not gone out yet.
   payload     JSON         NOT NULL,
 
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS mail_outbox (
 -- this file has to stay safe to re-run.
 --
 -- Comma-separated list. Used by the enquiry alert so more than one person at
--- Dolluz sees an enquiry arrive — an alert that reaches one inbox nobody is
+-- Dolluz sees an enquiry arrive - an alert that reaches one inbox nobody is
 -- watching is the same failure as no alert at all.
 SET @cc_col := (
   SELECT COUNT(*) FROM information_schema.COLUMNS

@@ -3,7 +3,7 @@
 /* ── the coverage bar ───────────────────────────────────────────────────
    Twenty-three segments on every tier, a different number lit. The point
    is the comparison between cards, so the geometry must be identical in
-   all five — same count, same height, same gap — and only the fill moves.
+   all five - same count, same height, same gap - and only the fill moves.
    ─────────────────────────────────────────────────────────────────────── */
 .covbar { margin: 14px 0 2px; }
 
@@ -89,7 +89,7 @@
 }
 
 /* Void on magenta, not white. White on #FF2E9A measures 3.44:1, which fails
-   for text this small — the frozen file uses it and should not. */
+   for text this small - the frozen file uses it and should not. */
 .plan__flag {
     position: absolute; top: -11px; left: 22px;
     background: var(--magenta); color: var(--void);
@@ -140,7 +140,7 @@
 .notify__form .ds-input { flex: 1; min-width: 200px; }
 .notify__tier { max-width: 260px; }
 
-/* Renamed from the bare .faq/.faq__item — those names are also used by
+/* Renamed from the bare .faq/.faq__item - those names are also used by
    Sections.css's accordion FAQ on the home page. Because this file gets
    imported after Home's in App.js, the unscoped versions of these rules
    were winning the cascade on every page, not just here, which is why the
@@ -152,7 +152,7 @@
 .pricing-faq__item h3 { margin-bottom: 8px; font-size: 1.02rem; }
 .pricing-faq__item p { margin: 0; }
 
-/* Four across holds to about 1020px, then folds to two — never three, which
+/* Four across holds to about 1020px, then folds to two - never three, which
    leaves an orphan card sitting alone on the second line. */
 @media (max-width: 1020px) {
     .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }

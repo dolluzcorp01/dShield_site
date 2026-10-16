@@ -1,5 +1,5 @@
 -- ─────────────────────────────────────────────────────────────────────────
---  dShield Global Site — legal & compliance schema
+--  dShield Global Site - legal & compliance schema
 --
 --  RUN THIS AFTER db/schema.sql. It extends the `leads` table created there
 --  and will fail on its own against an empty database.
@@ -7,7 +7,7 @@
 --     mysql -u root -p < db/schema.sql
 --     mysql -u root -p < db/schema-legal.sql
 --
---  Safe to re-run. Every statement here is idempotent — see the note above
+--  Safe to re-run. Every statement here is idempotent - see the note above
 --  the ALTER at the bottom, which needs more than IF NOT EXISTS to be so.
 -- ─────────────────────────────────────────────────────────────────────────
 
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS legal_documents (
 -- THERE IS DELIBERATELY NO email COLUMN. Do not add one. This table answers
 -- exactly one question, asked immediately before every send: is this address
 -- suppressed? Storing the address itself would turn a suppression list into
--- a directory of everyone who has ever asked us to stop writing to them —
+-- a directory of everyone who has ever asked us to stop writing to them -
 -- which is a worse thing to hold than the mailing list it protects.
 --
 -- THERE IS DELIBERATELY NO FOREIGN KEY to `leads`. A suppression must
@@ -108,7 +108,7 @@ DEALLOCATE PREPARE stmt;
 -- The body text is deliberately NOT legalese. It says what each document
 -- will cover and states that it is not yet binding. Plausible-looking
 -- invented terms would be worse than these blanks, because a visitor would
--- rely on them — and we would be publishing a promise nobody has approved.
+-- rely on them - and we would be publishing a promise nobody has approved.
 --
 -- The double-bracket markers below are literal and greppable. Do not invent
 -- values for them: a wrong registered address in a published privacy notice
@@ -133,8 +133,8 @@ what they are and are not. The scan reads information your servers already
 publish to any visitor. It does not defend, block or remediate anything, and
 no assessment can guarantee that a system is secure.
 
-It will set out acceptable use — in particular that you may scan only domains
-you are responsible for — and the limits of our liability for a service given
+It will set out acceptable use - in particular that you may scan only domains
+you are responsible for - and the limits of our liability for a service given
 away without charge.
 
 It will describe what happens when paid reports go on sale. Nothing is on
@@ -160,7 +160,7 @@ We collect this now, which is why this notice cannot wait for the rest of the
 site to be finished.
 
 When you run a free scan we store the domain you entered, the result, and
-your IP address. The IP is stored to rate limit the scanner — a scan is a
+your IP address. The IP is stored to rate limit the scanner - a scan is a
 request we make to somebody elses server, and an unlimited endpoint would
 make this site a free attack tool pointed at a third party.
 
@@ -238,7 +238,7 @@ cookies. We do not set any. A banner asking your permission for cookies that
 do not exist would be theatre, and asking for consent that is not needed
 trains people to click through the consent that is.
 
-If that changes — if analytics is ever added to this site — a consent banner
+If that changes - if analytics is ever added to this site - a consent banner
 becomes required, and this notice must be rewritten before it ships.
 
 ## Contact

@@ -88,7 +88,7 @@ function OrderStatus() {
                     <h1>Your report for {o.domain} is ready.</h1>
                     <p className="ds-muted">
                         We have also emailed the link. It works until{" "}
-                        {o.expiresAt ? new Date(o.expiresAt).toLocaleDateString() : "its expiry date"} — treat it as
+                        {o.expiresAt ? new Date(o.expiresAt).toLocaleDateString() : "its expiry date"} - treat it as
                         you would the report itself, since anyone holding it can read it.
                     </p>
                     <div className="orderdone__actions">
@@ -111,7 +111,7 @@ function OrderStatus() {
                     <p className="ds-eyebrow">Payment received</p>
                     <h1>We have your payment, and something went wrong.</h1>
                     <p className="ds-muted">
-                        We could not complete the assessment of {o.domain}. This is ours to fix, not yours —
+                        We could not complete the assessment of {o.domain}. This is ours to fix, not yours -
                         somebody here has already been alerted and will be in touch. You do not need to do
                         anything, and you have not lost your order.
                     </p>
@@ -135,7 +135,7 @@ function OrderStatus() {
                     <h1>This is taking longer than expected.</h1>
                     <p className="ds-muted">
                         Your payment is safe and your order is recorded. The report is still being produced, and
-                        we will email the link the moment it is ready — you can close this page.
+                        we will email the link the moment it is ready - you can close this page.
                     </p>
                     <p className="ds-faint">Order reference {o.orderRef}</p>
                     <div className="orderdone__actions">
@@ -156,7 +156,7 @@ function OrderStatus() {
                     <span>{STAGES[stage]}…</span>
                 </div>
                 <p className="ds-muted">
-                    This usually takes under two minutes. You can close this page — the report link is emailed
+                    This usually takes under two minutes. You can close this page - the report link is emailed
                     to you either way.
                 </p>
                 <p className="ds-faint">Order reference {o.orderRef}</p>

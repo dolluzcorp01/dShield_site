@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  pdf — render a report to a PDF, once, and freeze it.
+//  pdf - render a report to a PDF, once, and freeze it.
 //
 //  A report is evidence. A customer and their auditor must see the IDENTICAL
 //  document every time, months apart, so the file is generated once at
@@ -8,7 +8,7 @@
 //
 //  ⚠️  CHROME IS LAUNCHED WITH --no-sandbox, which is a real trade-off and
 //  is only acceptable because we render OUR OWN template. Nothing
-//  customer-supplied is ever passed as HTML — pdf-template.js escapes every
+//  customer-supplied is ever passed as HTML - pdf-template.js escapes every
 //  interpolated value, and that is what makes this safe rather than the
 //  sandbox flag.
 //
@@ -38,7 +38,7 @@ async function isPdfAvailable() {
         const explicit = String(process.env.PUPPETEER_EXECUTABLE_PATH || "").trim();
         const exe = explicit || await puppeteer.executablePath();
         if (!exe || !fs.existsSync(exe)) {
-            return { ok: false, reason: `Chrome not found at ${exe || "(unresolved)"} — run: npx puppeteer browsers install chrome` };
+            return { ok: false, reason: `Chrome not found at ${exe || "(unresolved)"} - run: npx puppeteer browsers install chrome` };
         }
         return { ok: true, executablePath: exe };
     } catch (e) {
@@ -120,8 +120,8 @@ async function renderReportPdf(report, orderRef, opts = {}) {
         /* THE FINGERPRINT IS A HASH OF THE REPORT CONTENT, NOT OF THE FILE.
            The task asks for the file's own SHA-256 printed inside the file,
            and that cannot exist: embedding the hash changes the bytes, which
-           changes the hash. The purpose — letting a customer and an auditor
-           confirm two copies are the same document — is served by hashing the
+           changes the hash. The purpose - letting a customer and an auditor
+           confirm two copies are the same document - is served by hashing the
            REPORT DATA, which is stable and reproducible. The file's own hash
            is still computed and stored on the order for integrity of the
            stored bytes; it simply is not printed inside itself. */
@@ -141,14 +141,14 @@ async function renderReportPdf(report, orderRef, opts = {}) {
             });
 
             const work = (async () => {
-                // `domcontentloaded`, not `networkidle` — this document makes no
+                // `domcontentloaded`, not `networkidle` - this document makes no
                 // network requests, and waiting for idle would just add latency.
                 await page.setContent(html, { waitUntil: "domcontentloaded" });
                 await page.emulateMediaType("print");
 
                 /* displayHeaderFooter REQUIRES explicit margins. Without them
                    the header and footer render outside the printable area and
-                   are simply invisible — an hour of debugging that looks like
+                   are simply invisible - an hour of debugging that looks like
                    the templates being ignored. */
                 return page.pdf({
                     format: "A4",

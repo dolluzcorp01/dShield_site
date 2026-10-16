@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // ─────────────────────────────────────────────────────────────────────────
-//  verify-remediation — the library and the paywall.
+//  verify-remediation - the library and the paywall.
 //
 //      node scripts/verify-remediation.js
 //
@@ -96,7 +96,7 @@ const baseScan = {
 };
 const paidScan = { ...baseScan, findings: [...failing, ...passing] };
 
-/* snapshot — no title of anything we FOUND.
+/* snapshot - no title of anything we FOUND.
    The titles of INCONCLUSIVE checks are deliberately exempt, and this is not
    a loophole. A free scan already names the checks that could not run, and
    /result already renders them, because "we could not look" stated plainly
@@ -121,13 +121,13 @@ failedHere.length
 /remediation/i.test(snap) ? fail("snapshot contains remediation") : pass("snapshot contains no remediation");
 /evidence/i.test(snap) ? fail("snapshot contains evidence") : pass("snapshot contains no evidence");
 
-// basic — titles yes, remediation no.
+// basic - titles yes, remediation no.
 const basic = JSON.stringify(buildReport(paidScan, "basic"));
 TITLES.some((t) => basic.includes(t)) ? pass("basic contains finding titles") : fail("basic contains no titles");
 /"remediation"/.test(basic) ? fail("basic leaks remediation") : pass("basic contains no remediation key");
 /"impact"/.test(basic) ? fail("basic leaks impact") : pass("basic contains no impact");
 
-// advanced — the lot.
+// advanced - the lot.
 const adv = JSON.stringify(buildReport(paidScan, "advanced"));
 /"remediation"/.test(adv) ? pass("advanced contains remediation") : fail("advanced has no remediation");
 /"impact"/.test(adv) ? pass("advanced contains impact") : fail("advanced has no impact");
@@ -136,11 +136,11 @@ const adv = JSON.stringify(buildReport(paidScan, "advanced"));
 // A snapshot scan must not be able to produce a paid report.
 try {
     buildReport(baseScan, "advanced");
-    fail("a snapshot scan produced an advanced report — findings were not required");
+    fail("a snapshot scan produced an advanced report - findings were not required");
 } catch (e) {
     pass("a snapshot scan cannot produce a paid report");
 }
 
 console.log("\n" + "─".repeat(62));
 if (failures) { console.log(`❌ ${failures} problem(s)\n`); process.exit(1); }
-console.log(`✅ library sound — ${entries.length} entries, ${implemented.length} implemented, paywall holds\n`);
+console.log(`✅ library sound - ${entries.length} entries, ${implemented.length} implemented, paywall holds\n`);

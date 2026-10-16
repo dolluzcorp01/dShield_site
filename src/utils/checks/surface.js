@@ -51,15 +51,15 @@ const bannerOf = (target) => memo(target, "surface:banner", async () => {
    Task 05a requested 31 speculative paths on every scan and got this scanner
    blocked by an ordinary customer site on shared hosting. To a web
    application firewall, a burst of requests for /phpmyadmin/, /manager/html
-   and /wp-config.php.bak is not "reading published information" — it is the
+   and /wp-config.php.bak is not "reading published information" - it is the
    signature of directory brute-forcing, because it is identical to it.
 
    So the free tier asks for almost nothing: three paths a well-run site
    expects to be asked for. Paid tiers probe harder, where the customer has
    accepted terms and knows what we do.
 
-   That ordering is also commercially correct — the paid scan genuinely
-   looks harder — but the reason it exists is that a free visitor should
+   That ordering is also commercially correct - the paid scan genuinely
+   looks harder - but the reason it exists is that a free visitor should
    never get a blocked, ungradeable scan from their first impression of us. */
 
 const ADMIN_PATHS_BASIC = [
@@ -118,9 +118,9 @@ const EOL = [
 ];
 
 const KNOWN_VULN = [
-    { re: /Apache\/2\.4\.(4[0-9]|[0-3][0-9])(?!\d)/i, name: "Apache 2.4.49 and earlier", note: "CVE-2021-41773 path traversal affects 2.4.49–2.4.50." },
+    { re: /Apache\/2\.4\.(4[0-9]|[0-3][0-9])(?!\d)/i, name: "Apache 2.4.49 and earlier", note: "CVE-2021-41773 path traversal affects 2.4.49-2.4.50." },
     { re: /nginx\/1\.(1[0-9]|20)\.(?!\d)/i, name: "nginx 1.20 or earlier", note: "Several resolver and mp4 module issues." },
-    { re: /OpenSSL\/3\.0\.[0-6](?!\d)/i, name: "OpenSSL 3.0.0–3.0.6", note: "CVE-2022-3602 and CVE-2022-3786 buffer overflow." },
+    { re: /OpenSSL\/3\.0\.[0-6](?!\d)/i, name: "OpenSSL 3.0.0-3.0.6", note: "CVE-2022-3602 and CVE-2022-3786 buffer overflow." },
     { re: /PHP\/8\.0\.[0-9](?!\d)/i, name: "PHP 8.0 early releases", note: "Multiple issues fixed in later 8.0.x." },
 ];
 
@@ -151,7 +151,7 @@ module.exports = [
         why: "An administration panel reachable from the open internet is a login form anybody in the world can attempt. Restricted to your office network or a VPN, it is a door that most attackers never find.",
         async run(target) {
             /* HIGH, NOT CRITICAL. A single critical caps the grade at D, and
-               that must be reserved for something actively exploitable — not
+               that must be reserved for something actively exploitable - not
                an admin path sitting behind authentication. When this was
                critical, google.com, wikipedia.org and stripe.com all scored
                D. If a source says critical, the source is stale. */
@@ -294,7 +294,7 @@ module.exports = [
             const hits = EOL.filter((e) => e.re.test(b.banner));
             return hits.length
                 ? { passed: false, evidence: `${hits[0].name}, unsupported since ${hits[0].ended}.`, detail: { banner: b.banner.slice(0, 120), matches: hits.map((h) => ({ name: h.name, ended: h.ended })) } }
-                : { passed: true, evidence: `"${b.banner.slice(0, 60)}" — no end-of-life version detected.` };
+                : { passed: true, evidence: `"${b.banner.slice(0, 60)}" - no end-of-life version detected.` };
         },
     },
 
@@ -326,7 +326,7 @@ module.exports = [
         id: "SURF-BUCKET-12",
         domain: 1, severity: "critical", minTier: "advanced",
         title: "Cloud storage container publicly readable",
-        why: "A storage bucket set to public lists and serves every file in it to anyone who learns the name — and the names are usually just your company name with a word after it.",
+        why: "A storage bucket set to public lists and serves every file in it to anyone who learns the name - and the names are usually just your company name with a word after it.",
         async run(target) {
             const base = target.domain.replace(/\.[a-z]+$/, "").replace(/\./g, "-");
             const names = [base, `${base}-assets`, `${base}-backup`, `${base}-static`, `${base}-uploads`, `${base}-data`, `${base}-prod`];
@@ -347,7 +347,7 @@ module.exports = [
 
             /* Report what was actually TESTED, not what was planned.
                S3 answers 403 for a bucket that is private or absent, which is
-               a normal reply — but four in a row trips the host governor and
+               a normal reply - but four in a row trips the host governor and
                the rest are skipped. Saying "none of 7" after testing 4 would
                be exactly the kind of quietly-wrong claim this product exists
                to avoid. */
@@ -443,7 +443,7 @@ module.exports = [
                 try {
                     if (src.startsWith("//")) host = new URL(`https:${src}`).hostname;
                     else if (/^https?:\/\//i.test(src)) host = new URL(src).hostname;
-                    else continue;                                   // relative — our own origin
+                    else continue;                                   // relative - our own origin
                 } catch (e) { continue; }
                 if (host === target.domain || host.endsWith(`.${target.domain}`)) continue;
                 external.push({ host, hasIntegrity: /\sintegrity=/i.test(tag) });
@@ -504,7 +504,7 @@ module.exports = [
                SOA, SRV and TXT. DNSKEY raises ERR_INVALID_ARG_VALUE, so that
                check can never have returned anything but an error.
 
-               Asked over DNS-over-HTTPS instead. No new dependency — it is an
+               Asked over DNS-over-HTTPS instead. No new dependency - it is an
                ordinary HTTPS request through the same helper as every other
                check. It does add one outbound host, which matters on a
                network that restricts egress: if Cloudflare cannot be reached
@@ -531,7 +531,7 @@ module.exports = [
             const keys = (data.Answer || []).filter((a) => a.type === 48);   // 48 = DNSKEY
             return keys.length
                 ? { passed: true, evidence: `DNSSEC is enabled, with ${keys.length} key(s) published.`, detail: { keyCount: keys.length } }
-                : { passed: false, evidence: "No DNSKEY record — the zone is not signed with DNSSEC." };
+                : { passed: false, evidence: "No DNSKEY record - the zone is not signed with DNSSEC." };
         },
     },
 ];

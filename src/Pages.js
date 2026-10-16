@@ -4,7 +4,7 @@ import { apiPost } from "./utils/api";
 import "./Pages.css";
 import { useDocumentMeta } from "./utils/meta";
 /* The lockup, not the bare eagle. DOLLUZ_CORP.png is the artwork as
-   supplied — gold bird, wordmark set in BLACK — which is invisible against
+   supplied - gold bird, wordmark set in BLACK - which is invisible against
    #0B0316. DOLLUZ_CORP_dark.png is that same file with its near-black pixels
    recoloured to bone and every gold pixel left exactly as supplied, which is
    what the frozen prototype does to produce its own lockup. It is generated
@@ -16,7 +16,7 @@ import { OFFICE, TIERS, SERVICES, COMPLIANCE, SMART_BUILT, WHATSAPP_HREF } from 
 
 /* The tier selector's own values. A ?topic= matching one of these pre-fills
    the selector; anything else is a service slug from a card on /services and
-   is shown as a read-only line instead — putting a service into a dropdown
+   is shown as a read-only line instead - putting a service into a dropdown
    of prices would misrepresent it as something with a list price. */
 const TIER_VALUES = ["basic", "advanced", "full_protection", "extended_support"];
 
@@ -120,10 +120,10 @@ function ContactForm() {
                     ) : (
                         <select className="ds-input" value={form.tier} onChange={set("tier")} disabled={busy}>
                             <option value="">Not sure yet</option>
-                            <option value="basic">Basic — $49</option>
-                            <option value="advanced">Advanced — $199</option>
-                            <option value="full_protection">Full Protection — $499</option>
-                            <option value="extended_support">Full Protection + Extended Support — $999+/month</option>
+                            <option value="basic">Basic - $49</option>
+                            <option value="advanced">Advanced - $199</option>
+                            <option value="full_protection">Full Protection - $499</option>
+                            <option value="extended_support">Full Protection + Extended Support - $999+/month</option>
                         </select>
                     )}
                 </div>
@@ -137,7 +137,7 @@ function ContactForm() {
             {error && <div className="ds-error">{error}</div>}
 
             {/* Disabled until there is an address to reply to. The form has
-                always refused to submit without one — it just did it by
+                always refused to submit without one - it just did it by
                 showing an error AFTER the click, which teaches somebody that
                 the button is unreliable rather than that the field is
                 required. The gradient draining out of the button says the
@@ -158,12 +158,12 @@ function ContactForm() {
 }
 
 /* The /contact route. Kept as a real page with its own canonical URL and
-   meta even though the form now also sits on the home page — it is a
+   meta even though the form now also sits on the home page - it is a
    deep link people are sent, and it is what the footer and the nav point at
    from every route that is not "/". */
 export function Contact() {
     useDocumentMeta({
-        title: "Contact Dolluz Corp — Security Services | dShield",
+        title: "Contact Dolluz Corp - Security Services | dShield",
         description: "Talk to our engineers about audits, penetration testing, incident response or compliance.",
         canonical: "/contact",
     });
@@ -199,7 +199,7 @@ export function Contact() {
    Rows render only where there is something real to print. The prototype
    ships a "PHONE" row reading "+91 00000 00000", which under a FAQ
    promising "a phone number that a person answers" is worse than no row at
-   all — so there is no phone field in OFFICE and no phone row here. WhatsApp
+   all - so there is no phone field in OFFICE and no phone row here. WhatsApp
    is a real number, so it is a real link.
    ───────────────────────────────────────────────────────────────────────── */
 function OfficeCard() {
@@ -302,7 +302,7 @@ export function HowItWorks() {
             <p className="ds-eyebrow">How it works</p>
             <h1>A scan, and then the honest part</h1>
             <p className="ds-lead">
-                dShield assesses. It does not defend, block or fix anything — and it is worth
+                dShield assesses. It does not defend, block or fix anything - and it is worth
                 being plain about that, because a great many products in this market are vague
                 on the point.
             </p>
@@ -328,16 +328,16 @@ export function HowItWorks() {
             <div className="ds-grid ds-grid--2" style={{ marginTop: 18 }}>
                 {[
                     ["No port scanning", "Scanning ports is active reconnaissance. It sets off intrusion detection and it is not what a customer agreed to when they typed a domain."],
-                    /* Corrected. The previous wording — "never touch anything we
-                       are not invited to" — was literally true and gave a false
+                    /* Corrected. The previous wording - "never touch anything we
+                       are not invited to" - was literally true and gave a false
                        impression: we do request common paths, and nobody invited
                        us to ask for /wp-config.php.bak. For a company selling
                        honesty about what it can and cannot see, a true-but-
                        misleading claim is worse than an unflattering one. */
-                    ["No attempts to break in", "We never try a login, never submit input designed to make something fail, and never attempt to gain access. We do request a small number of common web paths — the sort an attacker checks first — because finding an exposed backup file or an open admin page is the point."],
+                    ["No attempts to break in", "We never try a login, never submit input designed to make something fail, and never attempt to gain access. We do request a small number of common web paths - the sort an attacker checks first - because finding an exposed backup file or an open admin page is the point."],
                     ["No write access, ever", "Even at the highest tier, every connection to a customer's systems is read-only. A token carrying write access is refused by the code."],
                     ["No grade from a partial scan", "If too few checks complete, no score is published at all. A number built on checks that never ran is worse than no number."],
-                    ["We are not invisible, and we do not pretend to be", "Our scanner identifies itself in every request and comes from a fixed address. Your security tools may log the scan, and some firewalls will block it — if that happens we stop, and say so rather than pressing on. A tool that tried to hide from your defences would be a strange thing to buy from a security company."],
+                    ["We are not invisible, and we do not pretend to be", "Our scanner identifies itself in every request and comes from a fixed address. Your security tools may log the scan, and some firewalls will block it - if that happens we stop, and say so rather than pressing on. A tool that tried to hide from your defences would be a strange thing to buy from a security company."],
                 ].map(([t, d]) => (
                     <div className="ds-card" key={t}>
                         <h3>{t}</h3>
@@ -432,7 +432,7 @@ export function Trust() {
    outlined wordmark that signs the page off.
 
    EVERY LINK HERE GOES SOMEWHERE. The prototype's footer is ninety-odd
-   <button> elements with a hover colour and no handler — the Platform
+   <button> elements with a hover colour and no handler - the Platform
    column, the Services column, Compliance, Careers, Blog, and all five
    legal links included. A footer of dead links is worse than a short one:
    it is the part of a page people go to when they are looking for the terms
@@ -460,7 +460,7 @@ export function Footer() {
                             asset. It replaces the eagle-plus-typed-company-name
                             pairing that was here, which set "Dolluz Corp" in
                             Orbitron beside artwork that already says "DOLLUZ
-                            CORP" in the real brand face — the same words twice,
+                            CORP" in the real brand face - the same words twice,
                             in two different typefaces, six pixels apart.
 
                             alt carries the wordmark AND the tagline because
@@ -469,7 +469,7 @@ export function Footer() {
                         <img
                             className="footer__lockup"
                             src={lockup}
-                            alt="Dolluz Corp — One Place. One Start. One Team."
+                            alt="Dolluz Corp - One Place. One Start. One Team."
                             width="3950"
                             height="994"
                         />
@@ -485,7 +485,7 @@ export function Footer() {
                             {/* Under the address, because the two together are
                                 "here is how you reach us" and a number stranded
                                 below the postal address reads as part of it.
-                                Renders only when there is a real number — see
+                                Renders only when there is a real number - see
                                 WHATSAPP_HREF in site-content.js. */}
                             {WHATSAPP_HREF && (
                                 <a
@@ -568,7 +568,7 @@ export function Footer() {
                     is secure.
                 </p>
 
-                {/* The arcade sign-off — outlined, oversized, decorative.
+                {/* The arcade sign-off - outlined, oversized, decorative.
                     aria-hidden because it is the word "dShield" for the fourth
                     time on this page and carries nothing a reader needs. */}
                 <p className="footer__sign" aria-hidden="true">dShield</p>

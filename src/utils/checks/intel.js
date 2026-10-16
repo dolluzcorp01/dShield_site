@@ -1,12 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  Domains 10 & 20 — Breach & Exposure Intelligence, Brand & Digital Risk.
+//  Domains 10 & 20 - Breach & Exposure Intelligence, Brand & Digital Risk.
 //  9 checks, plus SURF-INVENTORY-16 and SURF-TAKEOVER-01 which are domain 1
 //  but built from the same certificate transparency data.
 //
 //  Ported from dShield v6.3 src/checks/intel.js.
 //
 //  THREE CHECKS NEED KEYS THIS SITE DOES NOT HAVE and return INCONCLUSIVE
-//  until they do — never a pass. An inconclusive check is excluded from
+//  until they do - never a pass. An inconclusive check is excluded from
 //  scoring on both sides, so their presence costs a customer nothing, while
 //  their absence would be a silent gap nobody noticed later.
 //
@@ -103,7 +103,7 @@ module.exports = [
         why: "Staff reuse passwords. An address of yours in a breach corpus means somebody may already hold a working password for one of your systems, without needing to attack you at all.",
         async run(target) {
             const r = await hibpDomain(target);
-            if (r.unavailable) throw new Error(`Breach intelligence unavailable — ${r.unavailable}`);
+            if (r.unavailable) throw new Error(`Breach intelligence unavailable - ${r.unavailable}`);
             if (r.status === 404 || !r.data) return { passed: true, evidence: "No breached accounts were found for this domain." };
 
             const accounts = Object.keys(r.data);
@@ -126,7 +126,7 @@ module.exports = [
         why: "An exposed finance or executive address is what invoice fraud is built on. Those accounts can authorise payments, and a criminal who knows one is compromised will start there.",
         async run(target) {
             const r = await hibpDomain(target);
-            if (r.unavailable) throw new Error(`Breach intelligence unavailable — ${r.unavailable}`);
+            if (r.unavailable) throw new Error(`Breach intelligence unavailable - ${r.unavailable}`);
             if (r.status === 404 || !r.data) return { passed: true, evidence: "No senior accounts appear in breach data." };
 
             const exec = Object.keys(r.data).filter((a) => EXEC_PREFIXES.some((p) => a.toLowerCase().startsWith(p)));
@@ -140,10 +140,10 @@ module.exports = [
         id: "BREACH-SECRET-54",
         domain: 10, severity: "critical", minTier: "advanced",
         title: "Credentials found in public code repository",
-        why: "A key committed to a public repository is found within minutes by automated scanners. Deleting the file does not help — it stays in the history unless the history itself is rewritten.",
+        why: "A key committed to a public repository is found within minutes by automated scanners. Deleting the file does not help - it stays in the history unless the history itself is rewritten.",
         async run(target) {
             const token = process.env.GITHUB_TOKEN;
-            if (!token) throw new Error("Repository scanning unavailable — GITHUB_TOKEN is not configured");
+            if (!token) throw new Error("Repository scanning unavailable - GITHUB_TOKEN is not configured");
 
             const patterns = [
                 `"${target.domain}" AKIA`,
@@ -263,7 +263,7 @@ module.exports = [
     },
 
     {
-        /* One of the eight free-tier checks. Self-contained on purpose — see
+        /* One of the eight free-tier checks. Self-contained on purpose - see
            the note at the top of this file. */
         id: "BRAND-TYPO-59",
         domain: 20, severity: "high", minTier: "snapshot",

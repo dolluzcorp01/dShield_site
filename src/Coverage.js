@@ -11,7 +11,7 @@ import { useDocumentMeta } from "./utils/meta";
    stand on its own for somebody who has never run a scan and may not yet
    know what the eighteen are.
 
-   Stylesheet is Services.css on purpose — there is no third stylesheet.
+   Stylesheet is Services.css on purpose - there is no third stylesheet.
    ───────────────────────────────────────────────────────────────────────── */
 
 /* Each names a system the customer already runs and states what connecting
@@ -41,7 +41,7 @@ function Coverage() {
                 <p className="ds-eyebrow">The part nobody shows you first</p>
                 <h1>Six of the eighteen open in two minutes</h1>
                 <p className="ds-lead coverage__lead" style={{ marginBottom: 34 }}>
-                    You give us read-only access to something you already use — the same way you
+                    You give us read-only access to something you already use - the same way you
                     add any app. You approve it on Microsoft’s screen, not ours. We never see
                     your password, and you can cut us off whenever you like.
                 </p>
@@ -58,7 +58,7 @@ function Coverage() {
                 <div className="ds-card checktwice">
                     <p>
                         <strong>We check twice.</strong> The first time we are guessing from the
-                        street. The second time, with your systems connected, we are not — and
+                        street. The second time, with your systems connected, we are not - and
                         your report stops saying “you told us it’s partly done” and starts saying{" "}
                         <strong>“four of your six administrators have no second step to log in.”</strong>
                     </p>
@@ -66,14 +66,14 @@ function Coverage() {
             </section>
 
             {/* The counterweight. Without this the page implies connectors close
-                the whole gap, and they do not — they close six of eighteen.
+                the whole gap, and they do not - they close six of eighteen.
                 Overstating that would undercut the exact honesty the entire
                 product is sold on, which is a bad trade for one page of copy. */}
             <section className="ds-wrap ds-section ds-section--tight">
                 <h2>And twelve that no system can answer</h2>
                 <p className="ds-lead coverage__counterweight">
                     Connecting your systems closes six of the eighteen. The other twelve are
-                    about process and people — whether your backups actually restore, whether a
+                    about process and people - whether your backups actually restore, whether a
                     junior would challenge a payment request from the CEO, whether someone would
                     admit a mistake early enough to matter. No API can answer those. They are
                     what the guided assessment and the consultation sessions are for.

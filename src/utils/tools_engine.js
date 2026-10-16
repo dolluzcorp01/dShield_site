@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  tools_engine — the five free public tools.
+//  tools_engine - the five free public tools.
 //
 //  Each is a separate front door with its own page and its own search
 //  traffic. They are not a dropdown on the scan page, and that is
@@ -19,7 +19,7 @@ const {
 
 // ── 1 · Password Exposure Check ──────────────────────────────────────────
 //
-// k-anonymity, and it is not a detail — it is the whole reason this tool is
+// k-anonymity, and it is not a detail - it is the whole reason this tool is
 // defensible. The password is hashed in the browser. Only the FIRST FIVE
 // characters of that hash are sent to us, and we forward only those five to
 // the range API. We receive a list of hash suffixes and count matches.
@@ -99,7 +99,7 @@ async function emailSpoofing(domainInput) {
         out.records.dmarc = { present: null, error: "Could not be checked" };
     }
 
-    // DKIM — selectors are chosen by the sender, so absence proves nothing.
+    // DKIM - selectors are chosen by the sender, so absence proves nothing.
     // Report what we find and say plainly what we cannot know.
     const SELECTORS = ["default", "google", "selector1", "selector2", "k1", "s1", "mail", "dkim", "zoho"];
     const found = [];
@@ -107,7 +107,7 @@ async function emailSpoofing(domainInput) {
         try {
             const txt = await withTimeout(txtRecords(`${sel}._domainkey.${domain}`), 4000, "DKIM lookup");
             if (txt.some((r) => /v=DKIM1|k=rsa|p=/i.test(r))) found.push(sel);
-        } catch (e) { /* selector absent — expected for most */ }
+        } catch (e) { /* selector absent - expected for most */ }
     }));
     out.records.dkim = {
         present: found.length > 0, selectors: found,
@@ -220,7 +220,7 @@ const HEADER_SPEC = [
     },
     {
         key: "permissions-policy", label: "Permissions Policy", severity: "low",
-        what: "Declares which browser features — camera, microphone, location — your pages may use.",
+        what: "Declares which browser features - camera, microphone, location - your pages may use.",
     },
 ];
 
@@ -249,7 +249,7 @@ async function securityHeaders(domainInput) {
         };
     });
 
-    // Cookie flags — a session cookie without Secure and HttpOnly is a
+    // Cookie flags - a session cookie without Secure and HttpOnly is a
     // session waiting to be stolen by any script on the page.
     const cookies = [].concat(res.headers["set-cookie"] || []);
     const cookieIssues = cookies.map((c) => {
@@ -322,7 +322,7 @@ async function lookalikeDomains(domainInput) {
             : registered.length
                 ? `${registered.length} lookalike domain(s) are registered but none are configured to send mail.`
                 : "No common misspelling of your domain appears to be registered.",
-        note: "We test common misspellings — a dropped letter, a doubled letter, two letters swapped, and characters that are hard to tell apart. This is not an exhaustive search of every possible variant.",
+        note: "We test common misspellings - a dropped letter, a doubled letter, two letters swapped, and characters that are hard to tell apart. This is not an exhaustive search of every possible variant.",
     };
 }
 

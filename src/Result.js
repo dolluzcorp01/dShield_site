@@ -16,14 +16,14 @@ const GRADE_WORD = {
 const SEVERITY_ORDER = ["critical", "high", "medium", "low"];
 
 /* ─────────────────────────────────────────────────────────────────────────
-   "Send me a copy of this" — the lead capture, from the prototype's
+   "Send me a copy of this" - the lead capture, from the prototype's
    #leadoptin block (line 1320 of 01-customer-website-v5.9-FROZEN.jsx).
 
    IT IS HERE AND NOT IN THE HERO, WHICH IS THE WHOLE POINT. The prototype's
    comment on this block:
 
      Offered after the result, never before it. The scan is free and the
-     result is theirs whether or not they give us an address — asking first
+     result is theirs whether or not they give us an address - asking first
      would make the address the price of the check.
 
    The scan box used to carry an optional email field. Removing it without
@@ -38,7 +38,7 @@ const SEVERITY_ORDER = ["critical", "high", "medium", "low"];
    A FAILURE HERE IS NEVER SHOWN. They already have their result; this is us
    asking for an address. An error on a courtesy step reads as a broken
    product, so the thank-you renders either way and the problem goes to the
-   console. That is the prototype's behaviour too, and it is the right one —
+   console. That is the prototype's behaviour too, and it is the right one -
    nothing the visitor could do about it, and nothing they lose.
    ───────────────────────────────────────────────────────────────────────── */
 
@@ -50,7 +50,7 @@ function ScanLeadCapture({ domain, scanId }) {
     const [busy, setBusy] = useState(false);
     const [sent, setSent] = useState(false);
 
-    /* UNTICKED ON LOAD — a literal false, not a prop a caller could set.
+    /* UNTICKED ON LOAD - a literal false, not a prop a caller could set.
        A pre-ticked box is not consent under DPDP or GDPR, and a form that
        ships one has poisoned every contact captured before anybody noticed.
 
@@ -76,7 +76,7 @@ function ScanLeadCapture({ domain, scanId }) {
                 /* The exact wording they read, sent with the tick, so the
                    record shows what was on screen rather than what we believe
                    the form said that day. Nothing is sent when the box is
-                   clear — a consent record carrying wording but no tick reads
+                   clear - a consent record carrying wording but no tick reads
                    as consent to whoever audits it later. */
                 consentText: optIn ? OPT_IN_TEXT : undefined,
             });
@@ -158,9 +158,9 @@ function ScanLeadCapture({ domain, scanId }) {
    A compact scan box, so a second domain does not mean going home first.
 
    The prototype keeps its input on screen after a scan because its result
-   appears on the same page. Ours is its own route — /result/:id is
+   appears on the same page. Ours is its own route - /result/:id is
    shareable, is what the result emails link to, and carries its own
-   noindex — so the page stays a page and only the box comes across.
+   noindex - so the page stays a page and only the box comes across.
 
    It streams like the home page's does, but shows no per-area progress:
    there is no grid above it to fill, and a second progress display arguing
@@ -227,7 +227,7 @@ function Result() {
 
     /* noindex, and a GENERIC title with no domain in it.
        A result is an assessment of somebody else's company and often carries
-       a poor grade. Letting Google index "acme.com — Grade D" would publish a
+       a poor grade. Letting Google index "acme.com - Grade D" would publish a
        security assessment of a third party under our name. */
     useDocumentMeta({
         title: "Scan Result | dShield",
@@ -265,7 +265,7 @@ function Result() {
     }
 
     /* An inconclusive scan gets no grade at all.
-       This is not a degraded case to paper over — it is the rule. In earlier
+       This is not a degraded case to paper over - it is the rule. In earlier
        testing of the main engine, a scan where every check errored reported
        grade A, score 100, zero findings, because with nothing running there
        was nothing left to fail. A customer behind a firewall would have been
@@ -274,7 +274,7 @@ function Result() {
     if (result.status === "inconclusive") {
         /* A blocked scan and a slow one look the same in the numbers and are
            completely different to the reader. If a firewall identified us and
-           stopped answering, say so — that is their protection working, not a
+           stopped answering, say so - that is their protection working, not a
            fault on either side, and it has a different remedy. */
         const wasBlocked = (result.inconclusive || []).some((i) =>
             /stopped responding|scanning was stopped/i.test(i.reason || ""));
@@ -288,7 +288,7 @@ function Result() {
                             <h2>{result.domain} stopped responding to us partway through.</h2>
                             <p className="ds-muted">
                                 This usually means a firewall or security service identified the scan
-                                and blocked it — which is your protection working. We stopped rather
+                                and blocked it - which is your protection working. We stopped rather
                                 than pressing on. Trying again in an hour usually succeeds, and if you
                                 own this domain you can allow our scanner instead.
                             </p>
@@ -313,12 +313,12 @@ function Result() {
                             {result.inconclusive.map((i) => (
                                 <li key={i.checkId}>
                                     <strong>{i.title}</strong>
-                                    <span className="ds-faint"> — {i.reason}</span>
+                                    <span className="ds-faint"> - {i.reason}</span>
                                 </li>
                             ))}
                         </ul>
                     )}
-                    {/* Only for the ordinary case — the blocked wording above
+                    {/* Only for the ordinary case - the blocked wording above
                         already explains itself, and repeating it would read as
                         though we had not understood our own result. */}
                     {!wasBlocked && (
@@ -337,7 +337,7 @@ function Result() {
     /* WHAT WE ACTUALLY MEASURED, not what we set out to measure.
 
        coverageMap.filter(d => d.scanned) counts the domains this tier
-       ATTEMPTS — a fixed five, always. domainScores holds the ones that
+       ATTEMPTS - a fixed five, always. domainScores holds the ones that
        produced a number, which is a smaller set whenever a check could not
        run: a scan of dolluzcorp.com attempts five and scores four, because
        crt.sh answered 404 and domain 10 was excluded from the grade.
@@ -351,7 +351,7 @@ function Result() {
     const attempted = result.coverageMap.filter((d) => d.scanned).length;
     const unreachable = attempted - scanned;
     const unscanned = total - attempted;
-    /* pct describes `unscanned` and nothing else — the areas no outside scan
+    /* pct describes `unscanned` and nothing else - the areas no outside scan
        can reach. Deriving it from `scanned` instead would fold the
        unreachable ones in and quietly disagree with the number printed
        beside it. */
@@ -405,7 +405,7 @@ function Result() {
                 )}
             </section>
 
-            {/* What we found — counts and areas only. No titles, no evidence.
+            {/* What we found - counts and areas only. No titles, no evidence.
                 The paywall is enforced on the server: withheld detail is never
                 sent to the browser, so it cannot be read out of the page. */}
             <section className="ds-wrap ds-section ds-section--tight">
@@ -448,7 +448,7 @@ function Result() {
                         <div>
                             <strong>The detail is not in this page.</strong>
                             <p className="ds-muted" style={{ margin: "6px 0 0" }}>
-                                Not hidden in the source, not greyed out — never sent. Each finding
+                                Not hidden in the source, not greyed out - never sent. Each finding
                                 names the exact host, file or record, what an attacker could do with
                                 it, and the steps to close it.
                             </p>
@@ -457,7 +457,7 @@ function Result() {
                 )}
             </section>
 
-            {/* The coverage map — the entire commercial argument, and the
+            {/* The coverage map - the entire commercial argument, and the
                 reason the free scan is worth giving away. */}
             <section className="ds-wrap ds-section ds-section--tight">
                 <p className="ds-eyebrow">Coverage</p>
@@ -468,8 +468,8 @@ function Result() {
                         <>
                             {" "}and could not reach {unreachable} more that we tried
                         </>
-                    )}. The other {unscanned} — {pct}% of what determines whether an incident
-                    becomes a crisis — cannot be seen from outside by anyone, including us.
+                    )}. The other {unscanned} - {pct}% of what determines whether an incident
+                    becomes a crisis - cannot be seen from outside by anyone, including us.
                 </p>
 
                 {/* THIS USED TO SAY "Measured" FOR A DOMAIN NOTHING MEASURED.
@@ -479,12 +479,12 @@ function Result() {
 
                         {d.scanned ? "Measured" : "Assessment required"}
 
-                    coverageMap is ALL_DOMAINS — a static list where 1, 4, 6,
+                    coverageMap is ALL_DOMAINS - a static list where 1, 4, 6,
                     10 and 20 are permanently scanned:true. It records which
                     domains the tier ATTEMPTS, not which ones returned an
                     answer. So a scan of dolluzcorp.com printed "Measured" for
                     domain 10, whose only snapshot check is BREACH-METADATA-55
-                    and whose actual result was "crt.sh returned HTTP 404" —
+                    and whose actual result was "crt.sh returned HTTP 404" -
                     recorded inconclusive and excluded from the grade.
 
                     An inconclusive check shown as measured is the rule this
@@ -534,7 +534,7 @@ function Result() {
 
                 It used to stop here and drop straight into the footer, so
                 somebody who had just been shown eighteen dark tiles scrolled
-                down and found nothing — the moment they are most likely to
+                down and found nothing - the moment they are most likely to
                 want to know what is in those tiles.
 
                 The prototype does not end after a result either: CONNECT and

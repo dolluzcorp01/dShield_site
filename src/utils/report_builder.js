@@ -1,11 +1,11 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  report_builder — turns a scan into the report a given tier has paid for.
+//  report_builder - turns a scan into the report a given tier has paid for.
 //
 //  ⚠️  THIS IS WHERE THE PAYWALL IS DECIDED, AND IT IS DECIDED HERE ON THE
 //  SERVER. Content a tier has not paid for is never placed in the object at
-//  all — not hidden, not flagged, not sent and ignored by the frontend.
+//  all - not hidden, not flagged, not sent and ignored by the frontend.
 //  Something absent from the response cannot leak from it, and /result tells
-//  customers exactly that: "not hidden in the source, not greyed out —
+//  customers exactly that: "not hidden in the source, not greyed out -
 //  never sent".
 //
 //  Every widening of a tier's content must be matched by a test in
@@ -20,7 +20,7 @@ const { SEVERITY_WEIGHT } = require("./scan_engine");
 const TIER_RANK = { snapshot: 0, basic: 1, advanced: 2, full_protection: 3 };
 const CHECK_BY_ID = new Map(ALL_CHECKS.map((c) => [c.id, c]));
 
-/* Severity, weight and domain come from the CHECK, never from the library —
+/* Severity, weight and domain come from the CHECK, never from the library -
    see the note in remediation.js. */
 const weightOf = (severity) => SEVERITY_WEIGHT[severity] || 0;
 
@@ -103,18 +103,18 @@ function buildReport(scan, tier = "snapshot") {
     }
 
     /* Above free we need the findings themselves. runScan only attaches them
-       above the snapshot tier — see the note there. If a caller passes a
+       above the snapshot tier - see the note there. If a caller passes a
        snapshot scan and asks for a paid report, say so rather than quietly
        returning an empty one. */
     if (!Array.isArray(scan.findings)) {
         throw new Error(
-            `buildReport("${tier}") needs the scan's findings. Run the scan at a paid tier — ` +
+            `buildReport("${tier}") needs the scan's findings. Run the scan at a paid tier - ` +
             "runScan() withholds findings on snapshot scans so the free response cannot leak them.");
     }
 
     const failed = scan.findings.filter((f) => !f.passed);
 
-    // BASIC — what is wrong and where, with the evidence. Not what to do
+    // BASIC - what is wrong and where, with the evidence. Not what to do
     // about it: that is the difference a customer is paying for at advanced.
     report.findings = failed.map((f) => {
         const check = CHECK_BY_ID.get(f.checkId);
@@ -132,7 +132,7 @@ function buildReport(scan, tier = "snapshot") {
         };
 
         if (rank >= 2) {
-            // ADVANCED — impact, the steps, how to verify, and what it costs.
+            // ADVANCED - impact, the steps, how to verify, and what it costs.
             out.impact = lib ? lib.impact : null;
             out.remediation = lib ? lib.remediation : null;
             out.effortHours = lib ? lib.effortHours : null;

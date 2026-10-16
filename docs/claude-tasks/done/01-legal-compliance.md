@@ -1,4 +1,4 @@
-# Claude Code — dShield Site · Task 01
+# Claude Code - dShield Site · Task 01
 ## Legal & compliance foundation
 
 **Repo:** `dolluzcorp01/dShield_site` · branch `main`
@@ -23,7 +23,7 @@ optional.
 Indian payment gateways generally require a live website with published Terms,
 Privacy Policy, Refund & Cancellation Policy and Contact page before they will
 approve a merchant account. KYC is the longest pole in the dShield launch
-plan, so building these pages is not a compliance chore that delays revenue —
+plan, so building these pages is not a compliance chore that delays revenue -
 it is a prerequisite for starting the clock on it.
 
 *(Confirm the exact list against Razorpay's current merchant onboarding
@@ -32,12 +32,12 @@ rule, not ours.)*
 
 ---
 
-## Design decisions — follow these, do not substitute
+## Design decisions - follow these, do not substitute
 
 ### Four documents, not seven
 
-The main dShield product has seven legal documents. Four of them — the DPA,
-NDA, Change Authority Annex and Protected Asset Schedule — only apply when a
+The main dShield product has seven legal documents. Four of them - the DPA,
+NDA, Change Authority Annex and Protected Asset Schedule - only apply when a
 customer uploads logs or lets us change their systems. Neither happens on the
 public site.
 
@@ -55,7 +55,7 @@ Build exactly these four:
 Counsel has not reviewed anything. Every document ships with placeholder body
 text and `is_placeholder = TRUE`.
 
-Placeholder text must be **obviously** placeholder — a banner on the page
+Placeholder text must be **obviously** placeholder - a banner on the page
 reading "This document is awaiting legal review and is not yet binding", not
 plausible-looking legalese that a visitor would mistake for a real policy.
 Fake terms are worse than no terms, because a visitor relies on them.
@@ -76,7 +76,7 @@ consent banner becomes required and this decision must be revisited.*
 
 ### Suppression is stored as a hash, never as an address
 
-Copy this from the main product — it is deliberate and it is right.
+Copy this from the main product - it is deliberate and it is right.
 
 The unsubscribe table stores `SHA-256(lowercased email)` and nothing else. No
 address, no name, no history. It cannot be used to look anyone up or to
@@ -90,7 +90,7 @@ there is **no foreign key** to `leads`.
 
 ## What to build
 
-### 1 · `db/schema-legal.sql` — new file
+### 1 · `db/schema-legal.sql` - new file
 
 A second schema file. `db/schema.sql` stays untouched; this is applied after
 it. Add a short header comment saying it must be run after `schema.sql`.
@@ -127,7 +127,7 @@ version, overwriting it destroys the record of what they agreed to.
 | `reason` | ENUM('unsubscribed','complained','bounced','manual','erasure') NOT NULL | |
 | `suppressed_at` | TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP | |
 
-No email column. No foreign key. Add the comment explaining why — the next
+No email column. No foreign key. Add the comment explaining why - the next
 person to read it will otherwise "fix" it by adding the address back.
 
 **Table `data_requests`**
@@ -164,7 +164,7 @@ greppable.
 
 ---
 
-### 2 · `src/backend_routes/Legal_server.js` — new file
+### 2 · `src/backend_routes/Legal_server.js` - new file
 
 Follow the exact house style of `Lead_server.js`: `express.Router()`,
 `getDBConnection(process.env.DB_NAME || "dshield")`, callback-style
@@ -174,25 +174,25 @@ Follow the exact house style of `Lead_server.js`: `express.Router()`,
 | Route | Behaviour |
 |---|---|
 | `GET /api/legal` | List all current documents: `doc_key`, `title`, `is_placeholder`, `effective_from`. Latest version per key only. |
-| `GET /api/legal/:key` | One document, latest version. 404 with a plain message if the key is unknown. Validate `:key` against the four known keys — do not interpolate it into SQL. |
+| `GET /api/legal/:key` | One document, latest version. 404 with a plain message if the key is unknown. Validate `:key` against the four known keys - do not interpolate it into SQL. |
 | `GET /api/preferences/:token` | Look up a lead by `unsubscribe_token`. Return a **masked** email (`sh•••@dolluzcorp.com`), never the full address. Unknown token → 404, same message as an expired one. |
-| `POST /api/preferences/:token/unsubscribe` | Write the SHA-256 of the address into `email_suppression` with reason `unsubscribed`. Idempotent — unsubscribing twice must succeed, not error. |
+| `POST /api/preferences/:token/unsubscribe` | Write the SHA-256 of the address into `email_suppression` with reason `unsubscribed`. Idempotent - unsubscribing twice must succeed, not error. |
 | `POST /api/data-request` | Body `{ email, request_type, details }`. Validate email. Insert into `data_requests`. |
 
 Masking matters: without it, anyone who can guess a token gets an address.
 With it, the person recognises their own address and nobody learns a new one.
 
 Reuse the in-memory limiter pattern already in `Tools_server.js` for
-`POST /api/data-request` — 10 per hour per IP is ample.
+`POST /api/data-request` - 10 per hour per IP is ample.
 
 ---
 
-### 3 · `src/Legal.js` + `src/Legal.css` — new files
+### 3 · `src/Legal.js` + `src/Legal.css` - new files
 
 One component rendering any legal document by slug, plus a small index page.
 
 - Route param `:key` maps to `GET /api/legal/:key`
-- Render the markdown body. **Do not add a markdown library** — the placeholder
+- Render the markdown body. **Do not add a markdown library** - the placeholder
   text is plain paragraphs and headings. A simple split on blank lines with
   `<h2>` for lines starting `## ` is enough. Keep the dependency list as it is.
 - When `is_placeholder` is true, render a prominent notice above the content
@@ -201,14 +201,14 @@ One component rendering any legal document by slug, plus a small index page.
 - Show `effective_from` as a formatted date at the top
 - Use existing tokens from `index.css`. Do not introduce new colours.
 
-Also export a `DataRequest` component — a small form posting to
+Also export a `DataRequest` component - a small form posting to
 `/api/data-request` with a type selector (access / erasure / correction). This
 is how a person exercises their DPDP rights, and the Privacy Notice must be
 able to link to it.
 
 ---
 
-### 4 · `src/Preferences.js` — new file
+### 4 · `src/Preferences.js` - new file
 
 The unsubscribe landing page, reached from an email link at
 `/preferences/:token`.
@@ -216,18 +216,18 @@ The unsubscribe landing page, reached from an email link at
 - Load `GET /api/preferences/:token`, show the masked address
 - One clear button: **Unsubscribe from all email**
 - On success, a confirmation that does not require another click
-- On an unknown or expired token, a calm message and a link to `/contact` —
+- On an unknown or expired token, a calm message and a link to `/contact` -
   not an error page. Someone clicking an old unsubscribe link is trying to do
   the right thing and should not be met with a failure.
 
-Reuse `.ds-card`, `.ds-btn`, `.ds-note`. No new CSS file — add the handful of
+Reuse `.ds-card`, `.ds-btn`, `.ds-note`. No new CSS file - add the handful of
 rules to `Pages.css`.
 
 ---
 
 ### 5 · Edits to existing files
 
-**`server.js`** — mount the new router alongside the existing three, same
+**`server.js`** - mount the new router alongside the existing three, same
 style:
 
 ```js
@@ -237,11 +237,11 @@ app.use("/api/legal", LegalRoutes);
 
 Note the data-request and preferences routes live in the same file but mount
 at different paths. Either mount `Legal_server` three times at `/api/legal`,
-`/api/preferences` and `/api/data-request`, or export three routers from it —
+`/api/preferences` and `/api/data-request`, or export three routers from it -
 **prefer three named router exports**, matching how `wired.js` does it in the
 main product. Keep it explicit.
 
-**`src/App.js`** — add routes, keeping the existing order and the `*`
+**`src/App.js`** - add routes, keeping the existing order and the `*`
 catch-all last:
 
 ```
@@ -251,12 +251,12 @@ catch-all last:
 /data-request       → DataRequest
 ```
 
-**`src/Pages.js`** — the footer currently links to five pages. Add a second
+**`src/Pages.js`** - the footer currently links to five pages. Add a second
 row beneath the existing `footer__links` nav, visually lighter, containing:
 Terms · Privacy · Refunds · Cookies · Your data. Keep the existing row as it
 is; do not merge them into one list of nine.
 
-**`src/backend_routes/Lead_server.js`** — two changes:
+**`src/backend_routes/Lead_server.js`** - two changes:
 
 1. Generate an `unsubscribe_token` (`crypto.randomUUID()`) when inserting a
    lead in `/notify`, and on the `ON DUPLICATE KEY UPDATE` path use
@@ -268,14 +268,14 @@ is; do not merge them into one list of nine.
    again should not be silently re-subscribed, and should not be told they are
    on a suppression list either.
 
-**`README.md`** — add `mysql -u root -p < db/schema-legal.sql` to the setup
+**`README.md`** - add `mysql -u root -p < db/schema-legal.sql` to the setup
 steps, immediately after the existing `schema.sql` line.
 
 ---
 
 ## What only Shoban can supply
 
-Leave these as literal, greppable placeholders. Do **not** invent values —
+Leave these as literal, greppable placeholders. Do **not** invent values -
 a wrong registered address in a published privacy notice is worse than an
 obvious blank.
 
@@ -300,23 +300,23 @@ Run these and report the actual output. Do not report success without running
 them.
 
 ```bash
-# 1 — schema applies cleanly, twice (it must be safe to re-run)
+# 1 - schema applies cleanly, twice (it must be safe to re-run)
 mysql -u root -p dshield < db/schema-legal.sql
 mysql -u root -p dshield < db/schema-legal.sql
 
-# 2 — frontend still compiles
+# 2 - frontend still compiles
 npx react-scripts build
 
-# 3 — server boots
+# 3 - server boots
 node server.js &
 curl -s localhost:4008/api/health
 
-# 4 — legal endpoints
+# 4 - legal endpoints
 curl -s localhost:4008/api/legal
 curl -s localhost:4008/api/legal/privacy
 curl -s localhost:4008/api/legal/nonsense      # expect a clean 404
 
-# 5 — the scan is untouched
+# 5 - the scan is untouched
 curl -s -X POST localhost:4008/api/scan \
      -H "Content-Type: application/json" \
      -d '{"domain":"dolluzcorp.com"}'
@@ -343,6 +343,6 @@ State plainly:
 1. Which files you created and which you edited
 2. The output of every verification step above
 3. Every `[[PLACEHOLDER]]` and the file it sits in
-4. Anything in these instructions that turned out to be wrong or impossible —
+4. Anything in these instructions that turned out to be wrong or impossible -
    say so rather than working around it silently. If something here conflicts
    with what is actually in the repo, stop and describe the conflict.

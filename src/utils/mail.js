@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  mail — queueing and the single point that talks to SendGrid.
+//  mail - queueing and the single point that talks to SendGrid.
 //
 //  Nothing outside the worker calls sendNow(). Request handlers call
 //  queueMail() and return; the worker sends afterwards. See the header of
@@ -10,7 +10,7 @@ const sgMail = require("@sendgrid/mail");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-/* Everything this application sends leaves as connect@dolluzcorp.com — the
+/* Everything this application sends leaves as connect@dolluzcorp.com - the
    mailbox the SendGrid sender identity is verified against, and the one whose
    SPF and DKIM records are published. The fallback matches the deployed
    SENDGRID_FROM rather than an address nobody has authenticated: a missing
@@ -19,7 +19,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
    This is NOT the address printed on the site. What a visitor is told to
    write to is OFFICE.email in src/data/site-content.js, and it is
-   deliberately a different, monitored inbox — see the note there. */
+   deliberately a different, monitored inbox - see the note there. */
 const FROM = process.env.SENDGRID_FROM || "connect@dolluzcorp.com";
 const FROM_NAME = process.env.SENDGRID_FROM_NAME || "dShield";
 
@@ -27,7 +27,7 @@ const FROM_NAME = process.env.SENDGRID_FROM_NAME || "dShield";
  * Is a usable API key configured?
  *
  * A blank value, or a leftover placeholder from .env.example, both count as
- * "not configured" — a key of "CHANGE_ME" would otherwise produce a 401 on
+ * "not configured" - a key of "CHANGE_ME" would otherwise produce a 401 on
  * every row and burn all five attempts before anybody noticed.
  */
 function isConfigured() {
@@ -114,7 +114,7 @@ async function sendNow({ to, cc, subject, html, text }) {
         text,
         html,
     };
-    // Only set cc when there is one — SendGrid rejects an empty array.
+    // Only set cc when there is one - SendGrid rejects an empty array.
     if (ccList.length) msg.cc = ccList;
 
     const [res] = await sgMail.send(msg);

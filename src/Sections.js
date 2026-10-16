@@ -22,13 +22,13 @@ import "./Sections.css";
    1,954-line function, the tables come from data/site-content.js so the
    standalone routes render the same words, and the hover states are CSS
    rather than the prototype's onMouseEnter/onMouseLeave handlers writing to
-   element.style — which never fire for a keyboard user, so the cards it
+   element.style - which never fire for a keyboard user, so the cards it
    applies them to had no focus appearance at all.
    ───────────────────────────────────────────────────────────────────────── */
 
 /* ── WHAT WE DO ──────────────────────────────────────────────────────────
    The four PROOF figures sit under it. They are checkable claims, which is
-   the point — 58 and 23 are asserted against the real catalogue by
+   the point - 58 and 23 are asserted against the real catalogue by
    scripts/verify-site-content.mjs, so this block cannot drift away from the
    engine without the verifier failing. */
 export function WhatWeDo() {
@@ -37,7 +37,7 @@ export function WhatWeDo() {
             <Reveal>
                 <p className="ds-eyebrow">What we do</p>
                 <h2 className="ds-shout sec__h2">
-                    We tell you what we can see —<br />and what we cannot
+                    We tell you what we can see - <br />and what we cannot
                 </h2>
                 <p className="ds-lead sec__lead">
                     Most security reports give you a number and let you assume it covers
@@ -64,7 +64,7 @@ export function WhatWeDo() {
 
 /* ── CONNECT ─────────────────────────────────────────────────────────────
    In the prototype this section renders only after a scan finishes. On the
-   home page there is no scan to finish, so it stands on its own — it is an
+   home page there is no scan to finish, so it stands on its own - it is an
    argument about the eighteen areas a scan cannot reach, and that argument
    is true before anybody types a domain. */
 export function Connect() {
@@ -76,7 +76,7 @@ export function Connect() {
                     Six of the eighteen<br />open in two minutes
                 </h2>
                 <p className="ds-lead sec__lead">
-                    You give us read-only access to something you already use — the same way you
+                    You give us read-only access to something you already use - the same way you
                     add any app. You approve it on Microsoft’s screen, not ours. We never see
                     your password, and you can cut us off whenever you like.
                 </p>
@@ -98,7 +98,7 @@ export function Connect() {
                 <div className="conn__twice">
                     <strong className="conn__twice-lead">We check twice.</strong> The first time
                     we are guessing from the street. The second time, with your systems
-                    connected, we are not — and your report stops saying{" "}
+                    connected, we are not - and your report stops saying{" "}
                     <em className="ds-faint">“you told us it’s partly done”</em> and starts
                     saying <strong>“four of your six administrators have no second step to log
                     in.”</strong>
@@ -111,14 +111,14 @@ export function Connect() {
 /* ── SPOT CHECKS ─────────────────────────────────────────────────────────
 
    THE PROTOTYPE LISTS SEVEN AND LINKS NONE OF THEM. Its cards are buttons
-   with a hover effect and no handler — including the two paid ones, which
+   with a hover effect and no handler - including the two paid ones, which
    have no engine behind them anywhere in this repository.
 
    All seven are cards here too, so the grid matches the prototype. What
    differs is what a card IS. The five built tools are links to their tool
    pages. The two unbuilt ones are plain divs: dimmed, no hover lift, no
    pointer, and outside the tab order because a div with no handler and no
-   tabindex simply is — nothing to click, nothing to tab to, nothing to buy.
+   tabindex simply is - nothing to click, nothing to tab to, nothing to buy.
    Their badge carries "SOON" and the price is not rendered at all, so no
    figure on those two cards reads as a thing you can pay for today.
 
@@ -169,8 +169,8 @@ export function SmartChecks() {
    already gone wrong. */
 export function ServicesBlock() {
     /* One flat run of eight, laid out two-up. The prototype numbers them
-       01–08 straight through, which only works if the left and right halves
-       are cells of ONE grid rather than two independent lists — numbering
+       01-08 straight through, which only works if the left and right halves
+       are cells of ONE grid rather than two independent lists - numbering
        per column would restart at 01 halfway across the row. */
     const all = [...SERVICES_LEFT, ...SERVICES_RIGHT];
 
@@ -180,7 +180,7 @@ export function ServicesBlock() {
                 <p className="ds-eyebrow">Services</p>
                 <h2 className="ds-shout sec__h2">When the report is not enough</h2>
                 <p className="ds-lead sec__lead">
-                    The platform is the first card. Everything after it is people — our
+                    The platform is the first card. Everything after it is people - our
                     engineers, on your side of the problem.
                 </p>
             </Reveal>
@@ -231,14 +231,14 @@ export function Compliance() {
                     The frameworks your clients<br />will ask you about
                 </h2>
                 <p className="ds-lead sec__lead">
-                    Certification is rarely the real goal — winning the contract is. We get you
+                    Certification is rarely the real goal - winning the contract is. We get you
                     through the audit and keep you there between them.
                 </p>
             </Reveal>
 
             {/* Two panels, not two bare columns. Each framework is a row that
-                reacts to the pointer and carries its index on the right —
-                01–04 down the left panel, 05–08 down the right, which is why
+                reacts to the pointer and carries its index on the right -
+                01-04 down the left panel, 05-08 down the right, which is why
                 the counter is offset by the panel index rather than restarting.
 
                 Every row is a link. The prototype's rows are buttons that
@@ -281,7 +281,7 @@ export function Compliance() {
 
    <details>/<summary> is the same interaction with the semantics already
    attached, keyboard behaviour included, and it stays open when the page is
-   printed — which matters, because Ctrl+P is currently how a customer gets
+   printed - which matters, because Ctrl+P is currently how a customer gets
    a file out of the report. */
 export function Faq() {
     return (

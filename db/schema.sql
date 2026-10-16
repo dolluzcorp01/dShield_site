@@ -1,5 +1,5 @@
 -- ─────────────────────────────────────────────────────────────────────────
---  dShield Global Site — schema
+--  dShield Global Site - schema
 --
 --  Run once:
 --     mysql -u root -p < db/schema.sql
@@ -16,7 +16,7 @@ USE dshield;
 
 -- ── scans ────────────────────────────────────────────────────────────────
 -- One row per free scan. result_json holds exactly what was returned to the
--- browser, so re-opening a shared link shows the same document — a result
+-- browser, so re-opening a shared link shows the same document - a result
 -- that changes when you reload it is not a result anyone can act on.
 CREATE TABLE IF NOT EXISTS scans (
   id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

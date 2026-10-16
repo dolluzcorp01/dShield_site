@@ -5,17 +5,17 @@ import { TIERS, DOMAINS } from "./data/site-content";
 import "./Tiers.css";
 
 /* ─────────────────────────────────────────────────────────────────────────
-   TIERS — the plan cards, from the prototype's section of the same name
+   TIERS - the plan cards, from the prototype's section of the same name
    (line 1429 of 01-customer-website-v5.9-FROZEN.jsx).
 
    The device that makes this table work is the bar: twenty-three segments,
    one per risk area, filled up to what that tier covers. Five prices in a
    row tell you nothing about what separates them; five bars of 5, 5, 8, 21
    and 21 segments tell you immediately, and they are all measuring the same
-   thing — which is why the heading is "Every bar is the same 23 areas".
+   thing - which is why the heading is "Every bar is the same 23 areas".
 
    Hover or focus reveals what a tier includes; clicking pins it open, so a
-   touch device — which has no hover — reaches the same list.
+   touch device - which has no hover - reaches the same list.
 
    THE SEGMENT COUNT IS NOT A LITERAL 23. It is DOMAINS.length, so a bar can
    never disagree with the grid above it. verify-site-content.mjs already
@@ -58,7 +58,7 @@ function Tiers() {
 
                                 {/* One segment per risk area. aria-hidden because
                                     the figure underneath already says "5/23
-                                    areas" — twenty-three empty spans would be
+                                    areas" - twenty-three empty spans would be
                                     read out as noise. */}
                                 <span className="tier__bar" aria-hidden="true">
                                     {DOMAINS.map((d, k) => (
@@ -94,7 +94,7 @@ function Tiers() {
 
             {/* The way out of this section.
 
-                The prototype's tier cards are inert — it has no pricing page
+                The prototype's tier cards are inert - it has no pricing page
                 to send anybody to. We do, and until now nothing in this
                 section pointed at it: the cards expand to show what a tier
                 includes and then stop.

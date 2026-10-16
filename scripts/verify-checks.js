@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // ─────────────────────────────────────────────────────────────────────────
-//  verify-checks — assert the shape of the check catalogue.
+//  verify-checks - assert the shape of the check catalogue.
 //
 //      node scripts/verify-checks.js
 //
@@ -83,7 +83,7 @@ const admin = ALL_CHECKS.find((c) => c.id === "SURF-ADMIN-02");
 if (!admin) fail("SURF-ADMIN-02 is missing");
 else admin.severity === "high"
     ? pass("SURF-ADMIN-02 is high, not critical")
-    : fail(`SURF-ADMIN-02 is "${admin.severity}" — it must be high, or well-run sites cap at D`);
+    : fail(`SURF-ADMIN-02 is "${admin.severity}" - it must be high, or well-run sites cap at D`);
 
 // ── 8 · id format ────────────────────────────────────────────────────────
 const ID_RE = /^[A-Z]+-[A-Z0-9-]+$/;
@@ -117,4 +117,4 @@ if (failures) {
     console.log(`❌ ${failures} problem(s) with the catalogue\n`);
     process.exit(1);
 }
-console.log(`✅ catalogue is sound — ${ALL_CHECKS.length} checks, ${Object.keys(byDomain).length} domains\n`);
+console.log(`✅ catalogue is sound - ${ALL_CHECKS.length} checks, ${Object.keys(byDomain).length} domains\n`);

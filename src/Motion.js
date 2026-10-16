@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 /* ─────────────────────────────────────────────────────────────────────────
-   Motion — the three animation primitives the site shares.
+   Motion - the three animation primitives the site shares.
 
    Ported from the frozen v5.9 prototype, where Count and Reveal sit at lines
    504 and 517 as local helpers inside the single-file component. They are
@@ -10,7 +10,7 @@ import React, { useEffect, useRef, useState } from "react";
    them was already living privately in Bolt.js.
 
    One copy of each. Two copies of a palette is how a product ends up with
-   two design systems — the prototype's own comment, and it applies just as
+   two design systems - the prototype's own comment, and it applies just as
    well to two copies of a hook.
    ───────────────────────────────────────────────────────────────────────── */
 
@@ -38,20 +38,20 @@ export function usePrefersReducedMotion() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   Count — a number that counts up to itself.
+   Count - a number that counts up to itself.
 
    Quartic ease-out, so it moves fast and settles slowly. That is what makes
    a score feel arrived-at rather than merely displayed.
 
    THE PROTOTYPE'S VERSION IGNORES REDUCED MOTION. It animates unconditionally
    from 0. A number sprinting upward is exactly the kind of movement the
-   setting is asking us to stop, and this one carries a security grade — the
+   setting is asking us to stop, and this one carries a security grade - the
    single most important figure on the page. Under reduced motion the final
    value is printed immediately.
 
    It also starts from 0 on every mount, which means a score of 0 animates
    from 0 to 0 and looks identical to a tile that never loaded. Real scans
-   produce 0 — dolluzcorp.com scores 0 on domain 20 today — so the final
+   produce 0 - dolluzcorp.com scores 0 on domain 20 today - so the final
    value is committed synchronously when it is already correct.
    ───────────────────────────────────────────────────────────────────────── */
 export function Count({ to, dur = 900 }) {
@@ -77,7 +77,7 @@ export function Count({ to, dur = 900 }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   Reveal — fades a block in when it scrolls into view.
+   Reveal - fades a block in when it scrolls into view.
 
    Under reduced motion the child is rendered plainly, with no wrapper
    transition and no observer attached at all.

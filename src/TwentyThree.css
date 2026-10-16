@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────
-   THE 23 — the tile grid.
+   THE 23 - the tile grid.
 
    Colours come from the tokens in index.css. There is no palette object and
    no hex literal below that is not an alpha wash of an existing token.
@@ -12,7 +12,7 @@
 
    The mark matters. Roughly one man in twelve cannot separate the lime from
    the amber, and "we scored this" against "we could not check this" is the
-   single most important distinction on the page — it is the difference
+   single most important distinction on the page - it is the difference
    between a measurement and a gap. Colour alone would hide it from exactly
    the people the product is meant to be honest with.
    ───────────────────────────────────────────────────────────────────────── */
@@ -41,7 +41,7 @@
     margin: 0;
 }
 
-/* Six columns, then three, then two — the prototype's .g23 exactly.
+/* Six columns, then three, then two - the prototype's .g23 exactly.
    auto-fill/minmax was close but not the same: at 1440px it produces eight
    columns and the grid reads as a wall rather than the four tidy rows of six
    the layout was drawn for. */
@@ -128,7 +128,7 @@
     color: var(--bone-faint);
 }
 
-/* idle — before anybody has scanned. Dimmed as a whole, because nothing
+/* idle - before anybody has scanned. Dimmed as a whole, because nothing
    here means anything yet. */
 .t23--idle {
     opacity: .5;
@@ -143,7 +143,7 @@
 .t23--lit .t23__no   { color: var(--lime); }
 .t23--lit .t23__name { color: var(--bone); }
 
-/* unreachable — we tried and got nothing back. Amber, never lime, and never
+/* unreachable - we tried and got nothing back. Amber, never lime, and never
    the same treatment as "you need to buy this to see it". */
 .t23--unreachable {
     border-color: var(--amber);
@@ -268,7 +268,7 @@
 }
 
 /* The tile lift and the open-tile rotation are decoration. The three states
-   remain fully distinguishable without them — border, mark and text all stay. */
+   remain fully distinguishable without them - border, mark and text all stay. */
 @media (prefers-reduced-motion: reduce) {
     .t23,
     .t23--open,

@@ -20,7 +20,7 @@ import {
    vertical, with black type. At a 70px header height it would be both the
    wrong shape and invisible.
 
-   So the eagle comes from eagle-mark.png — already isolated, already gold —
+   So the eagle comes from eagle-mark.png - already isolated, already gold -
    and the wordmark is set in the display face. It scales without blurring,
    costs 11 kB instead of 150, and takes its colours from the tokens.
 
@@ -29,14 +29,14 @@ import {
    half the navigation is unreachable without a mouse. Here the trigger is a
    real button with aria-expanded and aria-haspopup, opening on focus as well
    as hover; Escape closes, and so does focus leaving the header. Clicking
-   the trigger itself goes to the section — see the note on Trigger for why
+   the trigger itself goes to the section - see the note on Trigger for why
    click must not also toggle.
    ───────────────────────────────────────────────────────────────────────── */
 
 /* The ticker. Every item is a claim made elsewhere and has to stay true: 58
    is the check count in src/utils/checks/index.js, 23 and 5 are the coverage
    map, and 18 is the difference. If one stops matching the engine this is a
-   lie scrolling across the top of every page — which is why
+   lie scrolling across the top of every page - which is why
    scripts/verify-site-content.mjs asserts the numbers. */
 const TICKER = [
     "23 RISK AREAS",
@@ -71,7 +71,7 @@ function MegaMenu({ left, right, leftLabel, rightLabel, onPick }) {
                 ))}
             </div>
 
-            {/* the silver line — fades to nothing at both ends rather than
+            {/* the silver line - fades to nothing at both ends rather than
                 cutting the box in half with a hard rule */}
             <div className="mega__rule" aria-hidden="true" />
 
@@ -129,7 +129,7 @@ function Navbar() {
 
     /* OPEN ON HOVER *OR* FOCUS. CLICK GOES TO THE SECTION.
 
-       The obvious wiring — hover opens, click toggles — is broken on a
+       The obvious wiring - hover opens, click toggles - is broken on a
        mouse: entering the trigger opens the panel, and the click that
        follows immediately toggles it shut again, so it is impossible to
        open by clicking. Splitting the two jobs fixes it and is also the
@@ -220,8 +220,8 @@ function Navbar() {
                     {/* A SIBLING OF .nav__links, NOT A CHILD OF IT.
 
                         margin-left:auto only pushes when there is free space
-                        to consume. Inside .nav__links — a flex row sized to
-                        its own content — there is none, so the button sat
+                        to consume. Inside .nav__links - a flex row sized to
+                        its own content - there is none, so the button sat
                         against the last link with the whole right half of the
                         header empty. As a third child of .nav__inner the auto
                         margin has the row's spare width to eat, and the brand
@@ -233,7 +233,7 @@ function Navbar() {
                         Scrolls to the section on the home page, routes to
                         /contact from anywhere else. It stays an <a> with a
                         real href either way, so it is still a link a
-                        middle-click or a screen reader can use — a button
+                        middle-click or a screen reader can use - a button
                         that navigates is neither. */}
                     <Link
                         to="/contact"

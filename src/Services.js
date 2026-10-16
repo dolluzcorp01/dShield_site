@@ -7,7 +7,7 @@ import { useDocumentMeta } from "./utils/meta";
    What we do · Services · Compliance.
 
    Copy ported from the frozen customer site. The words were written and
-   approved there; the styling was not — that file is a standalone prototype
+   approved there; the styling was not - that file is a standalone prototype
    in neon cyan and magenta with inline styles. This uses the live site's
    tokens and existing classes, and nothing else.
 
@@ -22,7 +22,7 @@ const STATS = [
 ];
 
 /* Card 01 is our own platform and points back at the free scan rather than
-   at a contact form — asking someone to enquire about the thing they can
+   at a contact form - asking someone to enquire about the thing they can
    simply use, for nothing, right now, would be absurd. */
 const SERVICES = [
     { no: "01", name: "Cyber Resilience Check", note: "Our platform. Start free, above.", platform: true },
@@ -54,7 +54,7 @@ const PRIVACY = [
 
 function Services() {
     useDocumentMeta({
-        title: "Cybersecurity Services — Audits, Testing, Compliance | dShield",
+        title: "Cybersecurity Services - Audits, Testing, Compliance | dShield",
         description: "Penetration testing, incident response, SOC setup, third-party risk and ISO 27001, SOC 2 and DPDP compliance, delivered by Dolluz Corp engineers.",
         canonical: "/services",
     });
@@ -65,7 +65,7 @@ function Services() {
             {/* ── A · What we do ─────────────────────────────────────── */}
             <section className="ds-wrap ds-section">
                 <p className="ds-eyebrow">What we do</p>
-                <h1>We tell you what we can see — and what we cannot</h1>
+                <h1>We tell you what we can see - and what we cannot</h1>
                 <p className="ds-lead" style={{ marginBottom: 34 }}>
                     Most security reports give you a number and let you assume it covers
                     everything. Ours does the opposite. Every report carries a section titled
@@ -89,7 +89,7 @@ function Services() {
                 <p className="ds-eyebrow">Services</p>
                 <h2>When the report is not enough</h2>
                 <p className="ds-lead" style={{ marginBottom: 30 }}>
-                    The platform is the first column. Everything to the right is people — our
+                    The platform is the first column. Everything to the right is people - our
                     engineers, on your side of the problem.
                 </p>
 
@@ -122,7 +122,7 @@ function Services() {
                 <p className="ds-eyebrow">Compliance</p>
                 <h2>The frameworks your clients will ask you about</h2>
                 <p className="ds-lead" style={{ marginBottom: 30 }}>
-                    Certification is rarely the real goal — winning the contract is. We get you
+                    Certification is rarely the real goal - winning the contract is. We get you
                     through the audit and keep you there between them.
                 </p>
 
@@ -133,7 +133,7 @@ function Services() {
                             {STANDARDS.map(([name, what]) => (
                                 <li key={name}>
                                     <strong>{name}</strong>
-                                    <span className="ds-faint"> — {what}</span>
+                                    <span className="ds-faint"> - {what}</span>
                                 </li>
                             ))}
                         </ul>
@@ -144,7 +144,7 @@ function Services() {
                             {PRIVACY.map(([name, what]) => (
                                 <li key={name}>
                                     <strong>{name}</strong>
-                                    <span className="ds-faint"> — {what}</span>
+                                    <span className="ds-faint"> - {what}</span>
                                 </li>
                             ))}
                         </ul>

@@ -13,7 +13,7 @@ import { useDocumentMeta } from "./utils/meta";
 
    A dead link here is NOT an error state. Somebody clicking an old
    unsubscribe link is trying to do the right thing, and meeting them with a
-   red failure — or worse, leaving them unsure whether it worked — is how
+   red failure - or worse, leaving them unsure whether it worked - is how
    people give up and press "spam" instead, which costs the sending domain
    far more than the unsubscribe ever would.
    ───────────────────────────────────────────────────────────────────────── */
@@ -70,7 +70,7 @@ function Preferences() {
                     <h1>That link has expired</h1>
                     <p className="ds-muted">
                         {state.error} If you are trying to stop receiving email from us, write to
-                        us and we will take care of it — you do not need a working link for that.
+                        us and we will take care of it - you do not need a working link for that.
                     </p>
                     <div className="prefs__actions">
                         <Link to="/contact" className="ds-btn">Contact us</Link>

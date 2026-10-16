@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────
-   TIERS — five cards, each with a 23-segment bar.
+   TIERS - five cards, each with a 23-segment bar.
 
    Five columns, then two, then one: the prototype's .tiers breakpoints.
    ───────────────────────────────────────────────────────────────────────── */
@@ -66,7 +66,7 @@
 }
 .tier--star .tier__price { text-shadow: 0 0 22px rgba(255, 46, 154, .4); }
 
-/* The bar. One segment per risk area — the whole argument of the table. */
+/* The bar. One segment per risk area - the whole argument of the table. */
 .tier__bar {
     display: flex;
     gap: 2px;
@@ -149,6 +149,14 @@
    outline, so the comparison holds without colour. */
 @media print {
     .tier__gets { max-height: none; }
+    .tier__hint { display: none; }
+}
+
+/* "HOVER FOR WHAT IS INCLUDED" on a touch screen is an instruction nobody
+   can follow. The card already opens on tap - Tiers.js pins it on click,
+   which is why the hint is hidden rather than reworded. The copy itself is
+   still wrong for touch and is worth a second look. */
+@media (hover: none) {
     .tier__hint { display: none; }
 }
 

@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  net — the shared network helpers every check uses.
+//  net - the shared network helpers every check uses.
 //
 //  These lived in scan_engine.js. They moved here for one reason: scan_engine
 //  now imports the check list, and the checks need these helpers. Leaving
@@ -7,7 +7,7 @@
 //  check file would receive a half-initialised module with empty exports.
 //
 //  scan_engine.js re-exports every one of them, so its public surface is
-//  unchanged — tools_engine.js still imports them from there and did not
+//  unchanged - tools_engine.js still imports them from there and did not
 //  need touching.
 //
 //  Behaviour is IDENTICAL to before; this is a move, not a rewrite.
@@ -30,7 +30,7 @@ function withTimeout(promise, ms, label) {
  * Fetch a URL and return status, headers and a capped body.
  *
  * The cap matters. In the main engine a homepage over 256 KB hung every HTTP
- * check, because destroying the socket meant the 'end' event never fired —
+ * check, because destroying the socket meant the 'end' event never fired -
  * one check took ten seconds against a 108ms raw request. Read a bounded
  * number of bytes and resolve rather than waiting for a body we do not want.
  */
@@ -104,11 +104,11 @@ async function fetchUrl(url, opts = {}) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   THE HOST GOVERNOR — pacing, concurrency and backoff, per host.
+   THE HOST GOVERNOR - pacing, concurrency and backoff, per host.
 
    Task 05a got this scanner blocked by dolluzcorp.com: an ordinary customer
    site on ordinary shared hosting. The cause was volume and rate, not
-   intent — 31 speculative paths requested as fast as the network allowed
+   intent - 31 speculative paths requested as fast as the network allowed
    looks exactly like directory brute-forcing, because that is what
    brute-forcing looks like. The server identified it correctly.
 
@@ -136,7 +136,7 @@ const MAX_CONCURRENT_PER_HOST = 2;
 const CONSECUTIVE_FAILURES_BEFORE_BLOCK = 4;
 
 const BLOCKED_MESSAGE =
-    "Target stopped responding — scanning was stopped to avoid pressuring the server";
+    "Target stopped responding - scanning was stopped to avoid pressuring the server";
 
 const HOSTS = new Map();
 
@@ -148,7 +148,7 @@ function hostState(host) {
 }
 
 /* Each scan starts clean. One blocked target must never poison the next
-   visitor's scan — and a host that recovered must not stay marked. */
+   visitor's scan - and a host that recovered must not stay marked. */
 function resetHostState() { HOSTS.clear(); }
 
 /** Read-only view, used by the scheduler and by the request-count tests. */
@@ -159,7 +159,7 @@ function getHostState(host) {
 
 const isHostBlocked = (host) => !!(HOSTS.get(host) || {}).blocked;
 
-/** A 403 or 429 is a refusal, not an answer — see recordOutcome. */
+/** A 403 or 429 is a refusal, not an answer - see recordOutcome. */
 const isRefusalStatus = (status) => status === 403 || status === 429;
 
 function recordOutcome(host, ok) {
@@ -168,7 +168,7 @@ function recordOutcome(host, ok) {
     st.fails += 1;
     if (st.fails >= CONSECUTIVE_FAILURES_BEFORE_BLOCK && !st.blocked) {
         st.blocked = true;
-        console.error(`🛑 ${host} stopped responding after ${st.fails} consecutive failures — no further requests will be made to it this scan.`);
+        console.error(`🛑 ${host} stopped responding after ${st.fails} consecutive failures - no further requests will be made to it this scan.`);
     }
 }
 
@@ -195,7 +195,7 @@ function releaseSlot(host) {
     st.active = Math.max(0, st.active - 1);
 }
 
-/** Read a TLS certificate without trusting it — an expired cert is the finding. */
+/** Read a TLS certificate without trusting it - an expired cert is the finding. */
 function getCertificate(hostname, port = 443) {
     return new Promise((resolve, reject) => {
         const socket = tls.connect({
@@ -293,7 +293,7 @@ function tlsHandshake(host, opts = {}) {
  * attack from the far end and is the opposite of the passive scan we promise.
  *
  * The result is cached on the target, so a cache lives exactly as long as one
- * scan. A REJECTED promise is cached too, deliberately — if the homepage is
+ * scan. A REJECTED promise is cached too, deliberately - if the homepage is
  * unreachable, every check that needs it should fail fast with the same
  * reason rather than retrying the same dead host fifteen times.
  */
@@ -329,7 +329,7 @@ async function mapLimit(items, limit, fn) {
  * ask".
  *
  * This distinction IS the product. ENOTFOUND and ENODATA mean the server
- * answered and there is genuinely nothing there — a real negative a check may
+ * answered and there is genuinely nothing there - a real negative a check may
  * act on. Anything else (SERVFAIL, timeout, refused) means we did not get an
  * answer, and a check that treats that as "no record" reports a finding
  * against a domain that may be perfectly configured.
@@ -362,9 +362,9 @@ const cnameSafe = (name) => resolveSafe((n) => dns.resolveCname(n), name);
 /**
  * Hostnames published for this domain in certificate transparency logs.
  *
- * Two checks in different files need this — BREACH-METADATA-55 looks for
+ * Two checks in different files need this - BREACH-METADATA-55 looks for
  * internal-sounding names, SURF-STAGING-03 looks for reachable staging
- * environments — so it lives here rather than in either of them, and is
+ * environments - so it lives here rather than in either of them, and is
  * memoised so crt.sh is asked exactly once per scan.
  *
  * Resolves to { ok: true, names: Set } or { ok: false, error }. crt.sh is

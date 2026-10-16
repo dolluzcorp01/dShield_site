@@ -1,4 +1,4 @@
-# dShield Site — project context
+# dShield Site - project context
 
 Read this before changing anything. It is the standing context for every
 session; individual task files in `docs/claude-tasks/` sit on top of it.
@@ -15,12 +15,12 @@ It is **one of four applications**. The other three are not in this repository:
 
 | App | Subdomain | Who logs in |
 |---|---|---|
-| **This one** — public site | `dshield.dolluzcorp.com` | nobody |
+| **This one** - public site | `dshield.dolluzcorp.com` | nobody |
 | Customer portal | `app.dshield.dolluzcorp.com` | recurring subscribers |
 | Employee portal | `employee.dshield.dolluzcorp.com` | Dolluz staff |
 | Console | `admin.dshield.dolluzcorp.com` | admins |
 
-They must stay separate sites. The permission model depends on it — a
+They must stay separate sites. The permission model depends on it - a
 compromised session on one must not be able to reach another.
 
 ---
@@ -31,7 +31,7 @@ React 19 SPA + Express API + MySQL, matching the sibling dApps (dAdmin, dSlip,
 dTime). Follow the existing house style rather than introducing a new one.
 
 - **API port 4008.** Hardcoded in `server.js`, deliberately *not* from
-  `process.env.PORT` — `react-scripts` reads `.env` first and would bind the
+  `process.env.PORT` - `react-scripts` reads `.env` first and would bind the
   dev server to it. dAdmin is 4002.
 - **Database access** is `config/db.js` → `getDBConnection(dbName)`, a pool
   factory. Callback-style `db.query`, not promises. Do not add an ORM.
@@ -41,6 +41,36 @@ dTime). Follow the existing house style rather than introducing a new one.
   `.css` beside it. Design tokens are CSS variables in `src/index.css`.
 - **Response shape** is `{ success: boolean, message?: string, ... }`.
 - Errors are logged with `console.error` and an `❌` or `⚠️` prefix.
+- **Never use an em dash (U+2014) or an en dash (U+2013). Only a plain
+  hyphen `-`.** This covers everything: user-visible copy, code comments,
+  commit messages, documentation, email templates, SQL comments and JSON
+  data. It is not a straight swap, because the spacing carries the meaning:
+
+  - Between words it is punctuation, so it takes a space either side:
+    write `word - word`.
+  - Between numbers it is a range, so it takes a bare hyphen with no
+    spaces: write `9-5`, `60-90 days`, `1-3 days`.
+
+  Getting those two backwards produces `9 - 5` and `word-word`, which is
+  worse than leaving it alone.
+
+  A dash standing alone as a placeholder glyph stays bare, as in
+  `content: "-"` or `${value || "-"}`. Spaces inside that string would show
+  up on screen and in sent email.
+
+  To check, this must come back empty. `grep -P` is not available in the
+  Git Bash build on this machine, so the two characters are passed as
+  patterns instead:
+
+  ```bash
+  EM=$(printf '\xe2\x80\x94')   # em dash
+  EN=$(printf '\xe2\x80\x93')   # en dash
+  grep -rnI -e "$EM" -e "$EN" \
+    --exclude-dir=node_modules --exclude-dir=build --exclude-dir=.git .
+  ```
+
+  `.vscode/` sits inside the repo and is easy to forget: neither the rule
+  nor that command excludes it.
 
 **Do not add npm dependencies** without saying so explicitly and explaining
 why. The dependency list is deliberately short.
@@ -59,7 +89,7 @@ sentences. Inconclusive checks are excluded from **both sides** of the scoring
 sum, never counted as passes.
 
 Testing of the main engine once found an aborted scan reporting **grade A,
-score 100, zero findings** — because with every check errored there was nothing
+score 100, zero findings** - because with every check errored there was nothing
 left to fail. A customer behind a firewall would have been told they were
 secure by a product they came to for the opposite.
 
@@ -71,7 +101,7 @@ Below the coverage floor (`MIN_COVERAGE_RATIO`, `MIN_COVERAGE_CHECKS` in
 
 ### The paywall is server-side
 
-Content the free tier does not include is **never sent to the browser** — not
+Content the free tier does not include is **never sent to the browser** - not
 hidden with CSS, not greyed out, not present in the JSON. It cannot leak from a
 page if it was never in the response.
 
@@ -94,7 +124,7 @@ a sentence printed on the page becomes a lie.
 ### Domain input is validated before anything is fetched
 
 `normaliseDomain` and `isPrivateAddress` in `scan_engine.js` refuse internal
-names, IP addresses and reserved ranges — including `169.254.169.254`, the
+names, IP addresses and reserved ranges - including `169.254.169.254`, the
 cloud metadata endpoint that returns the server's own credentials. Without
 these guards the scanner is an open proxy into our own network.
 
@@ -118,19 +148,19 @@ Do not add these. Their absence is the plan, not an oversight.
 | **Login / accounts** | Portal access is for recurring subscribers only, and lives in a different app. One-time buyers never log in. |
 | **The 222-question assessment** | Full Protection and above. Different app. |
 | **Connectors** | Advanced and above. Different app. |
-| **Cookie consent banner** | The site sets no non-essential cookies. A banner asking permission for cookies we do not set is theatre. **This changes the moment analytics is added** — then a banner becomes required. |
+| **Cookie consent banner** | The site sets no non-essential cookies. A banner asking permission for cookies we do not set is theatre. **This changes the moment analytics is added** - then a banner becomes required. |
 
 ---
 
 ## Known gaps, in priority order
 
-1. **Legal pages** — Terms, Privacy Notice, Refund & Cancellation, Cookie
+1. **Legal pages** - Terms, Privacy Notice, Refund & Cancellation, Cookie
    Notice. Blocking: the site already stores IP and email, and Razorpay
    onboarding generally requires published policy pages.
-2. **Selling sections** — "What we do", Services, Compliance, "Six of the
+2. **Selling sections** - "What we do", Services, Compliance, "Six of the
    eighteen". The consulting work is the actual business and the site
    currently has no path to it.
-3. **SEO** — per-route meta tags and a sitemap. The five tools are meant to be
+3. **SEO** - per-route meta tags and a sitemap. The five tools are meant to be
    five separate front doors; without unique titles they are one page to a
    search engine.
 4. **Enquiries reach nobody.** They land in the `enquiries` table and SendGrid
@@ -142,9 +172,9 @@ Do not add these. Their absence is the plan, not an oversight.
 
 - **The rate limiter is in-memory**, per IP and per target domain, and resets
   on restart. Fine for one process. Under PM2 cluster mode, four processes
-  means four times the limit — move it to Redis then.
+  means four times the limit - move it to Redis then.
 - **`trust proxy` is on in production.** Behind nginx `req.ip` is the proxy
-  otherwise, and the scan limiter is per IP — every visitor would share one
+  otherwise, and the scan limiter is per IP - every visitor would share one
   bucket.
 - **Two checks need outbound access** some networks block: `crt.sh` and
   `api.pwnedpasswords.com`. Both degrade to inconclusive, never to a false

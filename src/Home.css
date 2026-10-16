@@ -25,7 +25,7 @@
     margin-bottom: 20px;
 
     /* A CRT stutter, twice in every seven seconds. Still for 88% of the
-       cycle — see the keyframes note in index.css. */
+       cycle - see the keyframes note in index.css. */
     animation: glitch 7s infinite;
 }
 
@@ -88,7 +88,7 @@
 }
 
 /* NO OUTER CARD. The prototype's scan row is a bare flex container at
-   maxWidth 560 — the input pill and the button ARE the control, and the
+   maxWidth 560 - the input pill and the button ARE the control, and the
    glow belongs to them. Wrapping them in a bordered panel put a box inside
    a box and made the input look like a field on a form rather than the one
    thing the page is asking you to use.
@@ -99,7 +99,7 @@
     max-width: 560px;
 }
 
-/* One row, one input, one button — the prototype's shape. The pill radius
+/* One row, one input, one button - the prototype's shape. The pill radius
    and the 250px flex basis are its numbers. */
 .scanbox__row { display: flex; gap: 10px; flex-wrap: wrap; }
 .scanbox__domain {
@@ -138,7 +138,7 @@
     box-shadow: none;
 }
 
-/* The level meter — five bars under the box while a scan runs. */
+/* The level meter - five bars under the box while a scan runs. */
 .scanbox__meter {
     display: flex;
     gap: 5px;
@@ -173,8 +173,8 @@
 @keyframes ds-pulse { 0%,100% { opacity: .25; } 50% { opacity: 1; } }
 
 /* .scanbox__fineprint was removed with the markup. The passive-scan promise
-   it carried is still made on the page — it is the FAQ answer to "Is this
-   safe to run on my live website?" — and the prototype keeps it there rather
+   it carried is still made on the page - it is the FAQ answer to "Is this
+   safe to run on my live website?" - and the prototype keeps it there rather
    than under the input. */
 
 .promise h3 { margin-bottom: 8px; font-size: 1.04rem; color: var(--bone); }
@@ -198,7 +198,7 @@
     color: var(--bone-faint); letter-spacing: .1em;
 }
 
-/* Bolt is gone below 860px — display:none, not a scaled-down version.
+/* Bolt is gone below 860px - display:none, not a scaled-down version.
 
    He is 200×230 plus a speech bubble. On a phone that pushes the scan box
    below the fold, and the scan box is the entire purpose of the page. Most
@@ -211,6 +211,19 @@
 
 @media (max-width: 720px) {
     .scanbox__row { flex-direction: column; }
+
+    /* THE FLEX BASIS HAS TO BE RESET HERE, not changed above.
+
+       .scanbox__domain is `flex: 1 1 250px`, which is right on a desktop
+       row: the input wants 250px of WIDTH and grows into the space the
+       button leaves. The moment this container becomes a column, the main
+       axis turns vertical and that same 250px becomes the input's HEIGHT.
+       The field rendered roughly 250px tall on a phone.
+
+       `auto` puts the basis back on the content, so the input is one line
+       high and full width, which is what a column wants. */
+    .scanbox__domain { flex-basis: auto; width: 100%; }
+
     .scanbox__go { width: 100%; }
     .gap { flex-direction: column; gap: 20px; align-items: flex-start; }
     .gap__figure {
@@ -225,4 +238,9 @@
 /* The gap card previously ended with no action. Someone persuaded by the
    argument had nowhere to go from it. */
 .gap__more { display: inline-block; margin-top: 16px; color: var(--lime); font-size: .92rem; }
+/* A finger is about 44px across. Link rows that sit on their own line get
+   padding rather than a bigger font, so the type stays as designed. */
+@media (max-width: 640px) {
+    .gap__more { padding: 11px 0; }
+}
 .gap__more:hover { color: #D8FF6E; }

@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  pdf-template — a complete, standalone HTML document for one report.
+//  pdf-template - a complete, standalone HTML document for one report.
 //
 //  ⚠️  NO EXTERNAL REQUESTS. No web fonts, no CDN, no images fetched over
 //  the network. A render that reaches the internet is a render that fails on
@@ -7,7 +7,7 @@
 //  font stacks only.
 //
 //  ⚠️  EVERY INTERPOLATED VALUE GOES THROUGH esc(). The report carries
-//  domains, hostnames and evidence strings — all of them influenced by
+//  domains, hostnames and evidence strings - all of them influenced by
 //  whoever owns the scanned estate. Chrome renders this with --no-sandbox,
 //  so a <script> tag reaching the template is not a cosmetic problem.
 //
@@ -26,11 +26,11 @@ const esc = (v) => String(v === null || v === undefined ? "" : v)
 // THE PDF STAYS ON A LIGHT THEME. It is a fifteen-page document people
 // print and put in a board pack; the arcade palette belongs on a screen and
 // a near-black page is unprintable. Only the accent HUES follow the new
-// brand — darkened until each one passes AA on white, because the arcade
+// brand - darkened until each one passes AA on white, because the arcade
 // colours themselves do not: lime #C6FF3D is 1.3:1 on white and magenta
 // #FF2E9A is 3.4:1. Measured ratios are in the comments.
 const INK = "#0b0c10";
-const GOLD = "#657300";     // dark lime, 5.24:1 on white — the brand accent,
+const GOLD = "#657300";     // dark lime, 5.24:1 on white - the brand accent,
 const TEXT = "#15171a";     // darkened until print and photocopiers hold it
 const MUTED = "#4a4f57";
 const FAINT = "#7b8189";
@@ -46,7 +46,7 @@ const SEV_COLOUR = {
 
 const GRADE_WORD = { A: "Strong", B: "Good", C: "Mixed", D: "Weak", E: "Poor" };
 
-/** A readable timestamp WITH its timezone — see the note on the cover. */
+/** A readable timestamp WITH its timezone - see the note on the cover. */
 function stamp(iso) {
     const d = iso ? new Date(iso) : new Date();
     const date = d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -89,7 +89,7 @@ function findingBlock(f) {
     <p class="sum">${esc(f.remediation.summary)}</p>
     ${steps}
     <p class="verify"><strong>How to confirm it is fixed:</strong> ${esc(f.remediation.verification)}</p>
-    <p class="effort">About ${esc(f.effortHours)} hours &middot; ${esc(f.skill)}${f.effortNote ? ` — ${esc(f.effortNote)}` : ""}</p>
+    <p class="effort">About ${esc(f.effortHours)} hours &middot; ${esc(f.skill)}${f.effortNote ? ` - ${esc(f.effortNote)}` : ""}</p>
   </div>` : ""}
 </section>`;
 }
@@ -101,7 +101,7 @@ function roadmapBlock(roadmap = [], totalHours) {
     <div class="band-head"><h3>${esc(b.label)}</h3><span>${esc(b.count)} finding${b.count > 1 ? "s" : ""} &middot; ${esc(b.totalHours)}h</span></div>
     <p class="band-blurb">${esc(b.blurb)}</p>
     <ol class="band-list">
-      ${(b.items || []).map((i) => `<li><span class="sev-dot" style="background:${SEV_COLOUR[String(i.severity).toLowerCase()] || TEXT}"></span>${esc(i.title)} <span class="faint">— ${esc(i.effortHours)}h &middot; ${esc(i.skill)}</span></li>`).join("")}
+      ${(b.items || []).map((i) => `<li><span class="sev-dot" style="background:${SEV_COLOUR[String(i.severity).toLowerCase()] || TEXT}"></span>${esc(i.title)} <span class="faint">- ${esc(i.effortHours)}h &middot; ${esc(i.skill)}</span></li>`).join("")}
     </ol>
     ${(b.notes || []).length ? `<ul class="band-notes">${b.notes.map((n) => `<li>${esc(n.note)}</li>`).join("")}</ul>` : ""}
   </div>`).join("");
@@ -115,7 +115,7 @@ function roadmapBlock(roadmap = [], totalHours) {
 }
 
 /**
- * @param report  the object from buildReport() — already tier-filtered
+ * @param report  the object from buildReport() - already tier-filtered
  * @param opts    { orderRef, shaShort }
  */
 function renderReportHtml(report = {}, opts = {}) {
@@ -130,7 +130,7 @@ function renderReportHtml(report = {}, opts = {}) {
 
     return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8" />
-<title>dShield — ${esc(r.domain)}</title>
+<title>dShield - ${esc(r.domain)}</title>
 <style>
   /* System stacks only. Nothing here is fetched. */
   * { box-sizing: border-box; }
@@ -214,7 +214,7 @@ function renderReportHtml(report = {}, opts = {}) {
     <div class="doctype">Security Assessment</div>
     <div class="subject">${esc(r.domain)}</div>
     <div class="gradebox">
-      <span class="g">${esc(r.grade || "—")}</span>
+      <span class="g">${esc(r.grade || "-")}</span>
       <span class="w">${esc(GRADE_WORD[r.grade] || "")}${r.score !== null && r.score !== undefined ? ` &middot; ${esc(r.score)} / 100` : ""}</span>
     </div>
     ${r.capped ? `<p class="faint" style="margin-top:10px">Grade capped at ${esc(r.grade)} because of ${esc(r.capReason)}.</p>` : ""}
@@ -222,7 +222,7 @@ function renderReportHtml(report = {}, opts = {}) {
   <div class="meta">
     <div><strong>Report tier:</strong> ${esc(tierName)}</div>
     <div><strong>Assessed:</strong> ${esc(stamp(r.scannedAt))}</div>
-    <div><strong>Order reference:</strong> ${esc(opts.orderRef || "—")}</div>
+    <div><strong>Order reference:</strong> ${esc(opts.orderRef || "-")}</div>
     <div><strong>Document fingerprint:</strong> ${esc(opts.shaShort || "computed on delivery")}</div>
   </div>
 </div>
@@ -242,18 +242,18 @@ function renderReportHtml(report = {}, opts = {}) {
 
   <h3>We measured ${esc(measured)} of ${esc(total)} risk domains</h3>
   <p class="lead">A scan of this kind reaches what your servers publish to anyone who asks.
-  The remaining ${esc(total - measured)} domains — whether your backups actually restore, whether a
+  The remaining ${esc(total - measured)} domains - whether your backups actually restore, whether a
   junior would challenge a payment request from the CEO, whether staff feel able to admit a
-  mistake — cannot be seen from outside by anyone, including us. They need an assessment with
+  mistake - cannot be seen from outside by anyone, including us. They need an assessment with
   your participation.</p>
 
   <h3>${esc(r.checksCompleted)} of ${esc(r.checksRun)} checks completed</h3>
   ${inconclusive.length ? `
   <p class="lead">The following checks could not complete. They are excluded from the score
-  <strong>on both sides</strong> rather than counted as passes — a number built on checks that never
+  <strong>on both sides</strong> rather than counted as passes - a number built on checks that never
   ran would tell you that you are safe when what actually happened is that we could not look.</p>
   <ul class="incon">
-    ${inconclusive.map((i) => `<li><strong>${esc(i.title)}</strong> — ${esc(i.reason)}</li>`).join("")}
+    ${inconclusive.map((i) => `<li><strong>${esc(i.title)}</strong> - ${esc(i.reason)}</li>`).join("")}
   </ul>` : `<p class="lead">Every check completed.</p>`}
 </section>
 

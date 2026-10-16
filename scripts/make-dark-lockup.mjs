@@ -3,16 +3,16 @@
 
    src/assets/img/DOLLUZ_CORP.png is the artwork as supplied: a gold eagle
    beside a wordmark set in BLACK. Our page background is #0B0316, so the
-   wordmark is invisible on it — the eagle floats next to nothing.
+   wordmark is invisible on it - the eagle floats next to nothing.
 
    This does two things to it.
 
-   ONE — recolour, exactly as the frozen v5.9 prototype did to produce its
+   ONE - recolour, exactly as the frozen v5.9 prototype did to produce its
    LOCKUP_SRC constant: near-black pixels become bone, every gold pixel is
    left as supplied. Alpha is preserved untouched, so the antialiased glyph
    edges stay antialiased rather than turning into a ragged bone stencil.
 
-   TWO — drop the vertical rule between the bird and the wordmark. It is a
+   TWO - drop the vertical rule between the bird and the wordmark. It is a
    separator drawn for a light ground, and against #0B0316 it reads as a
    seam down the middle of the mark rather than as part of it. The frozen
    prototype's lockup has no such rule.
@@ -32,12 +32,12 @@
    That gap is GAP_RATIO below, and it is the one number here anybody is
    likely to want to change. It is expressed as a fraction of the image
    HEIGHT rather than as a pixel count, so it survives the artwork being
-   resupplied at a different resolution — 0.30 means the same optical gap at
+   resupplied at a different resolution - 0.30 means the same optical gap at
    994px tall and at 4000px tall, where a hardcoded 298 would not.
 
    A pixel is "the black type" only if it is BOTH dark and near-grey.
    Testing darkness alone would catch the bronze at the bottom of the
-   eagle's gradient, which is dark but strongly chromatic — recolouring it
+   eagle's gradient, which is dark but strongly chromatic - recolouring it
    would put a bone smear through the middle of the bird.
 
    Run: node scripts/make-dark-lockup.mjs
@@ -70,7 +70,7 @@ const MAX_SPREAD = 34;             // "near-grey"
        0.13  the tighter of the two spaces the rule originally sat in
        0.30  a little wider than the bird-rule-wordmark span was in total
    The artwork ships with a rule between the two, so there is no "original"
-   gap to be faithful to — the rule was doing the separating. */
+   gap to be faithful to - the rule was doing the separating. */
 const GAP_RATIO = 0.30;
 
 /* What counts as the separator rule rather than as artwork: no wider than
@@ -102,7 +102,7 @@ const result = await page.evaluate(async (url, bone, maxLevel, maxSpread, ruleMa
     let touched = 0, opaque = 0;
 
     for (let i = 0; i < d.length; i += 4) {
-        if (d[i + 3] === 0) continue;          // fully transparent — leave it
+        if (d[i + 3] === 0) continue;          // fully transparent - leave it
         opaque++;
         const r = d[i], g = d[i + 1], b = d[i + 2];
         const max = Math.max(r, g, b);
@@ -214,9 +214,9 @@ console.log(`   ink groups found: ${result.groups}`);
    and the detector misses it, the same warning says so. */
 if (result.ruleAt) {
     const r = result.ruleAt;
-    console.log(`   removed separator rule at x=${r.a}–${r.b} (${r.width}px wide, ${r.tallest}px tall), ${result.cleared.toLocaleString()} px cleared`);
+    console.log(`   removed separator rule at x=${r.a}-${r.b} (${r.width}px wide, ${r.tallest}px tall), ${result.cleared.toLocaleString()} px cleared`);
 } else {
-    console.warn("   ⚠️  no separator rule matched — check the output before shipping it");
+    console.warn("   ⚠️  no separator rule matched - check the output before shipping it");
 }
 
 if (result.closed) {

@@ -1,12 +1,12 @@
-# Claude Code — dShield Site · Task 05c
-## The remediation library — what a paid report actually contains
+# Claude Code - dShield Site · Task 05c
+## The remediation library - what a paid report actually contains
 
 **Repo:** `dolluzcorp01/dShield_site` · branch `main`
 **Prerequisite:** Task 05b merged (`5d0266e`)
 **Source material:** the v6.3 package, `src/data/remediation-library.json`
 **Do not touch:** `src/utils/tools_engine.js`, `src/utils/suppression.js`,
 `src/utils/mail.js`, `src/workers/mail-worker.js`,
-`src/backend_routes/Tools_server.js`, and — except where stated below —
+`src/backend_routes/Tools_server.js`, and - except where stated below -
 `src/utils/scan_engine.js`
 
 ---
@@ -21,7 +21,7 @@ finding"*, an *"effort estimate per finding"* and *"verification steps"*. None
 of that text exists in this repository. Without it there is no difference
 between Basic and Advanced, and no honest way to charge for either.
 
-The v6.3 package has a 65-entry library carrying exactly this content — for
+The v6.3 package has a 65-entry library carrying exactly this content - for
 each check: what the finding is, what an attacker could do with it, numbered
 steps to close it, a verification step, an effort estimate and the skill
 needed. **This task ports it and connects it to the checks.**
@@ -33,10 +33,10 @@ needed. **This task ports it and connects it to the checks.**
 I have verified all four against the v6.3 file. Do not assume the source is
 correct.
 
-### Defect 1 — 15 check IDs do not match the scanner
+### Defect 1-15 check IDs do not match the scanner
 
 The library and the code drifted. The report looks findings up by ID, so each
-mismatch renders a finding with a title and nothing else — silently, with no
+mismatch renders a finding with a title and nothing else - silently, with no
 error.
 
 Rename these library IDs to the scanner's. **The scanner's ID is authoritative
@@ -61,12 +61,12 @@ in every case:**
 | `BRAND-TYPO-ACTIVE-59` | `BRAND-TYPO-59` |
 
 `BREACH-SOURCE-55` → `BREACH-METADATA-55` deserves a second look: confirm the
-library's text still describes what our check actually does — internal
+library's text still describes what our check actually does - internal
 hostnames leaking through certificate transparency logs. If the text describes
 something else, rewrite it to match the check rather than shipping guidance for
 a finding we did not make.
 
-### Defect 2 — `SURF-ADMIN-02` is `critical` in the library, `high` in the code
+### Defect 2 - `SURF-ADMIN-02` is `critical` in the library, `high` in the code
 
 The scanner is right. This is the bug that once capped google.com,
 wikipedia.org and stripe.com at grade D, because a single critical caps a
@@ -74,10 +74,10 @@ grade. Set the library entry to `severity: "high"`, `weight: 6`.
 
 **The scanner is the single source of truth for severity, domain and weight.**
 Consider removing those three fields from the library entirely and reading
-them from the check at render time — one source cannot disagree with itself.
+them from the check at render time - one source cannot disagree with itself.
 If you keep them, add a test asserting they match.
 
-### Defect 3 — the tier vocabulary is from an abandoned pricing model
+### Defect 3 - the tier vocabulary is from an abandoned pricing model
 
 The library uses `snapshot` / `report` / `continuous`. Those were the three
 tiers of an early prototype. The product uses `snapshot` / `basic` /
@@ -86,7 +86,7 @@ tiers of an early prototype. The product uses `snapshot` / `basic` /
 The field is meaningless as it stands. **Delete it.** Tier comes from the
 check's `minTier`, which Task 05a already ported correctly.
 
-### Defect 4 — `effort` is free text and cannot be totalled
+### Defect 4 - `effort` is free text and cannot be totalled
 
 30 distinct strings across 65 entries, including
 *"4 hours to publish; 60-90 days to reach full enforcement"*. The v6.3 report
@@ -95,9 +95,9 @@ code parses these with a regex that takes the first number, so that one becomes
 
 Replace with two fields:
 
-- `effortHours` — a number, the hands-on work only
-- `effortNote` — optional string for anything the number does not capture,
-  e.g. *"full DMARC enforcement takes 60–90 days of monitoring"*
+- `effortHours` - a number, the hands-on work only
+- `effortNote` - optional string for anything the number does not capture,
+  e.g. *"full DMARC enforcement takes 60-90 days of monitoring"*
 
 Where the source gives a range, take the **upper** bound. Under-promising on
 effort is the safer error when a customer is planning work.
@@ -106,7 +106,7 @@ effort is the safer error when a customer is planning work.
 
 ## What to build
 
-### 1 · `src/data/remediation-library.json` — new file
+### 1 · `src/data/remediation-library.json` - new file
 
 Port all 65 entries with the four fixes applied. Keep this shape:
 
@@ -146,7 +146,7 @@ Port all 65 entries with the four fixes applied. Keep this shape:
 | `BRAND-APP-61` | Not implemented. |
 | `BRAND-EXEC-62` | Not implemented. |
 
-Keep them rather than deleting them — the reasons are the record of decisions
+Keep them rather than deleting them - the reasons are the record of decisions
 that would otherwise be re-litigated, and the first two in particular are a
 deliberate product position, not an oversight.
 
@@ -154,7 +154,7 @@ deliberate product position, not an oversight.
 whoever writes the check, not customer content, and shipping them in a file the
 frontend can request would tell an attacker exactly how each check works.
 
-### 2 · `src/utils/remediation.js` — new file
+### 2 · `src/utils/remediation.js` - new file
 
 - `getRemediation(checkId)` → the entry, or `null`
 - `hasRemediation(checkId)` → boolean
@@ -166,7 +166,7 @@ At load, **assert every implemented library ID matches a check in
 months because nothing checked. A startup crash naming the mismatch is a far
 better outcome than a report that silently renders half a finding.
 
-### 3 · `src/utils/report_builder.js` — new file
+### 3 · `src/utils/report_builder.js` - new file
 
 Takes a scan result and a tier, returns the report object for that tier. This
 is where the paywall is decided, and it must be decided **here on the server**,
@@ -179,8 +179,8 @@ never in the frontend.
 | `advanced` | The above, plus `impact`, full `remediation` with steps and verification, `effortHours`, `skill`, and a prioritised roadmap. |
 | `full_protection` | Same as advanced for now. The questionnaire and connectors live in a different application. |
 
-**The roadmap** for advanced: findings grouped into three bands — *"This week"*
-(critical), *"This month"* (high), *"This quarter"* (medium and low) — each
+**The roadmap** for advanced: findings grouped into three bands - *"This week"*
+(critical), *"This month"* (high), *"This quarter"* (medium and low) - each
 with a total from `effortHours` and any `effortNote` collected.
 
 Sort within each band by weight descending, then by `effortHours` ascending, so
@@ -191,7 +191,7 @@ roadmap useful rather than merely ordered.
 never among the findings and never counted as passes. A customer paying for a
 report is owed a plain statement of what could not be measured.
 
-### 4 · `scripts/verify-remediation.js` — new file
+### 4 · `scripts/verify-remediation.js` - new file
 
 Assert, with no database and no network:
 
@@ -214,7 +214,7 @@ paywall that is not tested is a paywall that leaks.
 ### 5 · One permitted change to `scan_engine.js`
 
 Nothing else in it changes. If `runScan` does not already return each
-finding's `evidence` and `title` on the result object, add that — the report
+finding's `evidence` and `title` on the result object, add that - the report
 builder needs them. Free-scan output through the API must be **byte-identical**
 to before, because `Scan_server.js` builds the public response itself.
 
@@ -223,18 +223,18 @@ to before, because `Scan_server.js` builds the public response itself.
 ## Verification before you finish
 
 ```bash
-# 1 — the library
+# 1 - the library
 node scripts/verify-remediation.js
 
-# 2 — checks still intact
+# 2 - checks still intact
 node scripts/verify-checks.js
 
-# 3 — build and boot
+# 3 - build and boot
 npx react-scripts build
 node server.js &
 curl -s localhost:4008/api/health
 
-# 4 — FREE SCAN UNCHANGED
+# 4 - FREE SCAN UNCHANGED
 curl -s -X POST localhost:4008/api/scan \
      -H "Content-Type: application/json" \
      -d '{"domain":"github.com"}'
@@ -263,7 +263,7 @@ const { buildReport } = require('./src/utils/report_builder');
 ```
 
 Expected: snapshot has no titles and no remediation; basic has titles and no
-remediation; advanced has both. **If snapshot contains a title, stop** — the
+remediation; advanced has both. **If snapshot contains a title, stop** - the
 paywall leaks and nothing else in this task matters until it does not.
 
 **Then print one advanced finding in full and read it as a customer would.**
@@ -283,7 +283,7 @@ Also confirm:
 2. Output of both verify scripts
 3. The three-tier size and content table
 4. One advanced finding quoted in full, and your honest view of its quality
-5. Any entry whose text did not match what our check actually does — the
+5. Any entry whose text did not match what our check actually does - the
    `BREACH-METADATA-55` rename is the likeliest, but check the others
 6. Anything wrong or conflicting in these instructions. Tasks 01, 02 and 05a
    each found genuine errors in theirs.

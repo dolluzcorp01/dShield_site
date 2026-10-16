@@ -1,7 +1,7 @@
 /* ─────────────────────────────────────────────────────────────────────────
    Services and Coverage share this stylesheet.
 
-   Tokens only — every colour comes from the variables in index.css. The
+   Tokens only - every colour comes from the variables in index.css. The
    frozen prototype's cyan/lime/magenta palette does not come across; the
    live site is near-black and gold and stays that way.
 
@@ -58,6 +58,11 @@
 }
 
 .service__go:hover { color: #D8FF6E; }
+
+@media (max-width: 640px) {
+    /* 23px high at the foot of each card. */
+    .service__go { display: inline-block; padding: 12px 0; }
+}
 
 /* Card 01 is our own platform, and reads as the first column of the row
    rather than one more service to enquire about. */

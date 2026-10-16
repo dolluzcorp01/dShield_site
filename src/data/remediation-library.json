@@ -5,7 +5,7 @@
     "owner": "Dolluz Corp",
     "checkCount": 65,
     "implementedCount": 58,
-    "note": "Ported from dShield v6.3 with four defects fixed: check ids realigned to the scanner, SURF-ADMIN-02 severity corrected, the abandoned tier vocabulary removed, and free-text effort replaced with effortHours plus an optional effortNote. Severity, weight and domain are deliberately absent — they are read from the check at render time so the two sources cannot disagree. `detect` and `evidenceTemplate` are not shipped: they describe how each check works."
+    "note": "Ported from dShield v6.3 with four defects fixed: check ids realigned to the scanner, SURF-ADMIN-02 severity corrected, the abandoned tier vocabulary removed, and free-text effort replaced with effortHours plus an optional effortNote. Severity, weight and domain are deliberately absent - they are read from the check at render time so the two sources cannot disagree. `detect` and `evidenceTemplate` are not shipped: they describe how each check works."
   },
   "checks": [
     {
@@ -16,7 +16,7 @@
       "remediation": {
         "summary": "Either reclaim the destination on the third-party service or delete the DNS record entirely.",
         "steps": [
-          "Confirm the subdomain is genuinely unused by the business — check with marketing and engineering before removing anything.",
+          "Confirm the subdomain is genuinely unused by the business - check with marketing and engineering before removing anything.",
           "If the service is still needed, log into the third-party provider and re-create the resource so the CNAME resolves to something you control.",
           "If it is not needed, delete the CNAME record from your DNS zone.",
           "Search your zone file for other records pointing to third-party services and verify each destination is still claimed.",
@@ -33,13 +33,13 @@
       "id": "SURF-ADMIN-02",
       "title": "Administrative interface exposed to the internet",
       "finding": "An administrative console for one of your systems responds to requests from any address on the internet. Administrative interfaces are designed to be reached from trusted networks only.",
-      "impact": "Exposed admin panels are targeted by automated credential-stuffing tools continuously — typically within hours of first appearing. A single valid credential pair grants full control of the underlying system, and most admin panels do not enforce a second authentication factor by default.",
+      "impact": "Exposed admin panels are targeted by automated credential-stuffing tools continuously - typically within hours of first appearing. A single valid credential pair grants full control of the underlying system, and most admin panels do not enforce a second authentication factor by default.",
       "remediation": {
         "summary": "Restrict access to a trusted network range and enforce multi-factor authentication.",
         "steps": [
           "Move the interface behind your VPN, or restrict it by IP address at the firewall or web server level.",
           "If neither is possible immediately, enable multi-factor authentication on every account with access, as a stopgap.",
-          "Change the default administrative path where the software allows it — this reduces automated discovery but is not a substitute for access control.",
+          "Change the default administrative path where the software allows it - this reduces automated discovery but is not a substitute for access control.",
           "Review the account list and remove any account that no longer needs access.",
           "Enable and retain access logging on the interface so failed attempts are visible.",
           "Check whether credentials for this system appear in the breach findings section of this report."
@@ -59,7 +59,7 @@
       "remediation": {
         "summary": "Place the environment behind authentication or network restriction, and remove any production data it holds.",
         "steps": [
-          "Restrict access by IP allowlist or VPN immediately — this is the fastest containment step.",
+          "Restrict access by IP allowlist or VPN immediately - this is the fastest containment step.",
           "Add HTTP basic authentication as a minimum barrier if network restriction will take time.",
           "Determine whether the environment contains real customer data. If it does, treat this as a potential data exposure and follow your incident process.",
           "Replace production data with anonymised or synthetic data as standard practice.",
@@ -82,7 +82,7 @@
         "summary": "Block access to the directory at the web server, then treat every credential in the repository history as compromised.",
         "steps": [
           "Block all requests to paths beginning with /.git at the web server or CDN immediately.",
-          "Change your deployment process so version control directories are never copied to the web root — deploy build artefacts, not repository clones.",
+          "Change your deployment process so version control directories are never copied to the web root - deploy build artefacts, not repository clones.",
           "Assume every credential, API key and token that has ever appeared in the repository is now public. Rotate all of them.",
           "Review access logs for requests to /.git paths to establish whether the directory was actually retrieved and by whom.",
           "Scan the repository history for secrets to build a complete rotation list.",
@@ -91,7 +91,7 @@
         "verification": "Request /.git/config. The server should return 403 or 404."
       },
       "effortHours": 4,
-      "effortNote": "Rotating the exposed credentials adds 1–3 days.",
+      "effortNote": "Rotating the exposed credentials adds 1-3 days.",
       "skill": "DevOps / web administrator",
       "implemented": true
     },
@@ -99,12 +99,12 @@
       "id": "SURF-ENVFILE-05",
       "title": "Configuration file containing credentials is publicly readable",
       "finding": "A configuration file is being served as plain text. Files of this type hold database passwords, third-party API keys, encryption keys and mail server credentials.",
-      "impact": "This is direct credential disclosure requiring no exploitation whatsoever — an attacker simply requests the file and reads it. Database credentials in these files typically permit full read and write access. Payment gateway and cloud provider keys permit financial transactions and infrastructure changes.",
+      "impact": "This is direct credential disclosure requiring no exploitation whatsoever - an attacker simply requests the file and reads it. Database credentials in these files typically permit full read and write access. Payment gateway and cloud provider keys permit financial transactions and infrastructure changes.",
       "remediation": {
         "summary": "Block access immediately, then rotate every credential the file contained.",
         "steps": [
           "Block access to the file at the web server, and move the file outside the web root entirely.",
-          "Rotate every credential the file contained — database passwords, API keys, encryption keys, mail credentials. Treat all of them as compromised.",
+          "Rotate every credential the file contained - database passwords, API keys, encryption keys, mail credentials. Treat all of them as compromised.",
           "Review logs for that file path to determine whether it was retrieved, and by which addresses.",
           "Check the affected systems for signs of unauthorised access using the exposed credentials.",
           "Move secrets into environment variables or a dedicated secrets manager rather than files in the application directory.",
@@ -113,7 +113,7 @@
         "verification": "Request the file path. The server must return 403 or 404, not an empty 200."
       },
       "effortHours": 4,
-      "effortNote": "Rotation and review add 1–2 days.",
+      "effortNote": "Rotation and review add 1-2 days.",
       "skill": "DevOps / systems administrator",
       "implemented": true
     },
@@ -148,7 +148,7 @@
         "summary": "Disable automatic directory indexing across the web server.",
         "steps": [
           "In Apache, set 'Options -Indexes' in the server or virtual host configuration.",
-          "In Nginx, ensure 'autoindex off;' is set — this is the default but is sometimes overridden.",
+          "In Nginx, ensure 'autoindex off;' is set - this is the default but is sometimes overridden.",
           "In IIS, disable Directory Browsing in the site configuration.",
           "Review the files that were listed and remove anything that should not be publicly available.",
           "Place an empty index.html in directories that must remain web-accessible as a secondary safeguard."
@@ -189,7 +189,7 @@
       "remediation": {
         "summary": "Apply the vendor's fixed release, prioritising by whether the vulnerability is known to be exploited.",
         "steps": [
-          "Review the specific vulnerabilities listed and check whether any appear in CISA's Known Exploited Vulnerabilities catalogue — those take absolute priority.",
+          "Review the specific vulnerabilities listed and check whether any appear in CISA's Known Exploited Vulnerabilities catalogue - those take absolute priority.",
           "Apply the vendor's patched version following your change process.",
           "Where patching cannot happen immediately, apply any vendor-published workaround and note it as a temporary measure.",
           "Confirm the version reported by the component after patching, rather than assuming the update applied cleanly.",
@@ -206,7 +206,7 @@
       "id": "SURF-PORT-DB-10",
       "title": "Database port exposed to the internet",
       "finding": "A database service is accepting connections from the internet. Database engines are designed to be reached only from application servers on a trusted network.",
-      "impact": "Internet-exposed databases are scanned for continuously and are among the most reliably exploited assets online. Several engines — particularly Redis, MongoDB and Elasticsearch — have historically shipped with no authentication enabled by default, meaning exposure alone equals full data access. Automated ransom campaigns specifically target and wipe exposed databases.",
+      "impact": "Internet-exposed databases are scanned for continuously and are among the most reliably exploited assets online. Several engines - particularly Redis, MongoDB and Elasticsearch - have historically shipped with no authentication enabled by default, meaning exposure alone equals full data access. Automated ransom campaigns specifically target and wipe exposed databases.",
       "remediation": {
         "summary": "Restrict the port at the firewall so it is reachable only from your application servers.",
         "steps": [
@@ -252,13 +252,13 @@
       "id": "SURF-BUCKET-12",
       "title": "Cloud storage container publicly readable",
       "finding": "A cloud storage container associated with your organisation permits access without authentication. Its contents can be listed and downloaded by anyone.",
-      "impact": "Publicly readable storage containers are indexed by dedicated search tools and discovered within hours. They commonly hold database backups, customer documents, internal spreadsheets and system credentials. Because access is anonymous, the only record of a download is a cloud access log — which is frequently not enabled.",
+      "impact": "Publicly readable storage containers are indexed by dedicated search tools and discovered within hours. They commonly hold database backups, customer documents, internal spreadsheets and system credentials. Because access is anonymous, the only record of a download is a cloud access log - which is frequently not enabled.",
       "remediation": {
         "summary": "Remove public access, then determine what was exposed and for how long.",
         "steps": [
           "Set the container to private and remove any policy granting access to AllUsers or AuthenticatedUsers.",
           "Enable account-level public access blocking so this cannot be reintroduced by an individual setting.",
-          "Enumerate the contents and classify what was exposed — particularly any personal or financial data.",
+          "Enumerate the contents and classify what was exposed - particularly any personal or financial data.",
           "Enable access logging if it is not already on, and review any existing logs for anonymous requests.",
           "If personal data was exposed, assess your breach notification obligations under DPDP, GDPR or equivalent.",
           "Where files must remain publicly available, serve them through a CDN with signed URLs rather than open bucket permissions."
@@ -266,7 +266,7 @@
         "verification": "Request the container URL without credentials. It should return access denied."
       },
       "effortHours": 4,
-      "effortNote": "Assessing what was exposed adds 2–5 days.",
+      "effortNote": "Assessing what was exposed adds 2-5 days.",
       "skill": "Cloud administrator",
       "implemented": true
     },
@@ -316,7 +316,7 @@
       "id": "SURF-DEFAULT-15",
       "title": "Default installation page present",
       "finding": "A default installation page is being served. This indicates a system that was provisioned but never configured for its intended purpose, or a forgotten host.",
-      "impact": "Default pages signal an unmanaged system. Hosts in this state are typically unpatched, unmonitored and absent from asset inventories — which makes them an attractive foothold, and means a compromise there is unlikely to be noticed.",
+      "impact": "Default pages signal an unmanaged system. Hosts in this state are typically unpatched, unmonitored and absent from asset inventories - which makes them an attractive foothold, and means a compromise there is unlikely to be noticed.",
       "remediation": {
         "summary": "Determine whether the host is needed. Decommission it if not.",
         "steps": [
@@ -337,7 +337,7 @@
       "id": "SURF-INVENTORY-16",
       "title": "Internet-facing assets exceed documented inventory",
       "finding": "Our discovery identified more internet-facing systems than most organisations of your size expect to have. Each represents a potential entry point that must be patched, monitored and eventually decommissioned.",
-      "impact": "Unknown assets cannot be secured. The majority of breaches that begin at the perimeter start with a system the organisation had forgotten it owned — a campaign microsite, a departed vendor's environment, a proof of concept that was never removed. Attack surface grows silently; it rarely shrinks without deliberate effort.",
+      "impact": "Unknown assets cannot be secured. The majority of breaches that begin at the perimeter start with a system the organisation had forgotten it owned - a campaign microsite, a departed vendor's environment, a proof of concept that was never removed. Attack surface grows silently; it rarely shrinks without deliberate effort.",
       "remediation": {
         "summary": "Reconcile the discovered list against your asset register and assign an owner to each host.",
         "steps": [
@@ -359,11 +359,11 @@
       "id": "HDR-HSTS-17",
       "title": "HTTP Strict Transport Security not enabled",
       "finding": "Your site does not instruct browsers to always use an encrypted connection. A visitor's first request may travel unencrypted before any redirect takes effect.",
-      "impact": "Without this instruction, an attacker positioned on the same network as your user — public wifi, a compromised router — can intercept the initial unencrypted request and prevent the upgrade to HTTPS, reading credentials and session data in transit.",
+      "impact": "Without this instruction, an attacker positioned on the same network as your user - public wifi, a compromised router - can intercept the initial unencrypted request and prevent the upgrade to HTTPS, reading credentials and session data in transit.",
       "remediation": {
         "summary": "Add the Strict-Transport-Security header with a long max-age.",
         "steps": [
-          "Confirm every subdomain fully supports HTTPS before enabling this — the header cannot easily be undone once browsers have cached it.",
+          "Confirm every subdomain fully supports HTTPS before enabling this - the header cannot easily be undone once browsers have cached it.",
           "Begin with a short duration to validate: Strict-Transport-Security: max-age=300",
           "After confirming no issues, increase to a year: max-age=31536000; includeSubDomains",
           "Once stable, consider adding the preload directive and submitting to the browser preload list.",
@@ -408,7 +408,7 @@
           "Deploy in monitoring mode first: Content-Security-Policy-Report-Only with a reporting endpoint.",
           "Review reports for at least two weeks to identify legitimate sources you missed.",
           "Move to enforcement once reports are clean, beginning with the most sensitive pages such as checkout and login.",
-          "Avoid unsafe-inline and unsafe-eval — use nonces or hashes for inline scripts instead.",
+          "Avoid unsafe-inline and unsafe-eval - use nonces or hashes for inline scripts instead.",
           "Treat the policy as living configuration that must be updated when new third-party tools are added."
         ],
         "verification": "Confirm the enforcing header is present and that legitimate page functionality is unaffected."
@@ -422,7 +422,7 @@
       "id": "HDR-CSP-20",
       "title": "Content Security Policy weakened by unsafe directives",
       "finding": "A Content Security Policy is present but includes directives that substantially reduce its effectiveness.",
-      "impact": "Permitting inline script execution or wildcard sources means an injected script will still run. The policy provides reassurance without delivering the protection it appears to offer, which can be worse than having none — it may satisfy an audit while leaving the underlying risk in place.",
+      "impact": "Permitting inline script execution or wildcard sources means an injected script will still run. The policy provides reassurance without delivering the protection it appears to offer, which can be worse than having none - it may satisfy an audit while leaving the underlying risk in place.",
       "remediation": {
         "summary": "Remove unsafe directives by moving inline scripts to files or applying nonces.",
         "steps": [
@@ -504,7 +504,7 @@
       "id": "COOKIE-SECURE-24",
       "title": "Session cookie not restricted to encrypted connections",
       "finding": "A session cookie is not marked as requiring an encrypted connection. The browser will transmit it over unencrypted HTTP if any request is made that way.",
-      "impact": "Session cookies are equivalent to a logged-in password. If one is transmitted unencrypted — through a mistyped link, an old bookmark, or an attacker forcing a plain HTTP request — anyone monitoring the network can copy it and take over the session without needing credentials.",
+      "impact": "Session cookies are equivalent to a logged-in password. If one is transmitted unencrypted - through a mistyped link, an old bookmark, or an attacker forcing a plain HTTP request - anyone monitoring the network can copy it and take over the session without needing credentials.",
       "remediation": {
         "summary": "Add the Secure attribute to all cookies.",
         "steps": [
@@ -524,7 +524,7 @@
       "id": "COOKIE-HTTPONLY-25",
       "title": "Session cookie readable by JavaScript",
       "finding": "A session cookie can be read by JavaScript running on your page.",
-      "impact": "If any script on the page is compromised — your own, or one of your third-party analytics, chat or advertising components — it can read the session cookie and transmit it elsewhere. This converts a single compromised script into full account takeover for every user on the page.",
+      "impact": "If any script on the page is compromised - your own, or one of your third-party analytics, chat or advertising components - it can read the session cookie and transmit it elsewhere. This converts a single compromised script into full account takeover for every user on the page.",
       "remediation": {
         "summary": "Add the HttpOnly attribute to session cookies.",
         "steps": [
@@ -544,14 +544,14 @@
       "id": "COOKIE-SAMESITE-26",
       "title": "Cookie SameSite attribute not set",
       "finding": "Your cookies do not specify whether they should be sent when requests originate from other websites.",
-      "impact": "Without this restriction, a page an attacker controls can cause a user's browser to make an authenticated request to your application. The user's session is used to perform an action they did not intend — changing an email address, initiating a transfer, or altering a setting.",
+      "impact": "Without this restriction, a page an attacker controls can cause a user's browser to make an authenticated request to your application. The user's session is used to perform an action they did not intend - changing an email address, initiating a transfer, or altering a setting.",
       "remediation": {
         "summary": "Set SameSite=Lax on session cookies, or Strict where usability permits.",
         "steps": [
-          "Set SameSite=Lax as a baseline for session cookies — this permits normal navigation while blocking cross-site form submissions.",
+          "Set SameSite=Lax as a baseline for session cookies - this permits normal navigation while blocking cross-site form submissions.",
           "Use SameSite=Strict for high-sensitivity applications such as banking or administrative interfaces.",
           "Where SameSite=None is genuinely required for a legitimate cross-site integration, it must be paired with Secure.",
-          "Retain anti-CSRF tokens as a second layer — SameSite is not a complete replacement.",
+          "Retain anti-CSRF tokens as a second layer - SameSite is not a complete replacement.",
           "Test third-party integrations and payment redirects after the change."
         ],
         "verification": "Confirm SameSite is present with an appropriate value on all session cookies."
@@ -586,13 +586,13 @@
       "id": "TLS-CERT-EXPIRING-28",
       "title": "Certificate expiring soon",
       "finding": "A TLS certificate on a production system will expire shortly. When it does, browsers will display a full-page security warning and most API clients will refuse to connect.",
-      "impact": "Certificate expiry causes complete service outage, and it always occurs at the least convenient moment — expiry does not respect business hours. The outage is total rather than degraded: customers cannot reach the site, integrations fail, and mobile applications stop functioning. Recovery is quick once identified, but identification is often slow because the failure looks like a general outage.",
+      "impact": "Certificate expiry causes complete service outage, and it always occurs at the least convenient moment - expiry does not respect business hours. The outage is total rather than degraded: customers cannot reach the site, integrations fail, and mobile applications stop functioning. Recovery is quick once identified, but identification is often slow because the failure looks like a general outage.",
       "remediation": {
         "summary": "Renew the certificate now and automate renewal to prevent recurrence.",
         "steps": [
           "Renew and install the replacement certificate before the expiry date.",
           "Ensure the full certificate chain is installed, not only the leaf certificate.",
-          "Implement automated renewal — ACME clients handle this reliably for most environments.",
+          "Implement automated renewal - ACME clients handle this reliably for most environments.",
           "Where automation is not possible, set calendar reminders at 60, 30 and 14 days before expiry.",
           "Build an inventory of every certificate across the estate with owner and expiry date.",
           "Add expiry monitoring with alerting at 30 days, routed to a monitored channel rather than an individual's inbox."
@@ -614,7 +614,7 @@
         "steps": [
           "Issue and install a replacement certificate as the immediate priority.",
           "Verify the complete chain is installed and the service has been reloaded to pick up the new certificate.",
-          "Check for other certificates in the estate approaching expiry — this failure usually indicates a process gap rather than a one-off.",
+          "Check for other certificates in the estate approaching expiry - this failure usually indicates a process gap rather than a one-off.",
           "Implement automated renewal so this cannot recur.",
           "Add monitoring with alerting well before expiry."
         ],
@@ -629,11 +629,11 @@
       "id": "TLS-CERT-SELFSIGNED-30",
       "title": "Self-signed certificate on a public service",
       "finding": "A publicly reachable service presents a certificate that is not issued by a recognised certificate authority. Browsers cannot verify the identity of this system.",
-      "impact": "A self-signed certificate provides encryption but no identity assurance — there is no way to distinguish your genuine server from an attacker impersonating it. It also trains users and administrators to dismiss certificate warnings, which is the behaviour that makes interception attacks succeed.",
+      "impact": "A self-signed certificate provides encryption but no identity assurance - there is no way to distinguish your genuine server from an attacker impersonating it. It also trains users and administrators to dismiss certificate warnings, which is the behaviour that makes interception attacks succeed.",
       "remediation": {
         "summary": "Replace with a certificate from a trusted authority.",
         "steps": [
-          "Obtain a certificate from a recognised authority — free automated options are available and appropriate for most services.",
+          "Obtain a certificate from a recognised authority - free automated options are available and appropriate for most services.",
           "Install the certificate with its full intermediate chain.",
           "If the service is genuinely internal only, remove it from internet accessibility rather than leaving a self-signed certificate exposed.",
           "Set up automated renewal.",
@@ -650,7 +650,7 @@
       "id": "TLS-CHAIN-31",
       "title": "Incomplete certificate chain",
       "finding": "Your server does not send the complete certificate chain. Some clients can compensate by fetching the missing parts, but many cannot.",
-      "impact": "Desktop browsers usually recover from this, which is why it goes unnoticed. Mobile applications, older devices, API clients and payment integrations frequently do not — producing intermittent failures that are difficult to diagnose because the site appears to work correctly when tested from a browser.",
+      "impact": "Desktop browsers usually recover from this, which is why it goes unnoticed. Mobile applications, older devices, API clients and payment integrations frequently do not - producing intermittent failures that are difficult to diagnose because the site appears to work correctly when tested from a browser.",
       "remediation": {
         "summary": "Install the full chain including all intermediate certificates.",
         "steps": [
@@ -671,7 +671,7 @@
       "id": "TLS-HOSTNAME-32",
       "title": "Certificate does not match hostname",
       "finding": "The certificate presented does not include the hostname being requested. Browsers will show a security warning.",
-      "impact": "Users receive a warning identical to the one shown during a genuine interception attempt. The practical result is that visitors either abandon the site or learn to dismiss security warnings — the second outcome is worse, because it removes their ability to detect a real attack.",
+      "impact": "Users receive a warning identical to the one shown during a genuine interception attempt. The practical result is that visitors either abandon the site or learn to dismiss security warnings - the second outcome is worse, because it removes their ability to detect a real attack.",
       "remediation": {
         "summary": "Reissue the certificate covering all hostnames in use.",
         "steps": [
@@ -716,7 +716,7 @@
       "remediation": {
         "summary": "Restrict the cipher list to modern suites offering forward secrecy.",
         "steps": [
-          "Apply a modern cipher suite configuration — Mozilla's intermediate profile is a well-maintained reference.",
+          "Apply a modern cipher suite configuration - Mozilla's intermediate profile is a well-maintained reference.",
           "Prioritise suites providing forward secrecy, so that compromise of the server key does not expose past traffic.",
           "Remove all suites using RC4, DES, 3DES, export-grade algorithms or MD5.",
           "Set server cipher preference order rather than allowing the client to choose.",
@@ -753,7 +753,7 @@
       "id": "TLS-NOREDIRECT-36",
       "title": "Unencrypted connections not redirected",
       "finding": "Your site serves content over unencrypted connections rather than redirecting to the secure version.",
-      "impact": "Any data submitted over the unencrypted connection — including credentials — travels in plain text and can be read by anyone on the network path. Search engines may also index the insecure version, sending future visitors there by default.",
+      "impact": "Any data submitted over the unencrypted connection - including credentials - travels in plain text and can be read by anyone on the network path. Search engines may also index the insecure version, sending future visitors there by default.",
       "remediation": {
         "summary": "Redirect all HTTP traffic to HTTPS with a permanent redirect.",
         "steps": [
@@ -778,9 +778,9 @@
       "remediation": {
         "summary": "Update all resource references to use HTTPS.",
         "steps": [
-          "Identify all insecure references — the browser console lists them clearly.",
+          "Identify all insecure references - the browser console lists them clearly.",
           "Update each to HTTPS, or to protocol-relative URLs where the resource supports both.",
-          "For third-party resources without HTTPS support, find an alternative provider — this is now rare enough to be a warning sign about that vendor.",
+          "For third-party resources without HTTPS support, find an alternative provider - this is now rare enough to be a warning sign about that vendor.",
           "Add a Content-Security-Policy upgrade-insecure-requests directive as a safety net.",
           "Check content stored in your CMS, as editors frequently paste insecure image and embed URLs."
         ],
@@ -795,11 +795,11 @@
       "id": "EMAIL-SPF-38",
       "title": "No SPF record published",
       "finding": "Your domain does not publish a record declaring which mail servers are permitted to send email on its behalf.",
-      "impact": "Receiving mail systems have no basis on which to reject forged messages claiming to come from your domain. This is the foundation layer of email authentication — without it, DMARC cannot function and your domain is trivially spoofable.",
+      "impact": "Receiving mail systems have no basis on which to reject forged messages claiming to come from your domain. This is the foundation layer of email authentication - without it, DMARC cannot function and your domain is trivially spoofable.",
       "remediation": {
         "summary": "Publish an SPF record listing all legitimate sending sources.",
         "steps": [
-          "Identify every system that sends email as your domain — mail provider, marketing platform, CRM, invoicing system, application notifications, ticketing tools.",
+          "Identify every system that sends email as your domain - mail provider, marketing platform, CRM, invoicing system, application notifications, ticketing tools.",
           "Build a record including each, for example: v=spf1 include:_spf.google.com include:sendgrid.net -all",
           "Publish initially with ~all (soft fail) to observe behaviour without rejecting legitimate mail.",
           "Monitor for two weeks and add any legitimate sender you missed.",
@@ -822,7 +822,7 @@
         "summary": "Move to hard fail once the sender list is verified complete.",
         "steps": [
           "Review DMARC aggregate reports to confirm every legitimate sending source is present in the record.",
-          "Pay particular attention to systems that send infrequently — annual notices, disaster recovery, seasonal campaigns.",
+          "Pay particular attention to systems that send infrequently - annual notices, disaster recovery, seasonal campaigns.",
           "Change the final mechanism from ~all to -all.",
           "Monitor delivery closely for two weeks after the change.",
           "Keep a documented list of authorised senders and review it when tools change."
@@ -838,12 +838,12 @@
       "id": "EMAIL-SPF-40",
       "title": "SPF record exceeds DNS lookup limit",
       "finding": "Your SPF record requires more DNS lookups than the specification permits. Receiving servers will stop evaluating and treat the check as failed.",
-      "impact": "This causes silent, intermittent failure. Once the limit is exceeded, evaluation returns a permanent error — meaning legitimate email may be rejected while forged email is not reliably blocked. Because behaviour varies by provider, the symptom is usually reported as unpredictable delivery problems rather than an SPF fault.",
+      "impact": "This causes silent, intermittent failure. Once the limit is exceeded, evaluation returns a permanent error - meaning legitimate email may be rejected while forged email is not reliably blocked. Because behaviour varies by provider, the symptom is usually reported as unpredictable delivery problems rather than an SPF fault.",
       "remediation": {
         "summary": "Reduce the number of lookups below ten.",
         "steps": [
           "Count the lookups generated by each include, following nested includes to their full depth.",
-          "Remove senders no longer in use — most records exceed the limit through accumulation rather than genuine need.",
+          "Remove senders no longer in use - most records exceed the limit through accumulation rather than genuine need.",
           "Replace include mechanisms with explicit ip4 and ip6 entries where the sender publishes stable addresses, as these consume no lookups.",
           "Consider an SPF flattening service, accepting that it introduces a dependency requiring monitoring.",
           "Use subdomains for bulk marketing mail so the primary domain record stays simple.",
@@ -881,12 +881,12 @@
       "id": "EMAIL-DKIM-42",
       "title": "No DKIM signing detected",
       "finding": "We found no evidence that your outgoing email is cryptographically signed.",
-      "impact": "DKIM proves a message genuinely originated from your domain and was not altered in transit. Without it, DMARC has only SPF to rely on — and SPF breaks whenever mail is forwarded, causing legitimate messages to fail authentication. Both mechanisms are needed for reliable protection.",
+      "impact": "DKIM proves a message genuinely originated from your domain and was not altered in transit. Without it, DMARC has only SPF to rely on - and SPF breaks whenever mail is forwarded, causing legitimate messages to fail authentication. Both mechanisms are needed for reliable protection.",
       "remediation": {
         "summary": "Enable DKIM signing at every system that sends email as your domain.",
         "steps": [
           "Enable DKIM in your primary mail platform and publish the public key it generates in DNS.",
-          "Repeat for every third-party sender — marketing platform, CRM, invoicing, transactional mail service.",
+          "Repeat for every third-party sender - marketing platform, CRM, invoicing, transactional mail service.",
           "Use a key length of 2048 bits.",
           "Use distinct selectors per sending service so keys can be rotated independently.",
           "Send test messages from each source and confirm the signature validates at the receiving end.",
@@ -924,11 +924,11 @@
       "id": "EMAIL-DMARC-44",
       "title": "No DMARC record published",
       "finding": "Your domain publishes no policy telling receiving mail servers what to do with messages that fail authentication. Anyone on the internet can send email that appears to come from your domain.",
-      "impact": "This is the mechanism behind invoice fraud and payment redirection — an attacker sends a message that genuinely appears to originate from your finance team or a director, instructing a change of bank details or an urgent payment. Because the sender address is authentic, recipients have no visible reason to doubt it. Funds transferred this way are rarely recovered, and the window for intervention is measured in hours.",
+      "impact": "This is the mechanism behind invoice fraud and payment redirection - an attacker sends a message that genuinely appears to originate from your finance team or a director, instructing a change of bank details or an urgent payment. Because the sender address is authentic, recipients have no visible reason to doubt it. Funds transferred this way are rarely recovered, and the window for intervention is measured in hours.",
       "remediation": {
         "summary": "Publish a DMARC record, starting in monitoring mode and progressing to enforcement.",
         "steps": [
-          "Confirm SPF and DKIM are correctly configured first — DMARC depends on both.",
+          "Confirm SPF and DKIM are correctly configured first - DMARC depends on both.",
           "Publish an initial monitoring record: v=DMARC1; p=none; rua=mailto:dmarc-reports@yourdomain.com",
           "Use a DMARC report processing service, as raw aggregate reports are XML and difficult to interpret manually.",
           "Review reports for 30 days to identify every legitimate sending source, including systems you had forgotten.",
@@ -939,7 +939,7 @@
         "verification": "Query _dmarc.{domain} and confirm a valid record is returned with the intended policy."
       },
       "effortHours": 4,
-      "effortNote": "Reaching full enforcement takes 60–90 days of monitoring before the policy can be tightened safely.",
+      "effortNote": "Reaching full enforcement takes 60-90 days of monitoring before the policy can be tightened safely.",
       "skill": "Mail / DNS administrator",
       "implemented": true
     },
@@ -947,12 +947,12 @@
       "id": "EMAIL-DMARC-45",
       "title": "DMARC policy set to monitor only",
       "finding": "A DMARC record exists but is set to take no action. Messages failing authentication are still delivered normally.",
-      "impact": "This configuration provides reporting visibility but no protection. Your domain remains fully spoofable. This is the most common state we encounter — organisations publish a monitoring record intending to progress to enforcement, and then the task is never completed. From an attacker's perspective, p=none and no record at all are equivalent.",
+      "impact": "This configuration provides reporting visibility but no protection. Your domain remains fully spoofable. This is the most common state we encounter - organisations publish a monitoring record intending to progress to enforcement, and then the task is never completed. From an attacker's perspective, p=none and no record at all are equivalent.",
       "remediation": {
         "summary": "Progress the policy to quarantine, then to reject.",
         "steps": [
           "Review your aggregate reports and confirm every legitimate sending source is authenticating correctly.",
-          "Pay attention to infrequent senders — annual statements, backup systems, seasonal campaigns.",
+          "Pay attention to infrequent senders - annual statements, backup systems, seasonal campaigns.",
           "Move to p=quarantine, optionally with a percentage to phase the rollout: p=quarantine; pct=25",
           "Increase the percentage gradually to 100 while monitoring reports.",
           "Move to p=reject once quarantine has run cleanly for a month.",
@@ -961,7 +961,7 @@
         "verification": "The published policy should read p=reject, with aggregate reports showing no legitimate mail failing."
       },
       "effortHours": 8,
-      "effortNote": "The configuration is a day's work; reaching full enforcement takes 60–90 days of phased rollout.",
+      "effortNote": "The configuration is a day's work; reaching full enforcement takes 60-90 days of phased rollout.",
       "skill": "Mail administrator",
       "implemented": true
     },
@@ -974,7 +974,7 @@
         "summary": "Add a reporting address and use a service to process the reports.",
         "steps": [
           "Add rua=mailto:dmarc-reports@yourdomain.com to the DMARC record.",
-          "Use a DMARC report processing service — reports arrive as XML from dozens of providers daily and are impractical to read manually.",
+          "Use a DMARC report processing service - reports arrive as XML from dozens of providers daily and are impractical to read manually.",
           "Assign a named person to review the reports at a defined interval.",
           "Consider adding ruf for forensic reports, noting that these contain message content and carry privacy implications.",
           "Use the reports to complete your authorised sender inventory."
@@ -990,7 +990,7 @@
       "id": "EMAIL-MTASTS-47",
       "title": "MTA-STS not configured",
       "finding": "Your domain does not publish a policy requiring encrypted connections for incoming mail.",
-      "impact": "Mail transport encryption is opportunistic by default — if encryption cannot be negotiated, mail is usually delivered unencrypted rather than not at all. An attacker able to interfere with the connection can force this downgrade and read message contents in transit.",
+      "impact": "Mail transport encryption is opportunistic by default - if encryption cannot be negotiated, mail is usually delivered unencrypted rather than not at all. An attacker able to interfere with the connection can force this downgrade and read message contents in transit.",
       "remediation": {
         "summary": "Publish an MTA-STS policy, beginning in testing mode.",
         "steps": [
@@ -1040,7 +1040,7 @@
           "Enable signing at the DNS provider.",
           "Publish the resulting DS record at the registrar to establish the chain of trust.",
           "Validate the chain resolves correctly using a DNSSEC verification tool.",
-          "Ensure key rollover is automated — a lapsed signature makes the domain unresolvable, which is a total outage.",
+          "Ensure key rollover is automated - a lapsed signature makes the domain unresolvable, which is a total outage.",
           "Add DNSSEC validity to your monitoring."
         ],
         "verification": "A DNSSEC validation tool should confirm an unbroken chain of trust."
@@ -1096,12 +1096,12 @@
       "id": "BREACH-CREDS-52",
       "title": "Employee credentials present in breach corpora",
       "finding": "Email addresses belonging to your staff appear in publicly circulating breach data alongside passwords. These originate from breaches of unrelated third-party services where employees used their work address.",
-      "impact": "Attackers routinely take these lists, filter for corporate domains, and attempt the recovered passwords against corporate systems — a technique that succeeds because password reuse remains widespread. This requires no technical skill and leaves minimal trace, since the attempts appear as ordinary login activity.",
+      "impact": "Attackers routinely take these lists, filter for corporate domains, and attempt the recovered passwords against corporate systems - a technique that succeeds because password reuse remains widespread. This requires no technical skill and leaves minimal trace, since the attempts appear as ordinary login activity.",
       "remediation": {
         "summary": "Force password resets for affected accounts and enforce multi-factor authentication.",
         "steps": [
           "Require a password reset for every affected account, and verify the new password does not match a known-breached value.",
-          "Enforce multi-factor authentication across all corporate systems — this is the control that renders stolen passwords useless.",
+          "Enforce multi-factor authentication across all corporate systems - this is the control that renders stolen passwords useless.",
           "Review authentication logs for those accounts over the preceding 90 days for successful logins from unexpected locations.",
           "Provide a company password manager so staff are not required to memorise unique passwords.",
           "Advise staff not to use work addresses for personal service registrations.",
@@ -1123,7 +1123,7 @@
         "summary": "Treat as priority: reset immediately, enforce hardware-backed authentication, and review mailbox activity.",
         "steps": [
           "Reset credentials for the affected accounts as the immediate action.",
-          "Enforce phishing-resistant multi-factor authentication — hardware keys or passkeys rather than SMS codes.",
+          "Enforce phishing-resistant multi-factor authentication - hardware keys or passkeys rather than SMS codes.",
           "Review mailbox rules on those accounts. Attackers commonly create forwarding or auto-delete rules to hide their activity.",
           "Review sign-in history for access from unexpected locations or devices.",
           "Confirm payment approval processes require verification through a channel other than email.",
@@ -1140,7 +1140,7 @@
       "id": "BREACH-SECRET-54",
       "title": "Credentials found in public code repository",
       "finding": "A credential associated with your organisation was found in a publicly accessible code repository.",
-      "impact": "Automated systems continuously scan new public commits for credentials — exposed keys are typically discovered and used within minutes of publication. Depending on the credential type this may permit cloud infrastructure control, database access, or transactions against a payment provider. Deleting the commit does not remediate this, because the repository history retains it and automated collectors already hold a copy.",
+      "impact": "Automated systems continuously scan new public commits for credentials - exposed keys are typically discovered and used within minutes of publication. Depending on the credential type this may permit cloud infrastructure control, database access, or transactions against a payment provider. Deleting the commit does not remediate this, because the repository history retains it and automated collectors already hold a copy.",
       "remediation": {
         "summary": "Rotate the credential immediately. Removal from the repository is secondary and insufficient on its own.",
         "steps": [
@@ -1154,22 +1154,22 @@
         "verification": "The exposed credential should no longer authenticate, and the replacement should be stored outside source control."
       },
       "effortHours": 4,
-      "effortNote": "A full review adds 2–5 days.",
+      "effortNote": "A full review adds 2-5 days.",
       "skill": "DevOps / development lead",
       "implemented": true
     },
     {
       "id": "BREACH-METADATA-55",
       "title": "Internal information disclosed in public sources",
-      "finding": "Hostnames belonging to your organisation are published in public certificate transparency logs. Every certificate issued for your domain is recorded in these logs by design, and the names on them are readable by anyone. Several of yours describe internal systems — names of the kind used for administration, development or infrastructure rather than for public services.",
+      "finding": "Hostnames belonging to your organisation are published in public certificate transparency logs. Every certificate issued for your domain is recorded in these logs by design, and the names on them are readable by anyone. Several of yours describe internal systems - names of the kind used for administration, development or infrastructure rather than for public services.",
       "impact": "This is reconnaissance material. It tells an attacker which internal systems exist and what they are called before they send a single request to you, so they can aim at the administrative interface or the staging environment directly rather than searching for them. It is not exploitable on its own, but it removes most of the work from the preparation stage.",
       "remediation": {
-        "summary": "You cannot remove entries from certificate transparency logs — publication is the point of them. Reduce what future certificates disclose, and treat the already-published names as known.",
+        "summary": "You cannot remove entries from certificate transparency logs - publication is the point of them. Reduce what future certificates disclose, and treat the already-published names as known.",
         "steps": [
           "Review the disclosed hostnames and confirm which are genuinely internal systems rather than public services.",
           "Use a wildcard certificate for internal subdomains where appropriate, so individual hostnames are not published each time a certificate is issued.",
           "Where a name is already published, assume it is known permanently and make sure the system behind it is not reachable from the internet, or requires authentication if it is.",
-          "Avoid descriptive internal naming in any hostname that will receive a public certificate — a name that describes its function is an instruction to an attacker.",
+          "Avoid descriptive internal naming in any hostname that will receive a public certificate - a name that describes its function is an instruction to an attacker.",
           "Set up certificate transparency monitoring so you learn when a new name is published for your domain, including one you did not request."
         ],
         "verification": "Issue a new certificate and confirm the published entry does not disclose an internal hostname. Confirm any already-disclosed internal system either refuses connections from the internet or requires authentication."
@@ -1190,7 +1190,7 @@
           "Retrieve and preserve the content as evidence before requesting removal.",
           "Assess what is disclosed and which systems it originated from.",
           "If personal data is included, assess your notification obligations under applicable regulation.",
-          "Investigate how the data was obtained — this may indicate an active compromise.",
+          "Investigate how the data was obtained - this may indicate an active compromise.",
           "Request removal through the paste site's abuse process, recognising copies may persist.",
           "Reset any credentials that appear in the content."
         ],
@@ -1211,17 +1211,17 @@
         "summary": "Activate incident response immediately. This is an active incident, not a preventive finding.",
         "steps": [
           "Invoke your incident response plan and engage specialist support without delay.",
-          "Notify your cyber insurer — most policies require prompt notification to maintain cover.",
+          "Notify your cyber insurer - most policies require prompt notification to maintain cover.",
           "Engage legal counsel before any communication with the group.",
           "Preserve forensic evidence before making changes to affected systems.",
           "Determine the scope of data taken to establish notification obligations.",
           "Assume credentials across the environment are compromised and plan a coordinated reset.",
           "Prepare regulatory notification within the required timeframe."
         ],
-        "verification": "Not applicable — this requires incident response, not remediation of a configuration weakness."
+        "verification": "Not applicable - this requires incident response, not remediation of a configuration weakness."
       },
       "effortHours": 4,
-      "effortNote": "Immediate escalation required — this is not work to schedule.",
+      "effortNote": "Immediate escalation required - this is not work to schedule.",
       "skill": "Incident response team and executive leadership",
       "implemented": false,
       "notBuiltReason": "Requires monitoring criminal leak sites. Out of scope by policy."
@@ -1230,12 +1230,12 @@
       "id": "BRAND-TYPO-58",
       "title": "Lookalike domains registered",
       "finding": "Domains closely resembling yours have been registered by third parties.",
-      "impact": "Registration usually precedes use. These domains are typically prepared in advance and activated later for phishing against your customers or staff. The interval between registration and use is your warning window — and it is the only point at which prevention is straightforward.",
+      "impact": "Registration usually precedes use. These domains are typically prepared in advance and activated later for phishing against your customers or staff. The interval between registration and use is your warning window - and it is the only point at which prevention is straightforward.",
       "remediation": {
         "summary": "Assess each domain, monitor for activation, and register high-risk variants defensively.",
         "steps": [
           "Review each registered lookalike to determine whether it currently hosts content or has mail configured.",
-          "Prioritise those with mail records — these are configured for email-based fraud rather than website impersonation.",
+          "Prioritise those with mail records - these are configured for email-based fraud rather than website impersonation.",
           "Register the highest-risk unregistered variants defensively, protecting them with rejecting SPF and DMARC records.",
           "Monitor registered lookalikes for changes indicating imminent use.",
           "Prepare a takedown process with your registrar and legal counsel so response is fast when activation occurs.",
@@ -1252,11 +1252,11 @@
       "id": "BRAND-TYPO-59",
       "title": "Lookalike domain configured for email",
       "finding": "A domain resembling yours has been configured to send and receive email.",
-      "impact": "Mail configuration on a lookalike domain has no legitimate purpose. This is active preparation for fraud — the attacker intends to send messages appearing to come from your organisation. The recent certificate issuance suggests a matching website is also being prepared.",
+      "impact": "Mail configuration on a lookalike domain has no legitimate purpose. This is active preparation for fraud - the attacker intends to send messages appearing to come from your organisation. The recent certificate issuance suggests a matching website is also being prepared.",
       "remediation": {
         "summary": "Treat as active preparation. Initiate takedown and warn those likely to be targeted.",
         "steps": [
-          "Preserve evidence — registration records, DNS configuration, certificate issuance, any hosted content.",
+          "Preserve evidence - registration records, DNS configuration, certificate issuance, any hosted content.",
           "File an abuse report with the registrar and hosting provider.",
           "Engage legal counsel regarding trademark-based takedown, which is generally the fastest route.",
           "Warn staff, and consider warning customers and suppliers who may be targeted.",
@@ -1266,7 +1266,7 @@
         "verification": "Takedown submitted, mail gateway blocking in place, and likely targets warned."
       },
       "effortHours": 4,
-      "effortNote": "Immediate action required. Takedown itself typically takes 1–4 weeks.",
+      "effortNote": "Immediate action required. Takedown itself typically takes 1-4 weeks.",
       "skill": "Security lead with legal support",
       "implemented": true
     },
@@ -1279,7 +1279,7 @@
         "summary": "Initiate emergency takedown and warn customers immediately.",
         "steps": [
           "Preserve evidence with screenshots and full page captures before requesting removal.",
-          "Report to Google Safe Browsing and Microsoft SmartScreen — browser blocking is usually faster than takedown and protects users within hours.",
+          "Report to Google Safe Browsing and Microsoft SmartScreen - browser blocking is usually faster than takedown and protects users within hours.",
           "File urgent abuse reports with the hosting provider, registrar and certificate authority.",
           "Publish a warning through your own channels so customers can verify what is legitimate.",
           "Brief your support team so they can respond consistently to enquiries.",
@@ -1289,7 +1289,7 @@
         "verification": "The site is blocked by major browsers and removed by the hosting provider."
       },
       "effortHours": 4,
-      "effortNote": "Immediate action required. Effective takedown takes 24–72 hours.",
+      "effortNote": "Immediate action required. Effective takedown takes 24-72 hours.",
       "skill": "Security lead with communications support",
       "implemented": false,
       "notBuiltReason": "Not implemented."
@@ -1326,7 +1326,7 @@
         "summary": "Report the profiles and inform those likely to be contacted.",
         "steps": [
           "Document each profile before reporting, as they are often deleted once flagged.",
-          "Report through each platform's impersonation process — reports from the impersonated individual are generally actioned fastest.",
+          "Report through each platform's impersonation process - reports from the impersonated individual are generally actioned fastest.",
           "Inform staff, and consider informing key customers and partners.",
           "Encourage senior staff to verify their genuine accounts where the platform supports it.",
           "Establish periodic monitoring for new impersonation attempts.",
@@ -1386,12 +1386,12 @@
       "id": "SURF-THIRDPARTY-65",
       "title": "Third-party scripts loaded without integrity verification",
       "finding": "Your pages load scripts from external providers without verifying the content has not been altered.",
-      "impact": "You are executing code you do not control on every page load. If any provider is compromised — or their delivery network is — modified code runs with full access to your page, including anything users type into forms. This is the mechanism behind payment page skimming, which typically continues undetected for months.",
+      "impact": "You are executing code you do not control on every page load. If any provider is compromised - or their delivery network is - modified code runs with full access to your page, including anything users type into forms. This is the mechanism behind payment page skimming, which typically continues undetected for months.",
       "remediation": {
         "summary": "Add integrity attributes to external scripts, and reduce the number you rely on.",
         "steps": [
           "Inventory every external script your pages load, particularly on payment and login pages.",
-          "Remove any no longer serving a purpose — most sites accumulate these over time.",
+          "Remove any no longer serving a purpose - most sites accumulate these over time.",
           "Add integrity and crossorigin attributes to remaining external scripts so the browser verifies content before execution.",
           "Self-host critical libraries where the provider does not support versioned, immutable URLs.",
           "Apply a Content Security Policy restricting which sources may serve scripts.",

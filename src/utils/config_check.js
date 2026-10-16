@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  config_check — say out loud, at boot, what is configured badly enough to
+//  config_check - say out loud, at boot, what is configured badly enough to
 //  break something quietly.
 //
 //  WHY THIS EXISTS.
@@ -21,13 +21,13 @@
 //
 //  THE ONE EXCEPTION, for whoever adds the first one:
 //  A SIGNING SECRET LEFT AT A PLACEHOLDER MUST EXIT. Session tokens, JWTs,
-//  cookie secrets — anything where a known default means anyone can mint a
+//  cookie secrets - anything where a known default means anyone can mint a
 //  valid credential. There, starting IS the dangerous outcome: the server
 //  comes up, appears healthy, and accepts forged tokens from anybody who has
 //  read the repository. Warning is not enough because nothing downstream
 //  fails visibly.
 //
-//  This app has no such secret today — it has no login, no sessions and no
+//  This app has no such secret today - it has no login, no sessions and no
 //  JWTs, because portal access lives in a different application. If one is
 //  ever added, put it in FATAL below rather than WARNINGS, and the rule
 //  survives the person who wrote it.
@@ -63,7 +63,7 @@ const WARNINGS = [
     {
         /* This one fires in local development too, and that is deliberate.
            There is no way to tell "developer on a laptop" from "production
-           box where somebody forgot the variable" — and the second is the
+           box where somebody forgot the variable" - and the second is the
            case that silently hands the whole internet one rate-limit
            bucket. A warning you see every day and understand is cheaper
            than a limiter nobody notices is broken. */
@@ -89,7 +89,7 @@ const WARNINGS = [
 /**
  * Check the environment and report.
  *
- * Prints nothing at all when everything is configured — a quiet boot should
+ * Prints nothing at all when everything is configured - a quiet boot should
  * mean a good one, and a block that appears every time is a block people
  * stop reading.
  *
@@ -107,7 +107,7 @@ function checkConfig(env = process.env, io = console) {
         const width = Math.max(...fatal.map((c) => c.name.length));
         io.error("");
         io.error("╔══════════════════════════════════════════════════════════════════════════╗");
-        io.error("║  ❌  REFUSING TO START — a signing secret is at its placeholder value    ║");
+        io.error("║  ❌  REFUSING TO START - a signing secret is at its placeholder value    ║");
         io.error("╚══════════════════════════════════════════════════════════════════════════╝");
         fatal.forEach((c) => {
             io.error(`   ${c.name.padEnd(width)}  →  ${c.consequence}`);
@@ -126,7 +126,7 @@ function checkConfig(env = process.env, io = console) {
 
     io.warn("");
     io.warn("╔══════════════════════════════════════════════════════════════════════════╗");
-    io.warn("║  ⚠️   CONFIGURATION — these fail SILENTLY. The site will look fine.      ║");
+    io.warn("║  ⚠️   CONFIGURATION - these fail SILENTLY. The site will look fine.      ║");
     io.warn("╚══════════════════════════════════════════════════════════════════════════╝");
     warnings.forEach((c) => {
         io.warn(`   ${c.name.padEnd(width)}  ${c.state.padEnd(state)}`);

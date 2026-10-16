@@ -1,10 +1,10 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  Domain 6 — Email & Domain Security.  13 checks.
+//  Domain 6 - Email & Domain Security.  13 checks.
 //
 //  Ported from dShield v6.3 src/checks/email.js.
 //
 //  The source shares parsed SPF/DMARC/DKIM between checks through a scan
-//  cache that the checks populate in order — EMAIL-SPF-38 parses, and 39, 40
+//  cache that the checks populate in order - EMAIL-SPF-38 parses, and 39, 40
 //  and 41 read what it left behind.
 //
 //  That is not safe here: this engine runs checks in concurrent batches, so
@@ -121,7 +121,7 @@ module.exports = [
         async run(target) {
             const spf = await spfOf(target);
             assertResolved(spf, target.domain);
-            if (!spf.present) return { passed: true, evidence: "No SPF record — reported by EMAIL-SPF-38." };
+            if (!spf.present) return { passed: true, evidence: "No SPF record - reported by EMAIL-SPF-38." };
             return spf.enforcing
                 ? { passed: true, evidence: 'SPF ends with "-all".' }
                 : { passed: false, evidence: `SPF ends with "${spf.qualifier || "no "}all", which does not enforce.`, detail: { qualifier: spf.qualifier } };
@@ -132,11 +132,11 @@ module.exports = [
         id: "EMAIL-SPF-40",
         domain: 6, severity: "high", minTier: "advanced",
         title: "SPF record exceeds DNS lookup limit",
-        why: "Receivers stop evaluating SPF after ten DNS lookups and treat the result as an error. An over-long record does not fail safe — it stops working entirely.",
+        why: "Receivers stop evaluating SPF after ten DNS lookups and treat the result as an error. An over-long record does not fail safe - it stops working entirely.",
         async run(target) {
             const spf = await spfOf(target);
             assertResolved(spf, target.domain);
-            if (!spf.present) return { passed: true, evidence: "No SPF record — reported by EMAIL-SPF-38." };
+            if (!spf.present) return { passed: true, evidence: "No SPF record - reported by EMAIL-SPF-38." };
 
             // Direct count only. Nested includes would need recursive
             // resolution, so 8 or 9 is reported as a warning rather than a
@@ -173,7 +173,7 @@ module.exports = [
         async run(target) {
             const { found, failures, tested } = await dkimOf(target);
             if (failures > tested / 2) {
-                throw new Error(`DKIM lookup inconclusive — ${failures} of ${tested} selectors failed to resolve`);
+                throw new Error(`DKIM lookup inconclusive - ${failures} of ${tested} selectors failed to resolve`);
             }
             return found.length
                 ? { passed: true, evidence: `DKIM key found at selector "${found[0].selector}".`, detail: { selectors: found.map((f) => f.selector) } }
@@ -194,7 +194,7 @@ module.exports = [
         why: "A short DKIM key can be factored, and anyone who does can sign mail as you in a way that passes every check a receiver makes.",
         async run(target) {
             const { found } = await dkimOf(target);
-            if (!found.length) return { passed: true, evidence: "No DKIM key — reported by EMAIL-DKIM-42." };
+            if (!found.length) return { passed: true, evidence: "No DKIM key - reported by EMAIL-DKIM-42." };
 
             for (const { selector, record } of found) {
                 const m = record.match(/p=([A-Za-z0-9+/=]+)/);
@@ -234,7 +234,7 @@ module.exports = [
             if (!d.present) throw new Error("No DMARC record to evaluate");   // reported by -44
 
             if (d.policy === "none") {
-                return { passed: false, evidence: "DMARC policy is p=none — forged mail is reported but still delivered.", detail: { policy: "none", rua: d.rua } };
+                return { passed: false, evidence: "DMARC policy is p=none - forged mail is reported but still delivered.", detail: { policy: "none", rua: d.rua } };
             }
             if (d.pct < 100) {
                 return { passed: false, evidence: `DMARC is p=${d.policy} but applies to only ${d.pct}% of mail.`, detail: { policy: d.policy, pct: d.pct } };
@@ -251,7 +251,7 @@ module.exports = [
         async run(target) {
             const d = await dmarcOf(target);
             assertResolved(d, `_dmarc.${target.domain}`);
-            if (!d.present) return { passed: true, evidence: "No DMARC record — reported by EMAIL-DMARC-44." };
+            if (!d.present) return { passed: true, evidence: "No DMARC record - reported by EMAIL-DMARC-44." };
             return d.rua
                 ? { passed: true, evidence: "A DMARC aggregate reporting address is configured." }
                 : { passed: false, evidence: "The DMARC record has no rua reporting address." };

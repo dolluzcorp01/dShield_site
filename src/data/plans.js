@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  plans — the single price list.
+//  plans - the single price list.
 //
 //  This lived inside Lead_server.js and is now shared, because checkout and
 //  the pricing page disagreeing about what something costs is the kind of
@@ -14,7 +14,7 @@
 //  ⚠️  THE SITE DISPLAYS USD AND RAZORPAY CHARGES INR. The paise figures
 //  below were converted at ₹88 to the dollar. That rate is fixed in this
 //  file and does not track the market, so it needs reviewing before launch
-//  and periodically after — and the pricing page should show the rupee
+//  and periodically after - and the pricing page should show the rupee
 //  price a customer will actually be charged. See the note in the report.
 //
 //  ── available ──────────────────────────────────────────────────────────
@@ -26,7 +26,7 @@
 const USD_TO_INR = 88;
 const paiseFor = (usd) => usd * USD_TO_INR * 100;
 
-/** True only when a live key is configured — see the note above. */
+/** True only when a live key is configured - see the note above. */
 const paymentsConfigured = () => {
     const k = String(process.env.RAZORPAY_KEY_ID || "").trim();
     return k.startsWith("rzp_");
@@ -95,7 +95,7 @@ const BASE_PLANS = [
     {
         // Named for what it is: Extended Support is not an alternative to Full
         // Protection, it is Full Protection with the remediation carried out.
-        // The key stays `extended_support` — it is written into leads and
+        // The key stays `extended_support` - it is written into leads and
         // enquiries rows already, and renaming it would orphan them.
         key: "extended_support", name: "Full Protection + Extended Support", price: 999, display: "$999+",
         billing: "per month",

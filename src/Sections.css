@@ -8,7 +8,7 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 /* The frozen file gives every one of these sections `paddingTop:86`
-   (`70` for Connect) and never a paddingBottom — the gap you see is that
+   (`70` for Connect) and never a paddingBottom - the gap you see is that
    section's own top padding, not two paddings stacked. `.ds-section`
    (72px top *and* bottom) is shared by pages that don't have a frozen
    reference, so it stays as-is there; `.sec` overrides it here to match
@@ -200,7 +200,7 @@
    can point at, which is the whole reason those sections read as part of the
    same product as the tile grid above them.
 
-   .svc2 is the frozen file's own grid — 1fr 1fr, 13px, collapsing at 760.
+   .svc2 is the frozen file's own grid - 1fr 1fr, 13px, collapsing at 760.
    Services fills its eight cells with cards; Compliance fills its two with
    panels. */
 
@@ -245,7 +245,7 @@
    skew; opposing tilts read as two separate stacks of paper.
 
    :focus-visible carries the same rule. The prototype decorates hover only,
-   through JS handlers a keyboard never fires — every card it touches is
+   through JS handlers a keyboard never fires - every card it touches is
    invisible to tab focus. */
 .svc:hover,
 .svc:focus-visible {
@@ -380,7 +380,7 @@
 }
 
 /* THE OPEN STATE. Previously opening one of these changed nothing except
-   that text appeared underneath it — the row you clicked looked identical to
+   that text appeared underneath it - the row you clicked looked identical to
    the four you did not, so the only feedback was the page getting taller.
 
    Three signals, which is what the frozen file does: the border lights, the
@@ -435,7 +435,7 @@
 }
 
 /* The answer arrives rather than appearing. The frozen file runs its own
-   `pop` keyframe here, which overshoots to scale(1.16) with a 3° rotation —
+   `pop` keyframe here, which overshoots to scale(1.16) with a 3° rotation -
    fine on the small square tiles it was written for, but on a paragraph
    840px wide that overshoot is ~130px of transient width and pushes a
    horizontal scrollbar onto narrow viewports mid-animation.

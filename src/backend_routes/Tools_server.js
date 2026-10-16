@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  Tools_server — the five free tools.
+//  Tools_server - the five free tools.
 //
 //  GET  /api/tools/password/:prefix    5-char hash prefix ONLY, never a password
 //  POST /api/tools/email-spoofing      { domain }
@@ -42,7 +42,7 @@ function ipOf(req) {
     return String(req.ip || req.connection?.remoteAddress || "").replace(/^::ffff:/, "");
 }
 
-/** Record which tools get used. Domain only — never a password or a hash. */
+/** Record which tools get used. Domain only - never a password or a hash. */
 function logUse(tool, domain) {
     db.query("INSERT INTO tool_usage (tool, target) VALUES (?, ?)", [tool, domain || null],
         (err) => { if (err) console.error("⚠️  tool_usage insert failed:", err.sqlMessage || err.message); });
@@ -81,7 +81,7 @@ function run(toolName, fn) {
 // The route accepts a FIVE CHARACTER HASH PREFIX and nothing else. The
 // password is hashed in the browser and never leaves it. If this endpoint is
 // ever changed to accept a password, the promise printed on the page becomes
-// untrue — so it validates the shape strictly and refuses anything longer.
+// untrue - so it validates the shape strictly and refuses anything longer.
 router.get("/password/:prefix", async (req, res) => {
     if (!guard(req, res)) return;
     const prefix = String(req.params.prefix || "");

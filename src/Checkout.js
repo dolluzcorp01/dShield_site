@@ -9,7 +9,7 @@ import "./Checkout.css";
 
    The Razorpay script is loaded ON DEMAND rather than from index.html.
    Putting a third-party payment script in the document head would load it
-   on every page — including the free scan, which most visitors use and
+   on every page - including the free scan, which most visitors use and
    which has nothing to do with payment.
 
    The browser never sends a price. It sends a tier key, and the server
@@ -75,7 +75,7 @@ function Checkout() {
         e.preventDefault();
         setError("");
 
-        if (!form.email.trim()) return setError("Enter your email address — this is where the report is sent.");
+        if (!form.email.trim()) return setError("Enter your email address - this is where the report is sent.");
         if (!form.domain.trim()) return setError("Enter the domain you want assessed.");
         if (!accepted) return setError("Please accept the Terms of Service and Privacy Notice to continue.");
 
@@ -101,13 +101,13 @@ function Checkout() {
             amount: order.amount,
             currency: order.currency,
             name: "dShield",
-            description: `${order.planName} — ${order.domain}`,
+            description: `${order.planName} - ${order.domain}`,
             prefill: { email: form.email.trim(), name: form.name.trim() || undefined },
             theme: { color: "#C6FF3D" },
             handler: async (response) => {
                 /* This only makes the customer wait less. The webhook is the
                    authority and will fulfil the order regardless of what the
-                   browser reports — including if this callback never runs
+                   browser reports - including if this callback never runs
                    because the tab was closed. */
                 await apiPost("/api/payments/verify", {
                     razorpay_order_id: response.razorpay_order_id,

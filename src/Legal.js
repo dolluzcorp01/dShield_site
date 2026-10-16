@@ -8,7 +8,7 @@ import { useDocumentMeta } from "./utils/meta";
    Legal documents.
 
    No markdown library. The bodies are headings and paragraphs and nothing
-   else, and the dependency list on this project is deliberately short — a
+   else, and the dependency list on this project is deliberately short - a
    parser for `## ` and blank lines is twelve lines, which is cheaper than a
    dependency to audit, update and ship to every visitor.
    ───────────────────────────────────────────────────────────────────────── */
@@ -147,7 +147,7 @@ export function Legal() {
 
             {/* The banner is the point of shipping placeholders at all. A
                 visitor must not be able to mistake this for a policy that
-                binds anybody — an invented policy people rely on is worse
+                binds anybody - an invented policy people rely on is worse
                 than an obviously unfinished one. */}
             {doc.isPlaceholder && (
                 <div className="ds-note legal__placeholder">

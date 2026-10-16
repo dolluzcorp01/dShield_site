@@ -1,12 +1,12 @@
 /* ─────────────────────────────────────────────────────────────────────────
-   Bolt — the guide.
+   Bolt - the guide.
 
    Every colour here comes from the variables in index.css. There is no
    second copy of the palette: two palettes drift, and the one that drifts
    is always the one nobody is looking at.
 
    The four shell tones below are Bolt's own material rather than brand
-   colours — they exist nowhere else and are derived from void and void-2.
+   colours - they exist nowhere else and are derived from void and void-2.
    ───────────────────────────────────────────────────────────────────────── */
 
 .bolt {
@@ -42,7 +42,7 @@
 .bolt__stroke-cyan { stroke: var(--cyan); }
 .bolt__pupil   { fill: var(--void); }
 
-/* Eyes are lime at rest and cyan while he is scanning — the same shift the
+/* Eyes are lime at rest and cyan while he is scanning - the same shift the
    visor makes when it becomes a radar. */
 .bolt__eye { fill: var(--lime); }
 .bolt--scanning .bolt__eye { fill: var(--cyan); }
@@ -53,7 +53,7 @@
 
 /* ── the arms ───────────────────────────────────────────────────────────
    Rotation is an inline transform driven by mood, so it survives reduced
-   motion — he holds the correct POSE, he just stops moving between them. */
+   motion - he holds the correct POSE, he just stops moving between them. */
 .bolt__arm-l,
 .bolt__arm-r { transition: transform .55s cubic-bezier(.34, 1.56, .64, 1); }
 
@@ -185,7 +185,7 @@
    index.css already stops every animation globally, but Bolt is the one
    component on the site that floats, shakes, sparks and pulses without
    stopping. For somebody with vestibular sensitivity that is not a charming
-   detail, it is a reason to close the tab — so it is stated here too rather
+   detail, it is a reason to close the tab - so it is stated here too rather
    than depending on a rule in another file staying where it is.
 
    He keeps his pose. Only the motion goes. The caret is hidden outright

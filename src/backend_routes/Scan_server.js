@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  Scan_server — the free scan.
+//  Scan_server - the free scan.
 //
 //  POST /api/scan          run a snapshot scan, store it, return the result
 //  GET  /api/scan/:id      re-open a result by its id (shareable link)
@@ -22,7 +22,7 @@ const { ALL_CHECKS } = require("../utils/checks");
 /* checkId -> the risk area it belongs to, so a progress event can name the
    tile to light. Derived from the catalogue rather than written out again:
    a second hand-kept list of check ids is a second thing to forget when a
-   check is added, and it would fail silently — the tile simply never
+   check is added, and it would fail silently - the tile simply never
    lights and nobody notices. */
 const DOMAIN_OF = Object.fromEntries(ALL_CHECKS.map((c) => [c.id, c.domain]));
 const { isSuppressed } = require("../utils/suppression");
@@ -40,7 +40,7 @@ const db = getDBConnection(process.env.DB_NAME || "dshield");
 //
 // Note this resets on restart and does not survive multiple processes. That
 // is acceptable while the site runs as a single instance. If it is ever
-// scaled behind a load balancer, move this to Redis — a per-process limit
+// scaled behind a load balancer, move this to Redis - a per-process limit
 // across four processes is four times the limit.
 
 const RATE = { perIpPerHour: 12, perDomainPerHour: 4, windowMs: 3600000 };
@@ -95,7 +95,7 @@ router.post("/", async (req, res) => {
      *
      * A caller that sends Accept: text/event-stream gets the checks as they
      * finish and the finished scan as a finalevent. Any other caller gets
-     * exactly the JSON it got before — same shape, same status codes. The
+     * exactly the JSON it got before - same shape, same status codes. The
      * two share one route deliberately: the rate limiting, the scans row,
      * the suppression check, the lead and the result email are all here,
      * and a second streaming endpoint would be a second copy of all of it
@@ -103,8 +103,8 @@ router.post("/", async (req, res) => {
      *
      * ⚠️  BEHIND NGINX THIS NEEDS `proxy_buffering off;` ON THE /api/
      *     LOCATION. Without it the proxy holds the events and releases them
-     *     together at the end. That degrades to the old behaviour — the
-     *     grid fills on arrival instead of during — rather than breaking,
+     *     together at the end. That degrades to the old behaviour - the
+     *     grid fills on arrival instead of during - rather than breaking,
      *     which is why this is safe to ship before the nginx change.
      */
     const wantsStream = String(req.headers.accept || "").includes("text/event-stream");
@@ -122,14 +122,14 @@ router.post("/", async (req, res) => {
 
     /* One refusal path for both protocols. A streamed response has already
        sent 200 and its headers, so an error after that point can only be an
-       event — the status code is long gone. */
+       event - the status code is long gone. */
     const fail = (status, message, extra = {}) => {
         if (!wantsStream) return res.status(status).json({ success: false, message, ...extra });
         res.write(`data: ${JSON.stringify({ type: "error", message, ...extra })}\n\n`);
         return res.end();
     };
 
-    /* The blank line is what ends an SSE frame — written as \n\n rather than
+    /* The blank line is what ends an SSE frame - written as \n\n rather than
        two real newlines in the template so a reformat or a trailing-space
        trim cannot silently merge two events into one unparseable frame. */
     const emit = (payload) => {
@@ -213,13 +213,13 @@ router.post("/", async (req, res) => {
 
        The `leads` row is a different thing, and it is gated. Someone who has
        unsubscribed and later runs a scan must not be quietly re-subscribed
-       by it — an unsubscribe that only holds until the next form is not an
+       by it - an unsubscribe that only holds until the next form is not an
        unsubscribe. */
     if (row.visitor_email) {
         isSuppressed(db, row.visitor_email, (supErr, suppressed) => {
             /* Fail closed. If we could not confirm they are NOT suppressed,
                do not write the lead. A lead we failed to capture is
-               recoverable — they are in `scans` either way. Email sent to
+               recoverable - they are in `scans` either way. Email sent to
                someone who asked us to stop is not. */
             if (supErr) {
                 console.error("⚠️  Suppression check failed, lead not captured:", supErr.sqlMessage || supErr.message);
@@ -256,7 +256,7 @@ router.post("/", async (req, res) => {
 
        TRANSACTIONAL, deliberately: they typed their address into a box that
        offered to send them this result, in this moment. Suppression governs
-       the mailing list, not a receipt somebody asked for — see the category
+       the mailing list, not a receipt somebody asked for - see the category
        note in db/schema-mail.sql.
 
        The payload carries the grade, score and counts only. No finding
@@ -281,7 +281,7 @@ router.post("/", async (req, res) => {
 });
 
 // ── GET /api/scan/:id ────────────────────────────────────────────────────
-// A shareable link to a result. Free-tier content only — the stored JSON is
+// A shareable link to a result. Free-tier content only - the stored JSON is
 // exactly what was returned, which never contained withheld detail.
 router.get("/:id", (req, res) => {
     const id = String(req.params.id || "");

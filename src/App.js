@@ -25,13 +25,13 @@ function ScrollToTop() {
     return null;
 }
 
-/* The first thing a keyboard user reaches — off-screen until it takes focus.
+/* The first thing a keyboard user reaches - off-screen until it takes focus.
    See the keyboard-access block in index.css for why it exists.
 
    IT HAS TO KNOW WHICH PAGE IT IS ON. The prototype is a single page, so
    "skip to the check" always had somewhere to go. Here #scan-box exists only
    on the home page; hardcoding it would give every other route a skip link
-   that focuses nothing, which is worse than not having one — it looks like
+   that focuses nothing, which is worse than not having one - it looks like
    an escape hatch and behaves like a dead end. */
 function SkipLink() {
     const { pathname } = useLocation();
@@ -53,7 +53,7 @@ function App() {
                 {/* ⚠️  A NEW ROUTE MUST ALSO BE ADDED TO src/utils/routes.js.
                     That list is what server.js uses to decide 200 vs 404 in
                     production. A route added here and forgotten there still
-                    renders perfectly for a person — it just carries a 404
+                    renders perfectly for a person - it just carries a 404
                     status, so crawlers drop it and nobody notices. */}
                 <Routes>
                     <Route path="/" element={<Home />} />

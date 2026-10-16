@@ -1,5 +1,5 @@
-# Claude Code — dShield Site · Task 05a
-## Port the full check engine — 8 checks to 58
+# Claude Code - dShield Site · Task 05a
+## Port the full check engine - 8 checks to 58
 
 **Repo:** `dolluzcorp01/dShield_site` · branch `main`
 **Prerequisite:** Task 04 merged (`aa884ca` or later)
@@ -35,11 +35,11 @@ guidance that turns a finding into something a customer can act on.
 
 | Source file | Checks | Domain |
 |---|---|---|
-| `surface.js` | 13 | 1 — External Attack Surface |
-| `http.js` | 15 | 1 — headers and cookies |
-| `tls.js` | 8 | 4 — Encryption & Certificates |
-| `email.js` | 13 | 6 — Email & Domain Security |
-| `intel.js` | 9 | 10 & 20 — Breach intelligence, Brand |
+| `surface.js` | 13 | 1 - External Attack Surface |
+| `http.js` | 15 | 1 - headers and cookies |
+| `tls.js` | 8 | 4 - Encryption & Certificates |
+| `email.js` | 13 | 6 - Email & Domain Security |
+| `intel.js` | 9 | 10 & 20 - Breach intelligence, Brand |
 
 By tier: **8 snapshot** (already here), **11 basic**, **39 advanced**.
 
@@ -48,7 +48,7 @@ source IDs. They stay. This task adds the other 50.
 
 ---
 
-## Design decisions — follow these, do not substitute
+## Design decisions - follow these, do not substitute
 
 ### Port faithfully. Do not improve the checks.
 
@@ -61,7 +61,7 @@ grades from the same company.
 One check in particular: **`SURF-ADMIN-02` is `high`, not `critical`.** It was
 critical once, and because a single critical caps a grade at D, google.com,
 wikipedia.org and stripe.com all scored D. If you find a source that says
-critical, the source is stale — it is `high`.
+critical, the source is stale - it is `high`.
 
 ### One exception, and only one: the certificate expiry threshold
 
@@ -70,7 +70,7 @@ deliberate local fix and it stays.
 
 Let's Encrypt issues 90-day certificates and renews at 30 days remaining. A
 30-day threshold fires on perfectly healthy sites in the middle of normal
-automated renewal — tested against stripe.com, which sat at 29 days while
+automated renewal - tested against stripe.com, which sat at 29 days while
 renewing correctly. Do not "restore" it to 30 to match the source.
 
 ### Keep the current file structure, do not copy the source architecture
@@ -91,8 +91,8 @@ src/utils/checks/index.js      concatenates them, exports ALL_CHECKS
 ```
 
 `scan_engine.js` then imports `ALL_CHECKS` instead of holding the array
-inline. Everything else in `scan_engine.js` — scoring, tier gating,
-`normaliseDomain`, `isPrivateAddress`, the coverage floor — stays exactly as
+inline. Everything else in `scan_engine.js` - scoring, tier gating,
+`normaliseDomain`, `isPrivateAddress`, the coverage floor - stays exactly as
 it is. **Do not modify the scoring logic in this task.**
 
 Each check object keeps the existing shape:
@@ -101,18 +101,18 @@ Each check object keeps the existing shape:
 { id, domain, severity, minTier, title, why, async run(target) { ... } }
 ```
 
-`why` is this repo's addition and the source has no equivalent — one sentence,
+`why` is this repo's addition and the source has no equivalent - one sentence,
 plain English, explaining why a person should care. Write one for each of the
 50. It is what makes a finding readable rather than a code.
 
-### Tier gating already exists — use it
+### Tier gating already exists - use it
 
 `scan_engine.js` currently runs every check because all 8 are snapshot. Add a
 `minTier` filter so `runScan(domain, { tier })` runs only the checks at or
 below that tier, with `snapshot` as the default.
 
 The rank order is `snapshot → basic → advanced → full_protection`. A higher
-tier runs everything the lower tiers run plus its own — never a different set.
+tier runs everything the lower tiers run plus its own - never a different set.
 **Write a test for this.** A tier that is not a superset of the one below is a
 customer paying more for less.
 
@@ -122,7 +122,7 @@ customer paying more for less.
 needs a GitHub token. Neither is configured on this site.
 
 Port them, and have them return **inconclusive with a clear reason** when the
-key is absent — exactly as the source does. Do not skip them, and do not let
+key is absent - exactly as the source does. Do not skip them, and do not let
 them pass.
 
 This matters more than it looks. HIBP's domain-search endpoint also requires
@@ -137,18 +137,18 @@ costs nothing and their absence would be a silent gap later.
 `scan_engine.js` exports `fetchUrl`, `getCertificate`, `txtRecords`,
 `withTimeout` and `typoVariants`. Use them. Do not write a second HTTP helper.
 
-`fetchUrl` caps the response body deliberately — a homepage over 256 KB once
+`fetchUrl` caps the response body deliberately - a homepage over 256 KB once
 hung every HTTP check in the source engine, because destroying the socket meant
 the `end` event never fired. One check took ten seconds against a 108ms raw
 request. Do not remove the cap.
 
 ### The budget problem you must solve
 
-The current scan runs 8 checks sequentially and takes 20–60 seconds. **58
+The current scan runs 8 checks sequentially and takes 20-60 seconds. **58
 sequential checks will exceed any reasonable request timeout.**
 
 Group checks that hit the same target and run each group with bounded
-concurrency — `Promise.all` over batches of 6–8, not all 58 at once. A single
+concurrency - `Promise.all` over batches of 6-8, not all 58 at once. A single
 site being hit by 58 simultaneous requests from us looks like an attack and may
 get our IP blocked, which is the opposite of passive.
 
@@ -164,25 +164,25 @@ make fifteen requests.
 
 ## What to build
 
-### 1 · `src/utils/checks/` — five new files plus an index
+### 1 · `src/utils/checks/` - five new files plus an index
 
 Port the 58, keeping the 8 that exist. Work file by file and verify each before
 moving to the next; this is a long task and a mistake in check 40 is easier to
-find if checks 1–39 are already green.
+find if checks 1-39 are already green.
 
 **Order of work, easiest first:**
 
-1. `tls.js` — 8 checks, all from one certificate read, no new technique
-2. `email.js` — 13 checks, all DNS TXT lookups
-3. `http.js` — 15 checks, all from one homepage fetch
-4. `surface.js` — 13 checks, multiple paths per target, the most work
-5. `intel.js` — 9 checks, three of which stay inconclusive
+1. `tls.js` - 8 checks, all from one certificate read, no new technique
+2. `email.js` - 13 checks, all DNS TXT lookups
+3. `http.js` - 15 checks, all from one homepage fetch
+4. `surface.js` - 13 checks, multiple paths per target, the most work
+5. `intel.js` - 9 checks, three of which stay inconclusive
 
 `index.js` concatenates and exports `ALL_CHECKS`, and throws at load time if
 any two checks share an ID. A duplicate ID silently overwrites a finding and
 would be very hard to trace.
 
-### 2 · `src/utils/scan_engine.js` — modify
+### 2 · `src/utils/scan_engine.js` - modify
 
 - Import `ALL_CHECKS` rather than holding the array inline
 - Add the `tier` option and the `minTier` filter
@@ -190,7 +190,7 @@ would be very hard to trace.
 - Share one homepage fetch across the checks that need it
 - **Change nothing about scoring, grading, coverage, or the SSRF guards**
 
-### 3 · `src/backend_routes/Scan_server.js` — minimal change
+### 3 · `src/backend_routes/Scan_server.js` - minimal change
 
 The free scan continues to call `runScan(domain)` with no tier, which defaults
 to `snapshot` and runs 8 checks. **Free scan behaviour must not change.**
@@ -219,17 +219,17 @@ Print a table of tier, count and domain spread at the end.
 ## Verification before you finish
 
 ```bash
-# 1 — the check inventory
+# 1 - the check inventory
 node scripts/verify-checks.js
 
-# 2 — build
+# 2 - build
 npx react-scripts build
 
-# 3 — server boots
+# 3 - server boots
 node server.js &
 curl -s localhost:4008/api/health
 
-# 4 — FREE SCAN UNCHANGED — the one that matters most
+# 4 - FREE SCAN UNCHANGED - the one that matters most
 curl -s -X POST localhost:4008/api/scan \
      -H "Content-Type: application/json" \
      -d '{"domain":"dolluzcorp.com"}'
@@ -278,7 +278,7 @@ If an advanced scan takes longer than 90 seconds against a normal site, say so
 rather than reporting success. That is a finding, not a failure.
 
 Also confirm:
-- `git diff package.json` is empty — no new dependency
+- `git diff package.json` is empty - no new dependency
 - `git diff` does not touch `tools_engine.js`, `mail.js`, `mail-worker.js`,
   `suppression.js`, or `Tools_server.js`
 - `TLS-CERT-EXPIRING-28` still warns at 14 days
@@ -291,7 +291,7 @@ Also confirm:
 2. The output of `verify-checks.js`
 3. The per-tier scan output and the timing table
 4. Any check you could not port faithfully, and why. Some may depend on source
-   helpers that do not exist here — say which, rather than approximating the
+   helpers that do not exist here - say which, rather than approximating the
    behaviour silently.
 5. Anything wrong or conflicting in these instructions. Tasks 01 and 02 each
    found a genuine error in theirs and were right to say so.

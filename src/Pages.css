@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────
-   Contact — the form and the office card, side by side.
+   Contact - the form and the office card, side by side.
 
    1.15fr / .85fr, which is the frozen file's own ratio: the form is the
    thing being asked for, so it takes the larger share, but the card is wide
@@ -9,6 +9,9 @@
 .contact__split {
     display: grid;
     gap: 24px;
+    /* min-width:0 on the children: a grid item defaults to min-width:auto,
+       so it refuses to go narrower than its own content and overflows the
+       track instead. Both children carry cards with their own grids. */
     grid-template-columns: minmax(280px, 1.15fr) minmax(260px, .85fr);
     /* stretch, not start. The card carries far less text than the form, so
        left to size itself it stops halfway down and leaves the section
@@ -19,6 +22,7 @@
 
 @media (max-width: 900px) {
     .contact__split { grid-template-columns: 1fr; }
+    .contact__split > * { min-width: 0; }
 }
 
 /* The max-width belonged to a form that sat alone on the page. In a grid
@@ -38,7 +42,7 @@
 /* MAGENTA, NOT LIME.
 
    Every card on this site is lime-edged, which is correct for the ones that
-   report a finding — it is the palette's "we looked at this" colour. This
+   report a finding - it is the palette's "we looked at this" colour. This
    one is not reporting anything; it is the single place on the page that
    asks the visitor for something, and it is the destination of the header's
    magenta "Talk to experts" button.
@@ -129,6 +133,16 @@
 .office__go:hover,
 .office__go:focus-visible { text-decoration: underline; }
 
+@media (max-width: 640px) {
+    /* 18px high, and the last thing on the card. */
+    .office__go { padding: 13px 0; }
+
+    /* The email address and the WhatsApp number on the contact card are
+       links too, and were 20px high. */
+    .office__v a { display: inline-block; padding: 12px 0; }
+    .office__row { margin-bottom: 8px; }
+}
+
 .steps { margin-top: 34px; display: flex; flex-direction: column; gap: 4px; }
 .step { display: flex; gap: 22px; padding: 22px 0; border-bottom: 1px solid var(--line); }
 .step:last-child { border-bottom: 0; }
@@ -169,7 +183,7 @@
 .prefs__email { color: var(--bone); word-break: break-all; }
 .prefs__actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
 
-/* A service arrived via ?topic= — shown as a read-only line rather than
+/* A service arrived via ?topic= - shown as a read-only line rather than
    dropped into the tier dropdown, which lists prices a service does not have. */
 .contact__topic { color: var(--bone); display: flex; align-items: center; cursor: default; }
 
@@ -216,7 +230,7 @@
     color: var(--bone);
 }
 
-/* The lockup is a wide asset — roughly 4:1 — so it is sized by width and
+/* The lockup is a wide asset - roughly 4:1 - so it is sized by width and
    left to find its own height. width/height on the <img> tag match the
    file's real pixel dimensions so the browser reserves the right box before
    the image loads; without them the whole footer reflows on arrival.
@@ -257,7 +271,7 @@
 .footer__email:hover,
 .footer__email:focus-visible { text-decoration: underline; }
 
-/* WhatsApp brand green, the one colour on this site that is not a token —
+/* WhatsApp brand green, the one colour on this site that is not a token -
    it belongs to WhatsApp, and a lime WhatsApp mark is not recognised as one.
    Same reasoning as .float__wa. */
 .footer__wa {
@@ -331,6 +345,26 @@
 }
 .footer__legallinks a:hover,
 .footer__legallinks a:focus-visible { color: var(--lime); }
+
+/* ── phone: footer rows, and room for the floating buttons ───────────── */
+@media (max-width: 640px) {
+    /* Column links were 31px high and stacked tight enough to mis-tap. */
+    .footer__col a { padding: 14px 0; }
+
+    /* The legal row was 18px high with 20px between items, on one wrapped
+       line. Each one gets its own row with a real height instead. */
+    .footer__legallinks { gap: 0 20px; }
+    .footer__legallinks a { padding: 14px 0; }
+
+    .footer__reach a { padding: 14px 0; }
+
+    /* The WhatsApp and back-to-top buttons are fixed to the bottom right
+       and were sitting on top of the last footer links. They are 50px and
+       42px at this width, 16px from the edge, so the footer ends clear of
+       them rather than underneath. */
+    .footer { padding-bottom: 104px; }
+    .footer__sign { padding-bottom: 8px; }
+}
 
 .footer__note {
     font-size: .8rem;

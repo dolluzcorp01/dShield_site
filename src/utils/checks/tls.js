@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  Domain 4 — Encryption & Certificates.  8 checks.
+//  Domain 4 - Encryption & Certificates.  8 checks.
 //
 //  Ported from dShield v6.3 src/checks/tls.js. IDs, domains, severities and
 //  tiers match the source exactly: the scoring formula is published on
@@ -7,7 +7,7 @@
 //  severity that differs here from the main product gives the same domain
 //  two different grades from the same company.
 //
-//  ONE DELIBERATE DIVERGENCE — see TLS-CERT-EXPIRING-28 below.
+//  ONE DELIBERATE DIVERGENCE - see TLS-CERT-EXPIRING-28 below.
 // ─────────────────────────────────────────────────────────────────────────
 
 const { memo, tlsHandshake, withTimeout } = require("../net");
@@ -64,11 +64,11 @@ module.exports = [
             const days = daysUntil(hs.cert.valid_to);
             if (days < 0) throw new Error("Certificate already expired");   // reported by -29
 
-            /* FOURTEEN DAYS, NOT THIRTY — a deliberate divergence from v6.3.
+            /* FOURTEEN DAYS, NOT THIRTY - a deliberate divergence from v6.3.
                Let's Encrypt issues 90-day certificates and renews at 30 days
                remaining, and most other ACME issuers behave similarly. A
                thirty-day threshold therefore fires on a perfectly healthy
-               site in the middle of its normal renewal window — tested
+               site in the middle of its normal renewal window - tested
                against stripe.com, which sat at 29 days while renewing
                automatically. Do not "restore" this to 30 to match the
                source. */
@@ -89,7 +89,7 @@ module.exports = [
             const c = hs.cert;
             const selfSigned = JSON.stringify(c.issuer) === JSON.stringify(c.subject);
             return (selfSigned || hs.authError === "DEPTH_ZERO_SELF_SIGNED_CERT")
-                ? { passed: false, evidence: "The certificate is self-signed — its issuer is itself.", detail: { authError: hs.authError } }
+                ? { passed: false, evidence: "The certificate is self-signed - its issuer is itself.", detail: { authError: hs.authError } }
                 : { passed: true, evidence: `Issued by ${(c.issuer && (c.issuer.O || c.issuer.CN)) || "a recognised authority"}.` };
         },
     },

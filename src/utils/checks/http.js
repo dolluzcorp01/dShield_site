@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  Domain 1 — External Attack Surface, the HTTP-observable subset.
+//  Domain 1 - External Attack Surface, the HTTP-observable subset.
 //  14 checks here plus TLS-NOREDIRECT-36, which belongs to domain 4 but is
 //  answered by an HTTP request, so it lives with the request that answers it.
 //
@@ -16,7 +16,7 @@ const { memo, fetchUrl, withTimeout } = require("../net");
  * The homepage, fetched once per scan.
  *
  * The fallback to plain HTTP is deliberately narrow. Only an error that
- * means TLS is genuinely absent — refused, unresolvable, protocol error —
+ * means TLS is genuinely absent - refused, unresolvable, protocol error -
  * justifies retrying over HTTP. A TIMEOUT means the host is slow, not that
  * it lacks TLS, and retrying just doubles the wait for a result we will not
  * get. Profiling the source engine against github.com found exactly this
@@ -56,7 +56,7 @@ function assertUsable(res) {
     if (res.error) throw new Error(res.error);
     if (typeof res.status !== "number") throw new Error("No response status");
     if (res.status >= 400) {
-        throw new Error(`Origin returned HTTP ${res.status} — headers on an error or block page do not reflect the site's policy`);
+        throw new Error(`Origin returned HTTP ${res.status} - headers on an error or block page do not reflect the site's policy`);
     }
     return res;
 }
@@ -102,7 +102,7 @@ module.exports = [
         async run(target) {
             const res = assertUsable(await getRoot(target));
             const h = hdr(res, "strict-transport-security");
-            if (!h) return { passed: true, evidence: "No HSTS — reported by HDR-HSTS-17." };
+            if (!h) return { passed: true, evidence: "No HSTS - reported by HDR-HSTS-17." };
 
             const maxAge = parseInt((h.match(/max-age=(\d+)/i) || [])[1] || "0", 10);
             const subs = /includeSubDomains/i.test(h);
@@ -134,7 +134,7 @@ module.exports = [
         async run(target) {
             const res = assertUsable(await getRoot(target));
             const csp = hdr(res, "content-security-policy");
-            if (!csp) return { passed: true, evidence: "No CSP — reported by HDR-CSP-19." };
+            if (!csp) return { passed: true, evidence: "No CSP - reported by HDR-CSP-19." };
 
             const scriptSrc = (csp.match(/script-src([^;]*)/i) || [])[1] || "";
             const unsafe = [];
@@ -181,7 +181,7 @@ module.exports = [
         id: "HDR-REFERRER-23",
         domain: 1, severity: "low", minTier: "advanced",
         title: "Referrer policy not restricted",
-        why: "A permissive referrer policy leaks the full address of the page a visitor was on — including anything sensitive in the query string — to every site they click through to.",
+        why: "A permissive referrer policy leaks the full address of the page a visitor was on - including anything sensitive in the query string - to every site they click through to.",
         async run(target) {
             const res = assertUsable(await getRoot(target));
             const h = hdr(res, "referrer-policy");
@@ -253,7 +253,7 @@ module.exports = [
             const server = hdr(res, "server") || "";
             const powered = hdr(res, "x-powered-by") || "";
             return (/\d+\.\d+/.test(server) || /\d+\.\d+/.test(powered))
-                ? { passed: false, evidence: `Server: ${server || "—"} · X-Powered-By: ${powered || "—"}`, detail: { server, powered } }
+                ? { passed: false, evidence: `Server: ${server || "-"} · X-Powered-By: ${powered || "-"}`, detail: { server, powered } }
                 : { passed: true, evidence: "No software version is disclosed in the headers." };
         },
     },
@@ -279,11 +279,11 @@ module.exports = [
     {
         /* One of the eight free-tier checks. The body is the one already in
            this repo rather than the source's, because the free scan's output
-           must not change — see the note in checks/index.js. */
+           must not change - see the note in checks/index.js. */
         id: "SURF-GIT-04",
         domain: 1, severity: "critical", minTier: "snapshot",
         title: "Version control directory exposed",
-        why: "A published .git directory can often be reconstructed into your complete source code, including any password or key ever committed to it — even one deleted in a later commit.",
+        why: "A published .git directory can often be reconstructed into your complete source code, including any password or key ever committed to it - even one deleted in a later commit.",
         async run(target) {
             const res = await fetchUrl(`${target.origin}/.git/config`, { maxBytes: 4096 });
             const looksLikeGit = res.status === 200 && /\[core\]|repositoryformatversion/i.test(res.body || "");

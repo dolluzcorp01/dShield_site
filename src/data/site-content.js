@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  site-content — the words and tables the public site renders.
+//  site-content - the words and tables the public site renders.
 //
 //  Ported from the frozen customer-website prototype in
 //  dShield-v6.3-COMPLETE.zip:
@@ -10,7 +10,7 @@
 //  The prototype is one 1,954-line component with its tables declared at the
 //  top. Here the same tables are shared by the home page and the standalone
 //  routes (/pricing, /services, /coverage, /tools), which must not drift
-//  apart — two lists describing the same product is precisely the defect
+//  apart - two lists describing the same product is precisely the defect
 //  journey testing caught in the main engine: the site promised five areas,
 //  the engine covered two, and every check passed because each artefact was
 //  correct on its own terms.
@@ -18,7 +18,7 @@
 //  ⚠️  DOMAINS BELOW CARRIES NO SCORES.
 //  The prototype hardcodes score:62, score:78, score:41, score:94, score:10
 //  and strings like "your certificate expires in 19 days", because it renders
-//  with LIVE_API = false and never reads the scan response — scanResult is
+//  with LIVE_API = false and never reads the scan response - scanResult is
 //  assigned on line 913 of that file and never referenced again.
 //
 //  Shipping those constants would show every visitor the same five invented
@@ -33,7 +33,7 @@
 
    Group-scoped by design: it names Dolluz Corp and its products, not dShield
    alone. That is what lets a dShield unsubscribe be honoured without
-   destroying a permission the person gave to the company — and why the
+   destroying a permission the person gave to the company - and why the
    preference centre can offer "stop dShield" and "stop everything" as two
    separate, honest choices rather than one button that quietly means the
    other. The exact string is submitted with the tick, so a later change to
@@ -58,13 +58,13 @@ export const PREF_CATEGORIES = [
 
 /* ── the 23 risk areas, in customer language ──────────────────────────────
 
-   The names here are the ones a buyer recognises — "Your email", not "Email
+   The names here are the ones a buyer recognises - "Your email", not "Email
    & Domain Security". The engineering names still exist in scan_engine.js
    because a report has to line up with the main product; these are what the
    site says out loud.
 
    `seen` marks the five a scan can reach without anything from the customer.
-   It must stay in step with ALL_DOMAINS in src/utils/scan_engine.js — the
+   It must stay in step with ALL_DOMAINS in src/utils/scan_engine.js - the
    free scan covers domains 1, 4, 6, 10 and 20 via eight checks.
 
    `by` is how the other eighteen get answered: "connect" means a system the
@@ -96,7 +96,7 @@ export const DOMAINS = [
 ];
 
 /* The five a scan reaches, and the connector examples. Derived rather than
-   listed twice — a second hand-maintained list is a second thing to forget. */
+   listed twice - a second hand-maintained list is a second thing to forget. */
 export const SEEN_DOMAINS = DOMAINS.filter((d) => d.seen);
 export const CONNECT_DOMAINS = DOMAINS.filter((d) => d.by === "connect");
 
@@ -151,7 +151,7 @@ export const TIERS = [
 
    Eight, split across two columns in the menu. The left column is what we run
    continuously; the right is what we do when something needs proving or has
-   already gone wrong. That split is why the two columns exist — it is not
+   already gone wrong. That split is why the two columns exist - it is not
    just a way to make the box shorter.
 
    The fifth item was "ISO Standards & Audits", which is too narrow. ISO/IEC
@@ -161,7 +161,7 @@ export const TIERS = [
    names them. */
 /* The slug is what turns each card into a link. /contact?topic=<slug> is
    read by ContactForm, which shows the service as a read-only line rather
-   than dropping it into the tier dropdown — a service has no list price, and
+   than dropping it into the tier dropdown - a service has no list price, and
    putting one in a menu of prices would misrepresent it.
 
    The platform card carries no slug: it points back at the free scan at the
@@ -181,7 +181,7 @@ export const SERVICES_RIGHT = [
 ];
 export const SERVICES = [...SERVICES_LEFT, ...SERVICES_RIGHT];
 
-/* Compliance — the frameworks clients are actually asked to satisfy. Left is
+/* Compliance - the frameworks clients are actually asked to satisfy. Left is
    the certifiable standards, right is the privacy and reporting regimes.
    Same logic as the services split. */
 export const COMPLY_LEFT = [
@@ -199,7 +199,7 @@ export const COMPLY_RIGHT = [
 export const COMPLIANCE = [...COMPLY_LEFT, ...COMPLY_RIGHT];
 
 /* Why anyone should believe us. Every claim here is checkable, which is the
-   point — a security company that asks for trust without evidence is asking
+   point - a security company that asks for trust without evidence is asking
    for the wrong thing.
 
    "58" and "23" are not decorative. They are asserted against the real
@@ -235,7 +235,7 @@ export const FAQ = [
     },
 ];
 
-/* The prototype ships "+91 00000 00000" for both phone and WhatsApp —
+/* The prototype ships "+91 00000 00000" for both phone and WhatsApp -
    placeholders, the same class of thing as the unfilled markers in the legal
    documents. They are NOT copied here.
 
@@ -250,7 +250,7 @@ export const OFFICE = {
        deliberate.
 
        Outbound mail leaves as connect@dolluzcorp.com (SENDGRID_FROM), which
-       is the mailbox the sending infrastructure is authenticated against —
+       is the mailbox the sending infrastructure is authenticated against -
        its SPF and DKIM records are what make our mail arrive rather than
        land in a spam folder. Publishing that address on a public page puts
        it in front of every scraper that reads this site, and a sending
@@ -266,19 +266,19 @@ export const OFFICE = {
     hours: "Mon to Fri, 9:30am to 6:30pm IST",
 
     /* WhatsApp, digits only in international format. Empty would mean the
-       floating button does not render at all — see Floating.js. The
+       floating button does not render at all - see Floating.js. The
        prototype ships "+91 00000 00000" here and a button with no handler;
        this is the real number.
 
        Written with the country code and no punctuation because that is what
        wa.me takes. Floating.js strips non-digits anyway, so "+91 77790
-       79666" would also work — this form is just what reaches the URL. */
+       79666" would also work - this form is just what reaches the URL. */
     whatsapp: "917779079666",
 
     /* The same number, punctuated for a person to read off the page. The
        digits-only form above is what wa.me takes; this is what the footer
        and the contact card print. Kept immediately beside it so the two
-       cannot drift — a printed number that does not match the one the
+       cannot drift - a printed number that does not match the one the
        button dials is a support call nobody can explain. */
     whatsappDisplay: "+91 77790 79666",
 
@@ -295,7 +295,7 @@ export const OFFICE = {
    Three copies of this expression is three places for the number to go stale
    and two of them nobody would think to check.
 
-   wa.me wants digits only — no +, no spaces, no dashes — so the display form
+   wa.me wants digits only - no +, no spaces, no dashes - so the display form
    is stripped here rather than demanding a clean value in OFFICE. The
    pre-filled message is encoded, not interpolated: it contains a comma and a
    question mark, and a raw "?" would truncate the query string at exactly
@@ -315,13 +315,13 @@ export const WHATSAPP_HREF = (() => {
 
 /* ── Smart Checks ─────────────────────────────────────────────────────────
 
-   Seven single-question tools. The five free ones are BUILT — they are the
+   Seven single-question tools. The five free ones are BUILT - they are the
    five slugs in src/utils/routes.js and the five engines in tools_engine.js.
 
    The two paid ones are NOT built here. dShield-Backend-v6.3.zip carries
    working engines for both (socialImpersonation and executiveOsint in
    src/services/tools.js), so porting them is a contained piece of work
-   rather than a research problem — but until that happens, built:false keeps
+   rather than a research problem - but until that happens, built:false keeps
    them off the site. Advertising a tool with nothing behind it is the fifty
    connectors and one collector defect, in miniature. */
 export const SMART = [

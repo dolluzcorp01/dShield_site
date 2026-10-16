@@ -1,12 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  scan_engine — the free (snapshot) tier of the dShield scanner.
+//  scan_engine - the free (snapshot) tier of the dShield scanner.
 //
 //  Eight checks across the five domains the public site advertises. Ported
 //  from the dShield v6.3 engine, keeping the same check IDs, severities,
 //  weights and scoring formula so a free scan here and a paid scan there
 //  produce comparable numbers.
 //
-//  Everything runs on Node built-ins — dns, tls, https. No third-party
+//  Everything runs on Node built-ins - dns, tls, https. No third-party
 //  service, no API key, no per-scan cost. That is why the free tier can be
 //  unlimited.
 //
@@ -29,7 +29,7 @@ const {
 } = require("./net");
 const { ALL_CHECKS, checksForTier, orderedForTier, scanRank } = require("./checks");
 
-// Severity weights. Identical to the paid engine — the published formula
+// Severity weights. Identical to the paid engine - the published formula
 // depends on these, and a customer is invited to recompute a grade by hand.
 const SEVERITY_WEIGHT = { critical: 10, high: 6, medium: 3, low: 1 };
 
@@ -74,7 +74,7 @@ const ALL_DOMAINS = [
 // A grade may not be published below this ratio of checks completing.
 // Live testing of the main engine caught the worst possible failure: an
 // aborted scan of an unreachable host reported grade A, score 100, zero
-// findings — because with every check errored there was nothing left to
+// findings - because with every check errored there was nothing left to
 // fail. A firewalled customer would have been told they were secure.
 const MIN_COVERAGE_RATIO = 0.6;
 
@@ -93,7 +93,7 @@ const PER_CHECK_TIMEOUT_MS = 12000;
    also keeps a slow host from holding eight check slots open at once.
 
    The budget is 180s rather than 150s because pacing makes scans slower by
-   design — that is the trade this task exists to make. Free scans run 8
+   design - that is the trade this task exists to make. Free scans run 8
    checks and are nowhere near it. */
 const BATCH_QUIET = 8;
 const BATCH_NOISY = 2;
@@ -101,7 +101,7 @@ const BUDGET_MS = 180000;
 
 // ── scoring ──────────────────────────────────────────────────────────────
 //
-// Published formula — a customer can recompute any grade by hand, which is
+// Published formula - a customer can recompute any grade by hand, which is
 // the point. Do not change it without changing the Trust page with it.
 //
 //   domainScore = 100 − (failedWeight / applicableWeight × 100)
@@ -219,7 +219,7 @@ function isPrivateAddress(ip) {
 /**
  * Run the free scan.
  *
- * onProgress is called after each check so the site can show movement — a
+ * onProgress is called after each check so the site can show movement - a
  * blank screen for ninety seconds reads as broken however well it works.
  */
 async function runScan(domainInput, opts = {}) {
@@ -252,7 +252,7 @@ async function runScan(domainInput, opts = {}) {
     const target = { domain, hostname: domain, origin: `https://${domain}`, tier };
 
     /* Which checks this tier runs. A higher tier runs everything the lower
-       tiers run plus its own — never a different set. Default is snapshot, so
+       tiers run plus its own - never a different set. Default is snapshot, so
        an unchanged caller (the free scan) still runs exactly 8. */
     const checks = orderedForTier(tier);
 
@@ -265,7 +265,7 @@ async function runScan(domainInput, opts = {}) {
 
        Concurrency: BATCH at a time, not all of them. One site receiving 58
        simultaneous requests from us looks like an attack, and is the opposite
-       of the passive scan printed on the site — it also gets our address
+       of the passive scan printed on the site - it also gets our address
        blocked, after which every scan is inconclusive.
 
        A wall clock: once the budget is spent, whatever has not run is marked
@@ -278,7 +278,7 @@ async function runScan(domainInput, opts = {}) {
 
     let i = 0;
     while (i < checks.length) {
-        // Batch size follows the noisiest check in the run — two at a time
+        // Batch size follows the noisiest check in the run - two at a time
         // once we are requesting speculative paths.
         const size = scanRank(checks[i]) >= 4 ? BATCH_NOISY : BATCH_QUIET;
         const batch = checks.slice(i, i + size);
@@ -287,7 +287,7 @@ async function runScan(domainInput, opts = {}) {
         if (Date.now() > deadline) {
             batch.forEach((c) => inconclusive.push({
                 checkId: c.id, domain: c.domain, title: c.title,
-                reason: "Not run — the scan reached its time budget",
+                reason: "Not run - the scan reached its time budget",
             }));
             continue;
         }
@@ -309,11 +309,11 @@ async function runScan(domainInput, opts = {}) {
                     checkId: check.id, title: check.title });
             }
             try {
-                /* A SHORT, GENERIC LABEL — not check.title.
+                /* A SHORT, GENERIC LABEL - not check.title.
                    withTimeout formats its label as "<label> timed out", and
                    every place that shows a reason already prints the title
                    beside it. Passing the title produced "Administrative
-                   interface exposed to the internet — Administrative interface
+                   interface exposed to the internet - Administrative interface
                    exposed to the internet timed out", which reads as a bug in
                    a document a customer files. */
                 const out = await withTimeout(check.run(target), PER_CHECK_TIMEOUT_MS, "The check");
@@ -331,7 +331,7 @@ async function runScan(domainInput, opts = {}) {
                 /* A SECOND EVENT, WHEN THE CHECK ACTUALLY FINISHES.
                    The start event above fires for every check in a batch at
                    the same instant, because a batch runs concurrently under
-                   Promise.all — so eight "starting" events arrive together
+                   Promise.all - so eight "starting" events arrive together
                    with the same index and tell a caller nothing about
                    progress. Checks finish as their network calls return,
                    which is genuinely staggered, so this is the event worth
@@ -374,7 +374,7 @@ async function runScan(domainInput, opts = {}) {
         coverageMap: ALL_DOMAINS,
         /* FULL FINDINGS ARE ATTACHED ONLY ABOVE THE FREE TIER.
            The report builder needs each finding's title and evidence, but
-           Scan_server.js returns this object to the browser VERBATIM — it
+           Scan_server.js returns this object to the browser VERBATIM - it
            does not filter it. So attaching findings unconditionally would
            publish every title and evidence string on every free scan and
            destroy the paywall that /result promises is "never sent".
@@ -385,7 +385,7 @@ async function runScan(domainInput, opts = {}) {
         ...(tier !== "snapshot" ? { findings } : {}),
 
         // Titles only, and only for the domain they sit in. No evidence, no
-        // remediation, no detail — that is what the paid tiers are. The
+        // remediation, no detail - that is what the paid tiers are. The
         // paywall lives on the server; withheld content never reaches the
         // browser at all, so it cannot be read out of the page source.
         issueSummary: failed.map((f) => ({

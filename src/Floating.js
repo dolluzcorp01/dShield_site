@@ -8,14 +8,14 @@ import "./Floating.css";
 
    THE WHATSAPP BUTTON RENDERS ONLY IF THERE IS A NUMBER TO CALL.
 
-   The prototype's is a <button> with no handler and no number — OFFICE there
+   The prototype's is a <button> with no handler and no number - OFFICE there
    carries "+91 00000 00000" for both phone and whatsapp. Shipping that gives
    a customer a green WhatsApp button that either does nothing or opens a
    chat with a number nobody owns, on a page whose FAQ promises "a phone
    number that a person answers".
 
    So it is driven by OFFICE.whatsapp in data/site-content.js. Set that to a
-   real number in international format without punctuation — "919876543210" —
+   real number in international format without punctuation - "919876543210" -
    and the button appears. Leave it unset and only the back-to-top renders.
    verify-site-content.mjs fails the build if a placeholder run of zeroes
    ever gets put there.

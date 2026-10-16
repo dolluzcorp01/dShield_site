@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  Sitemap_server — GET /sitemap.xml
+//  Sitemap_server - GET /sitemap.xml
 //
 //  Generated from src/utils/routes.js rather than kept as a static file in
 //  public/. A static sitemap is correct on the day it is written and wrong
@@ -9,7 +9,7 @@
 //  a crawler no links to follow until JavaScript runs, so a route nobody
 //  links to externally may simply never be found.
 //
-//  Mounted BEFORE express.static and the SPA fallback in server.js — after
+//  Mounted BEFORE express.static and the SPA fallback in server.js - after
 //  them, the fallback would answer this path with index.html.
 // ─────────────────────────────────────────────────────────────────────────
 

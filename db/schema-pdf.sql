@@ -1,5 +1,5 @@
 -- ─────────────────────────────────────────────────────────────────────────
---  dShield Global Site — PDF report columns
+--  dShield Global Site - PDF report columns
 --
 --  RUN AFTER schema-orders.sql.
 --
@@ -7,7 +7,7 @@
 --     mysql -u root -p < db/schema-pdf.sql
 --
 --  Safe to re-run. MySQL 8 has no ADD COLUMN IF NOT EXISTS, so every column
---  goes through information_schema — the same pattern as schema-legal.sql.
+--  goes through information_schema - the same pattern as schema-legal.sql.
 --
 --  pdf_status is SEPARATE from the order's fulfilment_status on purpose. A
 --  failed PDF must never make a delivered order look undelivered: the

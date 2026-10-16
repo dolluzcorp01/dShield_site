@@ -13,7 +13,7 @@ const TOOLS = [
         seoTitle: "Email Spoofing Test \u2014 Can Anyone Fake Your Email? | dShield",
         seoDescription: "Free SPF, DKIM, DMARC and MTA-STS check. Find out in seconds whether someone can send email that appears to come from your domain.", name: "Email Spoofing Test", endpoint: "/api/tools/email-spoofing",
         blurb: "Can anyone send email that looks like it came from you?",
-        detail: "Checks SPF, DKIM, DMARC and MTA-STS — the records that tell the rest of the world which servers may send mail using your name.",
+        detail: "Checks SPF, DKIM, DMARC and MTA-STS - the records that tell the rest of the world which servers may send mail using your name.",
         input: "domain",
     },
     {
@@ -56,7 +56,7 @@ const TOOLS = [
    SHA-1 is computed in the browser using the Web Crypto API. Only the first
    five characters of the hash are sent to our server, which forwards them to
    the range API and returns every hash SUFFIX beginning with those five
-   characters — typically several hundred. We compare locally.
+   characters - typically several hundred. We compare locally.
 
    We never see the password. We never see the full hash. Nobody reading our
    logs could reconstruct either. If this ever changes so the password is
@@ -144,7 +144,7 @@ function PasswordTool() {
                             <h3>Not found in any known breach</h3>
                             <p className="ds-muted" style={{ marginBottom: 0 }}>
                                 Checked against {out.checked} hashes sharing your prefix. This means it
-                                has not appeared in a public breach corpus — not that it is strong, and
+                                has not appeared in a public breach corpus - not that it is strong, and
                                 not that it is safe to reuse.
                             </p>
                         </>
@@ -377,7 +377,7 @@ export function ToolPage() {
             <h1 style={{ marginTop: 14 }}>{tool.name}</h1>
             <p className="ds-lead">{tool.detail}</p>
 
-            {/* Factual only. No aggregateRating and no review count —
+            {/* Factual only. No aggregateRating and no review count -
                 inventing ratings is dishonest and a manual-action risk. */}
             <script type="application/ld+json">
                 {JSON.stringify({

@@ -10,7 +10,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "API — server.js",
+            "name": "API - server.js",
             "program": "${workspaceFolder}/server.js",
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",

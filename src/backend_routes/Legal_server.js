@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  Legal_server — legal documents, email preferences, and DPDP data requests.
+//  Legal_server - legal documents, email preferences, and DPDP data requests.
 //
 //  Exports THREE routers rather than one, because they mount at three
 //  different paths and a single router would have to carry the mount point
@@ -26,7 +26,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const clean = (v, max) => (v === undefined || v === null) ? null : String(v).trim().slice(0, max) || null;
 
 // The only four keys that exist. `:key` is checked against this list and the
-// matched constant is what reaches SQL — the value from the URL is passed as
+// matched constant is what reaches SQL - the value from the URL is passed as
 // a bound parameter and never interpolated.
 const DOC_KEYS = ["terms", "privacy", "refunds", "cookies"];
 
@@ -261,7 +261,7 @@ dataRequestRouter.post("/", (req, res) => {
                 console.error("❌ Data request could not be stored:", err.sqlMessage || err.message);
                 return res.status(500).json({ success: false, message: "We could not record that. Please try again." });
             }
-            /* No email is sent — SendGrid is not wired on this app. The row is
+            /* No email is sent - SendGrid is not wired on this app. The row is
                the record, and somebody has to watch `data_requests`. The DPDP
                Act sets a response deadline, so a request nobody reads is not a
                missed message, it is a missed statutory deadline. */

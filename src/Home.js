@@ -12,12 +12,12 @@ import { ContactSection } from "./Pages";
 
 /* The rotating PROMISED list and the interval that drove it are gone. They
    paced the scanning screen from a timer because there was no per-area
-   progress to show; there is now — Scan_server streams the engine's own
+   progress to show; there is now - Scan_server streams the engine's own
    onProgress events and `measuring` below is built from them. */
 
 function Home() {
     useDocumentMeta({
-        title: "Free Security Scan — See What an Attacker Sees | dShield",
+        title: "Free Security Scan - See What an Attacker Sees | dShield",
         description: "Check your company's security from the outside in under a minute. Email spoofing, certificates, exposed files and lookalike domains. No sign-up, no card.",
         canonical: "/",
     });
@@ -38,7 +38,7 @@ function Home() {
        The listener is on the hero rather than the window: below the fold he
        is not on screen and there is nothing to aim. It is throttled through
        requestAnimationFrame so a fast mouse cannot queue a re-render per
-       pixel, and it is skipped entirely under reduced motion — eyes that
+       pixel, and it is skipped entirely under reduced motion - eyes that
        track the pointer are exactly the kind of movement that setting is
        asking us to stop. */
     useEffect(() => {
@@ -77,7 +77,7 @@ function Home() {
     }, []);
 
     /* Areas the engine has started work on, in the order it reached them.
-       Driven by real progress events from the engine, not a timer — see
+       Driven by real progress events from the engine, not a timer - see
        apiStream in utils/api.js and the streaming block in Scan_server.js. */
     const [measuring, setMeasuring] = useState([]);
 
@@ -101,7 +101,7 @@ function Home() {
         navigate(`/result/${res.scanId}`, { state: { result: res.result } });
     };
 
-    /* The screenplay. Every mood is derived — no state exists for Bolt.
+    /* The screenplay. Every mood is derived - no state exists for Bolt.
 
        THERE IS NO "done" MOOD ON THIS PAGE. In the frozen prototype the
        result appeared below the fold, so Bolt could point down at it and say
@@ -116,7 +116,7 @@ function Home() {
     /* His scanning line still does NOT count areas.
 
        The prototype said "n/5 AREAS IN" from a simulated counter. We now
-       have real per-area progress and could show a true count — but the
+       have real per-area progress and could show a true count - but the
        tiles and the level meter already say which areas are done, and a
        third counter saying the same thing in a speech bubble is noise.
        "HOLD ON" is the frozen file's own line. */
@@ -134,7 +134,7 @@ function Home() {
                 <div className="ds-wrap hero__inner">
                   <div className="hero__cols">
                    <div className="hero__copy">
-                    {/* The prototype's chip, dot and all — the product name
+                    {/* The prototype's chip, dot and all - the product name
                         rather than a list of what it does not cost. */}
                     <p className="hero__chip">
                         <span className="hero__dot" aria-hidden="true" />
@@ -146,21 +146,21 @@ function Home() {
                     </h1>
                     <p className="ds-lead hero__lead">
                         Give us your website address. In about half a minute we check the five
-                        things a stranger can see from outside — then we name the other
+                        things a stranger can see from outside - then we name the other
                         eighteen, and show you what it takes to look inside.
                     </p>
 
                     {/* THE ADDRESS IS NOT ASKED FOR HERE.
 
                         This box used to carry a second field, "Email (optional
-                        — we will send you the result)". The prototype has no
+                        - we will send you the result)". The prototype has no
                         such field: one input, one GO, and the address is
                         requested AFTER the result, in the block its own comment
-                        explains —
+                        explains -
 
                           Offered after the result, never before it. The scan is
                           free and the result is theirs whether or not they give
-                          us an address — asking first would make the address
+                          us an address - asking first would make the address
                           the price of the check.
 
                         A free check that opens by asking who you are is not the
@@ -185,7 +185,7 @@ function Home() {
 
                         {error && <div className="ds-error">{error}</div>}
 
-                        {/* The level meter — one bar per area a free check
+                        {/* The level meter - one bar per area a free check
                             reaches, filling from REAL progress events now
                             rather than a rotating timer. A bar lights when
                             the engine actually starts that area. */}
@@ -236,8 +236,8 @@ function Home() {
                 already names all twenty-three of. */}
 
             {/* THE 23, in its idle state. The frozen prototype puts the full
-                grid on the home page before anything has been scanned — every
-                tile dim with a "?" — so the size of what a free check does
+                grid on the home page before anything has been scanned - every
+                tile dim with a "?" - so the size of what a free check does
                 NOT cover is visible before you run one. That is the whole
                 commercial argument, and it is also the honest one.
 
@@ -257,9 +257,9 @@ function Home() {
                             <p className="ds-eyebrow" style={{ marginBottom: 8 }}>The honest part</p>
                             <h2 className="ds-shout" style={{ fontSize: "1.7rem" }}>A scan sees about a quarter of your risk.</h2>
                             <p className="ds-muted" style={{ marginBottom: 0 }}>
-                                We measure five risk domains from outside. Eighteen more — whether your
+                                We measure five risk domains from outside. Eighteen more - whether your
                                 backups actually restore, whether a junior would challenge a payment
-                                request from the CEO, whether staff feel able to admit a mistake — no
+                                request from the CEO, whether staff feel able to admit a mistake - no
                                 scanner can reach. Your report shows all twenty-three, and marks plainly
                                 which ones we could not measure. Most tools show you the five and let
                                 you assume that is everything.
@@ -279,7 +279,7 @@ function Home() {
                 as the home page rather than a second copy of them.
 
                 TIERS and CONTACT are not here. They already exist as
-                /pricing and /contact and are reached from the nav — putting
+                /pricing and /contact and are reached from the nav - putting
                 a second pricing table and a second enquiry form on this page
                 would mean two of each to keep in step, which is the failure
                 this whole port is arranged against. */}

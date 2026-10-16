@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  mail-templates — the four emails this site sends.
+//  mail-templates - the four emails this site sends.
 //
 //  No template engine. Four emails in template literals do not justify a
 //  dependency to audit and keep current.
@@ -9,7 +9,7 @@
 //  uses do not exist there.
 //
 //  Every template returns { subject, html, text }. The text part is written
-//  to read properly on its own — some clients show it in preference to the
+//  to read properly on its own - some clients show it in preference to the
 //  HTML, and a text version that reads as stripped markup looks broken.
 //
 //  Voice: plain and direct, matching /trust and /how-it-works. No greetings
@@ -93,10 +93,10 @@ function footerText(category, payload = {}) {
 const btn = (href, label) =>
     `<a href="${esc(href)}" style="display:inline-block;background:${GOLD};color:${INK};font-weight:bold;font-size:14px;text-decoration:none;padding:11px 20px;border-radius:6px;">${esc(label)}</a>`;
 
-/* ── 1 · notify_confirm — MARKETING ──────────────────────────────────── */
+/* ── 1 · notify_confirm - MARKETING ──────────────────────────────────── */
 
 const notify_confirm = {
-    subject: () => "You are on the list — dShield",
+    subject: () => "You are on the list - dShield",
     html: (p = {}) => shell(`
 <p style="margin:0 0 16px;">You asked us to write when dShield paid reports open. We will, once they do.</p>
 <p style="margin:0 0 16px;">We will not write to you about anything else. No newsletter, no product updates, and we do not pass your address to anyone.</p>
@@ -104,7 +104,7 @@ const notify_confirm = {
 <p style="margin:0 0 8px;">${btn(SITE_URL, "Run a free scan")}</p>
 <p style="margin:16px 0 0;font-size:14px;color:${MUTED};">Or go straight to the tools: <a href="${SITE_URL}/tools" style="color:${MUTED};">email spoofing, SSL, security headers, lookalike domains and password exposure</a>.</p>`,
         footer("marketing", p)),
-    text: (p = {}) => `You are on the list — dShield
+    text: (p = {}) => `You are on the list - dShield
 
 You asked us to write when dShield paid reports open. We will, once they do.
 
@@ -121,7 +121,7 @@ The five free tools: ${SITE_URL}/tools
 ${footerText("marketing", p)}`,
 };
 
-/* ── 2 · scan_result — TRANSACTIONAL ─────────────────────────────────── */
+/* ── 2 · scan_result - TRANSACTIONAL ─────────────────────────────────── */
 //
 // The paywall applies here exactly as it does on the page: the grade, the
 // score and the counts, and NOTHING about what the individual findings are.
@@ -139,7 +139,7 @@ const scan_result = {
 <p style="margin:0 0 18px;">Here is the result of your free scan of <strong>${esc(p.domain)}</strong>.</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:8px;">
   <tr><td style="padding:18px 20px;">
-    <div style="font-size:44px;line-height:1;font-weight:bold;color:${GOLD};">${esc(p.grade || "—")}</div>
+    <div style="font-size:44px;line-height:1;font-weight:bold;color:${GOLD};">${esc(p.grade || "-")}</div>
     <div style="color:${MUTED};font-size:13px;margin-top:4px;">${esc(p.score)} out of 100</div>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:14px;border-top:1px solid ${LINE};">
       ${row("Critical", c.critical ?? 0, "#c0392b")}
@@ -152,7 +152,7 @@ const scan_result = {
 </table>
 <p style="margin:20px 0 8px;">${btn(`${SITE_URL}/result/${p.scanId}`, "Open the full result")}</p>
 <p style="margin:22px 0 0;padding-top:16px;border-top:1px solid ${LINE};font-size:14px;color:${MUTED};">
-A scan like this measures five of the twenty-three risk domains we assess. The other eighteen — whether your backups actually restore, whether a junior would challenge a payment request from the CEO — cannot be seen from outside by anyone, including us.
+A scan like this measures five of the twenty-three risk domains we assess. The other eighteen - whether your backups actually restore, whether a junior would challenge a payment request from the CEO - cannot be seen from outside by anyone, including us.
 <br /><br /><a href="${SITE_URL}/coverage" style="color:${MUTED};text-decoration:underline;">See what the other eighteen cover</a>
 </p>`, footer("transactional", p));
     },
@@ -160,7 +160,7 @@ A scan like this measures five of the twenty-three risk domains we assess. The o
         const c = p.counts || {};
         return `Your dShield scan of ${p.domain}
 
-Grade ${p.grade}  —  ${p.score} out of 100
+Grade ${p.grade} - ${p.score} out of 100
 
   Critical        ${c.critical ?? 0}
   High            ${c.high ?? 0}
@@ -171,8 +171,8 @@ Grade ${p.grade}  —  ${p.score} out of 100
 Open the full result: ${SITE_URL}/result/${p.scanId}
 
 A scan like this measures five of the twenty-three risk domains we assess.
-The other eighteen — whether your backups actually restore, whether a junior
-would challenge a payment request from the CEO — cannot be seen from outside
+The other eighteen - whether your backups actually restore, whether a junior
+would challenge a payment request from the CEO - cannot be seen from outside
 by anyone, including us.
 
 See what the other eighteen cover: ${SITE_URL}/coverage
@@ -182,17 +182,17 @@ ${footerText("transactional", p)}`;
     },
 };
 
-/* ── 3 · enquiry_ack — TRANSACTIONAL ─────────────────────────────────── */
+/* ── 3 · enquiry_ack - TRANSACTIONAL ─────────────────────────────────── */
 
 const enquiry_ack = {
-    subject: () => "We have your message — Dolluz Corp",
+    subject: () => "We have your message - Dolluz Corp",
     html: (p = {}) => shell(`
 <p style="margin:0 0 16px;">Thank you for writing to us. Your message has reached us and a person will reply to it.</p>
 ${p.topicLabel ? `<p style="margin:0 0 16px;">You asked about <strong>${esc(p.topicLabel)}</strong>.</p>` : ""}
 <p style="margin:0 0 16px;">We have not set an automatic reply time, because we would rather answer properly than quickly.</p>
 <p style="margin:0;color:${MUTED};font-size:14px;">While you wait, the free scan and the five free tools are available without an account.</p>`,
         footer("transactional", p)),
-    text: (p = {}) => `We have your message — Dolluz Corp
+    text: (p = {}) => `We have your message - Dolluz Corp
 
 Thank you for writing to us. Your message has reached us and a person will
 reply to it.
@@ -207,7 +207,7 @@ an account: ${SITE_URL}
 ${footerText("transactional", p)}`,
 };
 
-/* ── 4 · enquiry_alert — INTERNAL ────────────────────────────────────── */
+/* ── 4 · enquiry_alert - INTERNAL ────────────────────────────────────── */
 //
 // A working document for whoever picks this up, not a customer-facing email.
 // Every submitted field, laid out plainly, so nobody has to open the database
@@ -220,20 +220,20 @@ const FIELDS = [
 ];
 
 const enquiry_alert = {
-    subject: (p = {}) => `Enquiry from ${p.name || p.email || "unknown"} — ${p.topicLabel || p.tier || "general"}`,
+    subject: (p = {}) => `Enquiry from ${p.name || p.email || "unknown"} - ${p.topicLabel || p.tier || "general"}`,
     html: (p = {}) => shell(`
 <p style="margin:0 0 16px;font-size:16px;"><strong>New enquiry from the dShield site</strong></p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
 ${FIELDS.map(([k, label]) => `  <tr>
     <td style="padding:7px 12px 7px 0;color:${MUTED};vertical-align:top;white-space:nowrap;">${label}</td>
-    <td style="padding:7px 0;vertical-align:top;">${p[k] ? esc(p[k]).replace(/\n/g, "<br />") : `<span style="color:#a9adb4;">—</span>`}</td>
+    <td style="padding:7px 0;vertical-align:top;">${p[k] ? esc(p[k]).replace(/\n/g, "<br />") : `<span style="color:#a9adb4;">-</span>`}</td>
   </tr>`).join("\n")}
   <tr><td style="padding:7px 12px 7px 0;color:${MUTED};vertical-align:top;">Received</td>
       <td style="padding:7px 0;">${esc(p.receivedAt)}</td></tr>
 </table>`, footer("internal", p)),
     text: (p = {}) => `New enquiry from the dShield site
 
-${FIELDS.map(([k, label]) => `${(label + ":").padEnd(16)}${p[k] || "—"}`).join("\n")}
+${FIELDS.map(([k, label]) => `${(label + ":").padEnd(16)}${p[k] || "-"}`).join("\n")}
 ${"Received:".padEnd(16)}${p.receivedAt}
 
 --
@@ -241,9 +241,9 @@ ${footerText("internal", p)}`,
 };
 
 
-/* ── 5 · paid_report — TRANSACTIONAL ─────────────────────────────────── */
+/* ── 5 · paid_report - TRANSACTIONAL ─────────────────────────────────── */
 //
-// THE PAYWALL APPLIES HERE TOO. Grade, counts and the link — no finding
+// THE PAYWALL APPLIES HERE TOO. Grade, counts and the link - no finding
 // titles, no evidence. An email is forwarded far more often than a page is,
 // so if anything the rule matters more here than on the report itself.
 
@@ -259,7 +259,7 @@ const paid_report = {
 <p style="margin:0 0 18px;">Your report for <strong>${esc(p.domain)}</strong> is ready.</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:8px;">
   <tr><td style="padding:18px 20px;">
-    <div style="font-size:44px;line-height:1;font-weight:bold;color:${GOLD};">${esc(p.grade || "—")}</div>
+    <div style="font-size:44px;line-height:1;font-weight:bold;color:${GOLD};">${esc(p.grade || "-")}</div>
     <div style="color:${MUTED};font-size:13px;margin-top:4px;">${esc(p.score)} out of 100</div>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:14px;border-top:1px solid ${LINE};">
       ${row("Critical", c.critical ?? 0, "#c0392b")}
@@ -272,7 +272,7 @@ const paid_report = {
 </table>
 <p style="margin:20px 0 8px;">${btn(url, "Open your report")}</p>
 <p style="margin:16px 0 0;font-size:14px;color:${MUTED};">
-This link is private — anyone holding it can read the report, so treat it as you would the report itself.
+This link is private - anyone holding it can read the report, so treat it as you would the report itself.
 It works until <strong>${esc(p.expiresOn)}</strong>. If it expires, write to us and we will send a fresh one.
 </p>
 <p style="margin:14px 0 0;font-size:13px;color:${MUTED};">Order reference ${esc(p.orderRef)}</p>`,
@@ -282,7 +282,7 @@ It works until <strong>${esc(p.expiresOn)}</strong>. If it expires, write to us 
         const c = p.counts || {};
         return `Your dShield report for ${p.domain}
 
-Grade ${p.grade}  —  ${p.score} out of 100
+Grade ${p.grade} - ${p.score} out of 100
 
   Critical        ${c.critical ?? 0}
   High            ${c.high ?? 0}
@@ -292,7 +292,7 @@ Grade ${p.grade}  —  ${p.score} out of 100
 
 Open your report: ${SITE_URL}/report/${p.reportToken}
 
-This link is private — anyone holding it can read the report, so treat it as
+This link is private - anyone holding it can read the report, so treat it as
 you would the report itself. It works until ${p.expiresOn}. If it expires,
 write to us and we will send a fresh one.
 
@@ -303,7 +303,7 @@ ${footerText("transactional", p)}`;
     },
 };
 
-/* ── 6 · fulfilment_delayed — TRANSACTIONAL ──────────────────────────── */
+/* ── 6 · fulfilment_delayed - TRANSACTIONAL ──────────────────────────── */
 //
 // They have paid and we cannot deliver yet. Silence is the one unacceptable
 // outcome, so this goes out immediately and says a person is involved. It
@@ -314,7 +314,7 @@ const fulfilment_delayed = {
     html: (p = {}) => shell(`
 <p style="margin:0 0 16px;">We have your payment, and we could not finish the assessment of <strong>${esc(p.domain)}</strong>.</p>
 <p style="margin:0 0 16px;">Too few of our checks completed to publish a report we would stand behind. This usually means a firewall stopped the scan partway through, which is your protection working rather than anything wrong on your side.</p>
-<p style="margin:0 0 16px;">We would rather tell you this than send you a number built on checks that did not run. Somebody here has already been alerted and will be in touch — you do not need to do anything.</p>
+<p style="margin:0 0 16px;">We would rather tell you this than send you a number built on checks that did not run. Somebody here has already been alerted and will be in touch - you do not need to do anything.</p>
 <p style="margin:0;font-size:13px;color:${MUTED};">Order reference ${esc(p.orderRef)}</p>`,
         footer("transactional", p)),
     text: (p = {}) => `We could not complete your dShield report for ${p.domain}
@@ -326,7 +326,7 @@ This usually means a firewall stopped the scan partway through, which is your
 protection working rather than anything wrong on your side.
 
 We would rather tell you this than send you a number built on checks that did
-not run. Somebody here has already been alerted and will be in touch — you do
+not run. Somebody here has already been alerted and will be in touch - you do
 not need to do anything.
 
 Order reference ${p.orderRef}
@@ -335,32 +335,32 @@ Order reference ${p.orderRef}
 ${footerText("transactional", p)}`,
 };
 
-/* ── 7 · fulfilment_failed — INTERNAL ────────────────────────────────── */
+/* ── 7 · fulfilment_failed - INTERNAL ────────────────────────────────── */
 //
 // A paid order that could not be delivered. This is the alert that means a
 // person finds out before the customer does.
 
 const fulfilment_failed = {
-    subject: (p = {}) => `Fulfilment failed — ${p.orderRef || "unknown order"}`,
+    subject: (p = {}) => `Fulfilment failed - ${p.orderRef || "unknown order"}`,
     html: (p = {}) => shell(`
 <p style="margin:0 0 16px;font-size:16px;"><strong>A paid order was not delivered</strong></p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
 ${[["orderRef", "Order"], ["tier", "Tier"], ["domain", "Domain"], ["email", "Customer"], ["amountInr", "Amount (INR)"], ["error", "Error"]]
     .map(([k, label]) => `  <tr>
     <td style="padding:7px 12px 7px 0;color:${MUTED};vertical-align:top;white-space:nowrap;">${label}</td>
-    <td style="padding:7px 0;vertical-align:top;">${p[k] ? esc(p[k]) : `<span style="color:#a9adb4;">—</span>`}</td>
+    <td style="padding:7px 0;vertical-align:top;">${p[k] ? esc(p[k]) : `<span style="color:#a9adb4;">-</span>`}</td>
   </tr>`).join("")}
 </table>
 <p style="margin:18px 0 0;color:${MUTED};font-size:13px;">The customer has paid. Until somebody acts on this, they have money with us and nothing to show for it.</p>`,
         footer("internal", p)),
     text: (p = {}) => `A paid order was not delivered
 
-Order    : ${p.orderRef || "—"}
-Tier     : ${p.tier || "—"}
-Domain   : ${p.domain || "—"}
-Customer : ${p.email || "—"}
-Amount   : INR ${p.amountInr ?? "—"}
-Error    : ${p.error || "—"}
+Order    : ${p.orderRef || "-"}
+Tier     : ${p.tier || "-"}
+Domain   : ${p.domain || "-"}
+Customer : ${p.email || "-"}
+Amount   : INR ${p.amountInr ?? "-"}
+Error    : ${p.error || "-"}
 
 The customer has paid. Until somebody acts on this, they have money with us
 and nothing to show for it.

@@ -1,4 +1,4 @@
-# Claude Code — dShield Site · Task 08
+# Claude Code - dShield Site · Task 08
 ## The arcade theme
 
 **Repo:** `dolluzcorp01/dShield_site` · branch `main`
@@ -14,7 +14,7 @@
 
 **This task changes appearance only.** Not one line of behaviour, scoring,
 pricing, paywall or email. If you find yourself editing a route or a check,
-stop — you have gone outside the task.
+stop - you have gone outside the task.
 
 ---
 
@@ -22,7 +22,7 @@ stop — you have gone outside the task.
 
 The site currently uses near-black and gold. Shoban has reviewed the frozen
 v5.9 design and confirmed **the arcade theme is the direction for all dShield
-applications** — this site, the customer portal, the employee portal and the
+applications** - this site, the customer portal, the employee portal and the
 console.
 
 In Task 02 I instructed that only the *copy* be ported from the frozen file and
@@ -53,7 +53,7 @@ body      #B9AEDC    body copy
 faint     #6E6193    metadata
 ```
 
-Note this is **purple-black, not neutral black** — `#0B0316` has a violet cast
+Note this is **purple-black, not neutral black** - `#0B0316` has a violet cast
 and the whole palette depends on it. A neutral `#0A0A0A` kills the effect.
 
 ### Typography
@@ -67,7 +67,7 @@ mono      'JetBrains Mono'    metadata, tickers, check IDs
 All three are on Google Fonts. Load them in `public/index.html` with the
 existing `<link>` pattern, replacing Inter and IBM Plex Mono.
 
-**Orbitron has no lowercase to speak of** — it is a display face. Use it for
+**Orbitron has no lowercase to speak of** - it is a display face. Use it for
 headings and short labels only. A paragraph set in Orbitron is unreadable, and
 the frozen file never does it.
 
@@ -95,7 +95,7 @@ design language, not every flourish.
 
 **1 · The colour and type system**, as CSS variables in `src/index.css`.
 Everything else follows from this. Do this first and check the site before
-going further — a large part of the change lands from this alone.
+going further - a large part of the change lands from this alone.
 
 **2 · The top ticker.** A thin scrolling marquee above the header:
 `58 CHECKS · NO SIGN-UP · NO CARD · 23 RISK AREAS · 5 VISIBLE FROM OUTSIDE`.
@@ -105,7 +105,7 @@ The `marq` keyframe in the frozen file. Pause it on hover, and honour
 **3 · Chunky bordered cards.** 2px borders in `edge`, larger radius, a lime
 glow on hover. This is most of the arcade feel.
 
-**4 · The pricing bars** — the strongest idea in the design. Every tier shows
+**4 · The pricing bars** - the strongest idea in the design. Every tier shows
 the same 23-segment bar with a different number filled:
 
 | Tier | Filled |
@@ -118,18 +118,18 @@ the same 23-segment bar with a different number filled:
 
 Seeing five identical bars with different fills makes the tier difference
 obvious in a way a feature list never does. **Check these numbers against
-`src/data/plans.js` and use what is there** — if the data disagrees with this
+`src/data/plans.js` and use what is there** - if the data disagrees with this
 table, the data wins and you should say so in your report.
 
 **5 · Scanlines and glow.** A subtle CRT scanline overlay on dark sections, and
-a soft lime glow on primary buttons. Keep it restrained — this reads as
+a soft lime glow on primary buttons. Keep it restrained - this reads as
 premium at 8% opacity and as a novelty at 30%.
 
 ### Do not port these
 
 **Bolt, the robot mascot.** He is 200 lines of SVG with eye-tracking, four
 moods and a typed script. He would need his own task, and he is a bigger
-commitment than a repaint — a mascot is a brand decision, not a theme.
+commitment than a repaint - a mascot is a brand decision, not a theme.
 
 Leave a comment in `Home.js` noting where he would sit if Shoban wants him
 later.
@@ -144,7 +144,7 @@ every section for a fade. Not worth the complexity. Static is fine.
 
 ## What to build
 
-### 1 · `src/index.css` — the system
+### 1 · `src/index.css` - the system
 
 Replace the variable block. **Keep every existing variable name.** `--gold`
 becomes `#C6FF3D`, `--ink` becomes `#0B0316`, and so on. Every component
@@ -162,7 +162,7 @@ and the hover lift.
 Swap the font links for Orbitron, Chakra Petch and JetBrains Mono. Update
 `theme-color` to `#0B0316`.
 
-Regenerate `og-image.png` in the new palette — the current one is gold on black
+Regenerate `og-image.png` in the new palette - the current one is gold on black
 and would be the only place the old theme survives, which is exactly where it
 would be noticed.
 
@@ -170,27 +170,27 @@ would be noticed.
 
 Most pages inherit from the variables. These need real attention:
 
-**`Navbar.js`** — the ticker above the header, Orbitron wordmark. Keep every
+**`Navbar.js`** - the ticker above the header, Orbitron wordmark. Keep every
 existing link and the mobile burger behaviour exactly as it is.
 
-**`Home.js`** — the hero headline in Orbitron, the scan box with a lime glow,
+**`Home.js`** - the hero headline in Orbitron, the scan box with a lime glow,
 the five promise cards in the arcade style.
 
-**`Result.js`** — the grade card, the counts row and the 23-domain coverage map
+**`Result.js`** - the grade card, the counts row and the 23-domain coverage map
 are the most-seen screens on the site. The coverage grid in particular should
 use the lime border for measured and stay dimmed for the rest, as it does now.
 
-**`Pricing.js`** — the 23-segment bars, "Most chosen" in magenta.
+**`Pricing.js`** - the 23-segment bars, "Most chosen" in magenta.
 
-**`Report.js`** — the paid report. **Print styles must stay readable**: white
+**`Report.js`** - the paid report. **Print styles must stay readable**: white
 background, dark text. A customer printing a neon-on-black report gets an
 unreadable page and a large ink bill.
 
-**`Legal.js` and `Pages.js`** — mostly inherited. Check that long-form text is
+**`Legal.js` and `Pages.js`** - mostly inherited. Check that long-form text is
 still comfortable to read; `#B9AEDC` on `#0B0316` is lower contrast than the
 current combination.
 
-### 4 · The PDF is separate — decide and say which
+### 4 · The PDF is separate - decide and say which
 
 `src/utils/pdf-template.js` renders a document people print and file.
 
@@ -198,17 +198,17 @@ current combination.
 near-black background is unprintable and looks wrong in a board pack. Adopt the
 new *accent* colours for severity pills and headings on a white page.
 
-If you disagree, say so and explain — do not silently convert it.
+If you disagree, say so and explain - do not silently convert it.
 
 ---
 
-## Accessibility — check this, do not assume
+## Accessibility - check this, do not assume
 
 Lime `#C6FF3D` on void `#0B0316` is a very high contrast ratio and passes
 easily. Two combinations are the risk:
 
-- **Lime text on lime-tinted surfaces** — check any button or badge
-- **`faint` `#6E6193` on `void`** — measure it. If it is below 4.5:1 for body
+- **Lime text on lime-tinted surfaces** - check any button or badge
+- **`faint` `#6E6193` on `void`** - measure it. If it is below 4.5:1 for body
   text, lighten it rather than shipping it. It is used for metadata across the
   whole site.
 
@@ -220,24 +220,24 @@ anything fails, fix it and say what you changed.
 ## Verification
 
 ```bash
-# 1 — build
+# 1 - build
 npx react-scripts build
 
-# 2 — boot
+# 2 - boot
 node server.js &
 curl -s localhost:4008/api/health
 
-# 3 — NOTHING FUNCTIONAL CHANGED
+# 3 - NOTHING FUNCTIONAL CHANGED
 curl -s -X POST localhost:4008/api/scan \
      -H "Content-Type: application/json" \
      -d '{"domain":"github.com"}'
 
-# 4 — both verify scripts
+# 4 - both verify scripts
 node scripts/verify-checks.js
 node scripts/verify-remediation.js
 ```
 
-Step 3 must be identical to before this task — same grade, same counts, same
+Step 3 must be identical to before this task - same grade, same counts, same
 keys. A theme change that alters a scan result means something outside the
 theme was touched.
 
@@ -256,7 +256,7 @@ Report which pages you actually viewed and which you did not.
 - No file under `src/backend_routes/`, `src/utils/checks/`, `src/data/` or
   `db/` appears in the diff
 - `git diff package.json` is empty
-- The severity colours still map to the same severities — a critical finding
+- The severity colours still map to the same severities - a critical finding
   must not become the same colour as a pass
 
 ---
@@ -267,7 +267,7 @@ Report which pages you actually viewed and which you did not.
 2. The measured contrast ratios, and anything you changed to pass
 3. Which pages you viewed, honestly
 4. Whether you kept the PDF light, and why
-5. Anything that looks wrong in the new theme that the old one hid — long text
+5. Anything that looks wrong in the new theme that the old one hid - long text
    blocks and dense tables are the likeliest
 6. Anything wrong or conflicting in these instructions. Tasks 01, 02, 05a, 05c
    and 07 each found genuine errors in theirs.

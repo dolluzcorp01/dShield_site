@@ -16,7 +16,7 @@ const app = express();
 // Same convention as the sibling dApps: dAdmin 4002, dShield 4008.
 const port = 4008;
 
-// ✅ CORS — explicit allowlist in production; in development also allow any
+// ✅ CORS - explicit allowlist in production; in development also allow any
 // localhost / 127.0.0.1 port so the React dev server on 3000 isn't blocked.
 const isProd = process.env.NODE_ENV === "production";
 
@@ -48,7 +48,7 @@ app.use(cors({
 
    Razorpay signs the exact body it sent. express.json() would parse it, and
    anything we then re-stringify differs by key order and whitespace, so the
-   HMAC never matches — and the failure looks exactly like a wrong secret,
+   HMAC never matches - and the failure looks exactly like a wrong secret,
    which is a genuinely miserable afternoon.
 
    Scoped to this one path, so every other route still gets parsed JSON. */
@@ -71,7 +71,7 @@ const LeadRoutes = require('./src/backend_routes/Lead_server');
 
 // Legal_server exports three routers rather than one. They share a file
 // because they share the suppression and document helpers, but they mount at
-// three unrelated paths — folding them into one router would mean writing
+// three unrelated paths - folding them into one router would mean writing
 // the mount point into each route string.
 const { legalRouter, preferencesRouter, dataRequestRouter } = require('./src/backend_routes/Legal_server');
 
@@ -92,7 +92,7 @@ app.use("/api/reports", ReportRoutes);
 const SitemapRoutes = require('./src/backend_routes/Sitemap_server');
 app.use("/sitemap.xml", SitemapRoutes);
 
-// Health check — used by the deploy script and by uptime monitoring.
+// Health check - used by the deploy script and by uptime monitoring.
 app.get("/api/health", (req, res) => {
     res.json({ ok: true, app: "dshield-global", time: new Date().toISOString() });
 });
@@ -103,8 +103,8 @@ app.get("/api/health", (req, res) => {
  * reaches here matched no router, so it is a genuine unknown endpoint.
  *
  * Without it, Express's default handler replies with an HTML error page.
- * utils/api.js calls res.json() on every response, so a typo in a path — or
- * a route that was removed while the frontend still calls it — surfaced to
+ * utils/api.js calls res.json() on every response, so a typo in a path - or
+ * a route that was removed while the frontend still calls it - surfaced to
  * the visitor as "Unexpected response from the server" instead of anything
  * that says what happened, and to us as nothing at all.
  *
@@ -130,7 +130,7 @@ if (isProd) {
     /* SPA fallback, with an honest status code.
      *
      * Previously every path returned 200 and let React render NotFound. To a
-     * person that looks right; to a crawler it is a "soft 404" — the server
+     * person that looks right; to a crawler it is a "soft 404" - the server
      * said the page exists and is healthy, so every typo and every stale link
      * anyone ever posts becomes an indexed page, diluting the ranking of the
      * pages that matter.
@@ -140,7 +140,7 @@ if (isProd) {
      * error. The difference is invisible to a person and decisive for a
      * crawler.
      *
-     * Known paths live in src/utils/routes.js — add new routes there as well
+     * Known paths live in src/utils/routes.js - add new routes there as well
      * as in src/App.js. */
     app.get(/^\/(?!api\/).*/, (req, res) => {
         const status = isKnownRoute(req.path) ? 200 : 404;
@@ -154,7 +154,7 @@ if (isProd) {
  * instance. Under PM2 cluster mode four processes would each poll
  * mail_outbox on the same schedule and every message would go out four
  * times. If that day comes the fix is a lock or one dedicated worker
- * process — not a shorter interval. See the header of
+ * process - not a shorter interval. See the header of
  * src/workers/mail-worker.js. */
 if (String(process.env.MAIL_WORKER_ENABLED || "").toLowerCase() === "true") {
     const { startMailWorker } = require("./src/workers/mail-worker");
@@ -171,7 +171,7 @@ app.listen(port, () => {
      *
      * Printed after the port line so it cannot be scrolled past by whatever
      * boots next, and inside the listen callback so it appears only once the
-     * server is actually up — a warning about a webhook secret is noise if
+     * server is actually up - a warning about a webhook secret is noise if
      * the port was already taken.
      *
      * It exits only for a signing secret left at a placeholder, and this app

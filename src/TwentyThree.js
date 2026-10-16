@@ -9,12 +9,12 @@ import "./TwentyThree.css";
 const SEEN_COUNT = SEEN_DOMAINS.length;
 
 /* ─────────────────────────────────────────────────────────────────────────
-   THE 23 — the tile grid, ported from the frozen prototype's section of the
+   THE 23 - the tile grid, ported from the frozen prototype's section of the
    same name (line 1183 of 01-customer-website-v5.9-FROZEN.jsx).
 
    THE PROTOTYPE HAS TWO TILE STATES. THIS HAS THREE, AND HAS TO.
 
-   There, a tile is either lit — a hardcoded score of 62, 78, 41, 94 or 10 —
+   There, a tile is either lit - a hardcoded score of 62, 78, 41, 94 or 10 -
    or dark, meaning "we need to look inside". Two states, because with
    LIVE_API = false there was never a real scan to disagree with them.
 
@@ -32,7 +32,7 @@ const SEEN_COUNT = SEEN_DOMAINS.length;
    aborted scan once reported grade A, score 100 and zero findings.
 
    With two states that tile falls dark, and dark says "connect a system or
-   answer questions". That is the wrong sentence. Nothing needs connecting —
+   answer questions". That is the wrong sentence. Nothing needs connecting -
    a public source was unreachable for ninety seconds. Telling a customer to
    buy a tier to see something a retry would have shown is a small lie that
    the whole product is arranged against.
@@ -43,11 +43,11 @@ const SEEN_COUNT = SEEN_DOMAINS.length;
 
 /* Which of the three a tile is in.
 
-   `scanned` comes from coverageMap — the engine's own list of what this tier
+   `scanned` comes from coverageMap - the engine's own list of what this tier
    attempts. A domain it attempted but produced no score for was attempted
    and failed, and that is the distinction the third state carries. */
 function tileState(d, result, measuring) {
-    /* Mid-scan. The engine has reached this area and has not finished it —
+    /* Mid-scan. The engine has reached this area and has not finished it -
        a real state from a real progress event, not a timer.
 
        IT SHOWS NO NUMBER. We do not have one yet, and a placeholder score
@@ -129,19 +129,19 @@ function Detail({ d, state, result }) {
                 <h3 className="t23d__title">{d.name}</h3>
                 <p className="t23d__found">
                     {n === 0
-                        ? `Scored ${scored.score} — nothing failed here.`
+                        ? `Scored ${scored.score} - nothing failed here.`
                         : `Scored ${scored.score} · ${n} problem${n > 1 ? "s" : ""} found.`}
                 </p>
                 {n > 0 && (
                     /* Severity and count, never a title. issueSummary carries
-                       domain and severity only — the paywall is server-side
+                       domain and severity only - the paywall is server-side
                        and this panel must not become the place it leaks. */
                     <p className="ds-muted t23d__sub">
                         {(result.issueSummary || [])
                             .filter((i) => i.domain === d.n)
                             .map((i) => i.severity)
                             .join(" · ")}
-                        {" — the free check counts them. Naming them is the Basic report."}
+                        {" - the free check counts them. Naming them is the Basic report."}
                     </p>
                 )}
             </div>
@@ -166,7 +166,7 @@ function Detail({ d, state, result }) {
                         ))}
                     </ul>
                 )}
-                {/* No upsell here. Nothing about this needs buying — the
+                {/* No upsell here. Nothing about this needs buying - the
                     source was unreachable, and a retry is the honest offer. */}
                 <p className="ds-muted t23d__sub">
                     It is left out of the grade entirely rather than counted as a pass.
@@ -195,7 +195,7 @@ function Detail({ d, state, result }) {
 
 /**
  * @param result  a completed scan response, or null before one has run.
- *                Pass null and the grid renders its idle state — every tile
+ *                Pass null and the grid renders its idle state - every tile
  *                dim with a "?", which is what the home page shows before
  *                anybody has typed a domain.
  */
@@ -243,7 +243,7 @@ function TwentyThree({ result, measuring }) {
             {!result && (
                 <p className="ds-muted t23s__foot">
                     A free check scores five of these. The grid shows all twenty-three, including
-                    the eighteen it cannot reach — <Link to="/coverage">what the other eighteen cover</Link>.
+                    the eighteen it cannot reach - <Link to="/coverage">what the other eighteen cover</Link>.
                 </p>
             )}
         </section>

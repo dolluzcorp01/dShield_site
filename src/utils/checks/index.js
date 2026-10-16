@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  The check catalogue — 58 checks across five files.
+//  The check catalogue - 58 checks across five files.
 //
 //    surface.js  13   external attack surface, content, DNS
 //    http.js     15   headers and cookies, from one shared homepage fetch
@@ -20,8 +20,8 @@
 //      DNSKEY at all and the source's approach never worked (surface.js)
 //
 //  The eight free-tier checks keep the bodies this repo already had, so the
-//  free scan's output is unchanged by the port. Where a v6.3 body differed —
-//  SURF-GIT-04's match pattern, BRAND-TYPO-59's data source — the existing
+//  free scan's output is unchanged by the port. Where a v6.3 body differed -
+//  SURF-GIT-04's match pattern, BRAND-TYPO-59's data source - the existing
 //  one won.
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -48,7 +48,7 @@ if (duplicates.length) {
 }
 
 /* Tier rank. A higher tier runs everything the lower tiers run PLUS its own,
-   never a different set — a tier that is not a superset of the one below is a
+   never a different set - a tier that is not a superset of the one below is a
    customer paying more and receiving less. Enforced by scripts/verify-checks.js. */
 const TIER_RANK = { snapshot: 0, basic: 1, advanced: 2, full_protection: 3 };
 
@@ -62,7 +62,7 @@ function checksForTier(tier = "snapshot") {
    Cheap and quiet first, speculative path probing last.
 
    If a target's firewall decides it has seen enough of us, it does so partway
-   through — so whatever ran first is what we still have. Ordering by noise
+   through - so whatever ran first is what we still have. Ordering by noise
    means a blocked scan still carries its DNS, certificate and header results
    rather than losing everything.
 
@@ -77,7 +77,7 @@ const PATH_PROBING = new Set([
 ]);
 
 /* Which other hosts a check talks to. Pacing meant for the customer's server
-   must not slow down crt.sh or a breach API — they are different hosts and
+   must not slow down crt.sh or a breach API - they are different hosts and
    the governor already keeps them separate, but these also need not be
    throttled to two at a time. */
 const OFF_TARGET = new Set([

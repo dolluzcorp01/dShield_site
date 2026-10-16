@@ -3,28 +3,28 @@ import { usePrefersReducedMotion } from "./Motion";
 import "./Bolt.css";
 
 /* ─────────────────────────────────────────────────────────────────────────
-   Bolt — the guide.
+   Bolt - the guide.
 
    Ported from the frozen v5.9 prototype. The design note there is the test
    for any future change to him, so it is repeated here:
 
-     Every line he says is doing a job — telling you what to do next. He is
+     Every line he says is doing a job - telling you what to do next. He is
      navigation wearing a costume, not decoration.
 
    A mascot that says "Hi, I'm Bolt!" has failed. One that says
    "← PSST. DROP YOUR SITE IN HERE" is a signpost.
 
    He is stateless. Mood and pointer position come in as props; he owns
-   nothing. Colours come from the CSS variables in index.css via Bolt.css —
+   nothing. Colours come from the CSS variables in index.css via Bolt.css -
    there is deliberately no palette object in this file.
    ───────────────────────────────────────────────────────────────────────── */
 
 /* The reduced-motion hook used to live here. It moved to Motion.js when the
-   tile grid needed it too — Count and Reveal are guarded by the same setting,
+   tile grid needed it too - Count and Reveal are guarded by the same setting,
    and a second copy of it is a second thing to forget to update. */
 
 /* ─────────────────────────────────────────────────────────────────────────
-   Type — the typewriter.
+   Type - the typewriter.
 
    His lines are typed rather than printed because that is what makes a line
    read as spoken. Under reduced motion the whole line is shown at once: the
@@ -57,7 +57,7 @@ export function Type({ text, speed = 26 }) {
 
    BOLT STANDS TO THE RIGHT OF THE INPUT BOX, SO HIS LEFT ARM IS THE ONE
    THAT POINTS AT IT. In the prototype, pointing with the right arm aimed
-   him at a button on the far edge of the screen — the exact opposite of the
+   him at a button on the far edge of the screen - the exact opposite of the
    instruction he was giving.
 
    If he is ever moved to the left of the box on some other layout, mirror
@@ -135,7 +135,7 @@ function Bolt({ mood = "greet", look = { x: 0, y: 0 } }) {
             <circle className="bolt__cyan bolt__core" cx="100" cy="152" r="6.5" filter={`url(#${glow})`} />
             <rect className="bolt__magenta" x="80" y="174" width="40" height="4" rx="2" opacity=".55" />
 
-            {/* LEFT ARM — the one that points, because the box is to his left */}
+            {/* LEFT ARM - the one that points, because the box is to his left */}
             <g className="bolt__arm-l"
                style={{ transformOrigin: "68px 136px", transform: `rotate(${armAngle}deg)` }}>
                 <rect className="bolt__metal" x="36" y="132" width="32" height="9" rx="4.5" strokeWidth="1.8" />
@@ -144,7 +144,7 @@ function Bolt({ mood = "greet", look = { x: 0, y: 0 } }) {
                 <rect className="bolt__lime" x="19" y="134" width="9" height="5" rx="2.5" />
             </g>
 
-            {/* right arm — idle, and mirrors upward when he gets excited */}
+            {/* right arm - idle, and mirrors upward when he gets excited */}
             <g className="bolt__arm-r"
                style={{
                    transformOrigin: "132px 136px",

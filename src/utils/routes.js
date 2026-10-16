@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  routes — the single list of paths this site actually serves.
+//  routes - the single list of paths this site actually serves.
 //
 //  Used by two things that must agree:
 //    server.js            to answer 404 for anything not listed, instead of
@@ -10,14 +10,14 @@
 //
 //  Two lists that must agree eventually disagree. The failure is quiet and
 //  nasty in this direction: a new route missing from here still renders
-//  perfectly for a human, because index.html is served either way — it just
+//  perfectly for a human, because index.html is served either way - it just
 //  carries a 404 status, so crawlers drop it and nobody notices for months.
 //
 //  CommonJS on purpose: server.js requires this at boot, and the frontend
 //  does not import it. Same convention as scan_engine.js.
 // ─────────────────────────────────────────────────────────────────────────
 
-// Exact paths. /data-request is here — it must serve normally — but it is
+// Exact paths. /data-request is here - it must serve normally - but it is
 // excluded from the sitemap and carries noindex, because it is a personal
 // form and has no business in a search result.
 const EXACT_ROUTES = [
@@ -35,7 +35,7 @@ const EXACT_ROUTES = [
 ];
 
 // Paths whose children are valid: /tools/ssl, /legal/privacy, /result/<uuid>,
-// /preferences/<token>. The trailing slash is required — "/tools" is matched
+// /preferences/<token>. The trailing slash is required - "/tools" is matched
 // exactly above, and without it "/toolsomething" would match too.
 const PREFIX_ROUTES = ["/tools/", "/legal/", "/result/", "/preferences/", "/order/", "/report/"];
 
@@ -56,7 +56,7 @@ function isKnownRoute(pathname) {
  * is a separate front door for somebody searching a specific question, and
  * the scan converts them once they are here.
  *
- * /result, /preferences and /data-request are absent by design — they mirror
+ * /result, /preferences and /data-request are absent by design - they mirror
  * the Disallow lines in robots.txt and the noindex tags in the app.
  */
 const SITEMAP_ROUTES = [

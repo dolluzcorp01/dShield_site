@@ -13,7 +13,7 @@
 .checkout__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
 .checkout__list li { padding-left: 20px; position: relative; color: var(--bone-dim); font-size: .93rem; line-height: 1.5; }
 .checkout__list li::before { content: "✓"; position: absolute; left: 0; color: var(--pass); }
-.checkout__list--no li::before { content: "—"; color: var(--bone-faint); }
+.checkout__list--no li::before { content: "-"; color: var(--bone-faint); }
 
 .checkout__total {
     display: flex; justify-content: space-between; align-items: baseline;

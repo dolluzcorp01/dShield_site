@@ -1,10 +1,10 @@
 // ─────────────────────────────────────────────────────────────────────────
-//  suppression — the one place that knows how a suppressed address is
+//  suppression - the one place that knows how a suppressed address is
 //  recognised.
 //
 //  This exists so there is exactly ONE definition of the hash and ONE
-//  definition of the lookup. Three routers ask the same question — Lead,
-//  Legal and Scan — and if each carried its own copy, a change to the
+//  definition of the lookup. Three routers ask the same question - Lead,
+//  Legal and Scan - and if each carried its own copy, a change to the
 //  hashing (a trim, a case fold, a different algorithm) would silently stop
 //  matching rows written by the others. A suppression list that fails to
 //  match is indistinguishable from an empty one: everybody who unsubscribed
@@ -16,7 +16,7 @@
 
 const crypto = require("crypto");
 
-/** SHA-256 of the lowercased, trimmed address — the only form we ever store. */
+/** SHA-256 of the lowercased, trimmed address - the only form we ever store. */
 function emailHash(email) {
     return crypto.createHash("sha256").update(String(email).trim().toLowerCase()).digest("hex");
 }
@@ -24,7 +24,7 @@ function emailHash(email) {
 /**
  * Has this address asked us to stop?
  *
- * Callback style, matching the rest of the backend — `db.query` here is
+ * Callback style, matching the rest of the backend - `db.query` here is
  * callback-based and this deliberately does not introduce a promise layer
  * over it.
  *

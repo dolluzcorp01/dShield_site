@@ -11,14 +11,14 @@ import { useDocumentMeta } from "./utils/meta";
    such field and is out of scope for a theme change. It is presentation:
    the same figures the copy already states, drawn instead of written.
 
-   The five and the twenty-three are checkable — ALL_DOMAINS in
+   The five and the twenty-three are checkable - ALL_DOMAINS in
    scan_engine.js is 23 entries with 5 marked scanned. The 8 is five scanned
    plus the three systems Advanced connects.
 
    ⚠️  THE 21 FOR FULL PROTECTION DISAGREES WITH plans.js. Its feature list
    says "Covers the 18 domains no scan can reach", which with the five
    scanned makes 23, not 21. The frozen v5.9 design says 21 and so does the
-   task, so 21 is what is drawn — but one of the two is wrong and somebody
+   task, so 21 is what is drawn - but one of the two is wrong and somebody
    who knows the answer needs to settle it. Flagged in the task report.
    ───────────────────────────────────────────────────────────────────────── */
 const COVERS = {
@@ -63,7 +63,7 @@ function CoverageBar({ covers, tone }) {
 
 function Pricing() {
     useDocumentMeta({
-        title: "Pricing — Security Assessment Reports | dShield",
+        title: "Pricing - Security Assessment Reports | dShield",
         description: "From a free grade to full remediation. See what each level covers, what a report contains, and where the free scan stops.",
         canonical: "/pricing",
     });
@@ -89,7 +89,7 @@ function Pricing() {
 
     /* Split on price, not on `available`. When Basic goes on sale it belongs
        in the paid row with a working checkout button, not promoted up into
-       the free band — which is what splitting on availability would do. */
+       the free band - which is what splitting on availability would do. */
     const free = plans.find((p) => p.price === 0);
     const paid = plans.filter((p) => p.price > 0);
 
@@ -126,7 +126,7 @@ function Pricing() {
             ) : (
                 <>
                 {/* The free scan sits above the paid row rather than inside it.
-                    It is not a fifth option competing with the other four — it
+                    It is not a fifth option competing with the other four - it
                     is the thing everybody starts with, and putting it in the
                     grid squeezed the four paid tiers onto two lines. */}
                 {free && (
@@ -256,7 +256,7 @@ function Pricing() {
                     <h3>Why is the scan free?</h3>
                     <p className="ds-muted">
                         Because it costs us almost nothing to run. It reads what your servers already
-                        publish to anyone who asks — no third-party service, no per-scan fee. We would
+                        publish to anyone who asks - no third-party service, no per-scan fee. We would
                         rather you saw the quality of the work before deciding whether to pay for more of it.
                     </p>
                 </div>

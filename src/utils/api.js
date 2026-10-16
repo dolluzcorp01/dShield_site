@@ -27,7 +27,7 @@ export async function apiGet(endpoint) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   apiStream — POST that reads Server-Sent Events back.
+   apiStream - POST that reads Server-Sent Events back.
 
    NOT EventSource. That only speaks GET, and a GET that runs a scan would be
    something a crawler or a link prefetcher could fire: every preview bot
@@ -43,7 +43,7 @@ export async function apiGet(endpoint) {
    onEvent entirely and await the result.
 
    Falls back to a plain JSON POST when the browser has no ReadableStream, or
-   when the server answered with JSON anyway — which is what happens behind a
+   when the server answered with JSON anyway - which is what happens behind a
    proxy that buffers the whole response. Same object either way.
    ───────────────────────────────────────────────────────────────────────── */
 export async function apiStream(endpoint, body, onEvent) {
